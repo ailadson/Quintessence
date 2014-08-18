@@ -8,7 +8,7 @@ Ether.Ether = function(engine) {
 
 	//stats
 	this.range = 30;
-	this.mass = 10;
+	this.mass = 5;
 }
 
 Ether.Ether.prototype.getStability = function(){
@@ -40,6 +40,17 @@ Ether.Ether.prototype.getElementCount = function(){
 	return { f : f, w: w, a: a, e: e}
 }
 
+Ether.Ether.prototype.newElement = function(e){
+	this.increaseMass();
+	e.xOffset = e.x - this.x; 
+	e.yOffset = e.y - this.y;
+	this.elements.push(e);
+}
+
+Ether.Ether.prototype.looseElement = function(){
+
+}
+
 Ether.Ether.prototype.init = function(){
 	for(var i=0;i<this.mass;i++){
 		var element = new Ether.Element('core');
@@ -63,6 +74,33 @@ Ether.Ether.prototype.decreaseMass = function(){
 Ether.Ether.prototype.draw = function(engine){
 	engine.ctx.globalCompositeOperation = "lighter";
 
+	this.drawCoreElements(engine);
+	this.drawElements(engine);
+}
+
+Ether.Ether.prototype.drawElements = function(engine){
+	for (var i = 0; i < this.elements.length; i++) {
+		var e = this.elements[i];
+
+		var x = this.x + e.xOffset;
+		var y = this.y + e.yOffset;
+
+
+		engine.ctx.beginPath();
+
+		var gradient = engine.ctx.createRadialGradient(x,y,0,x,y,e.radius);
+		gradient.addColorStop(0.1,"white");
+		gradient.addColorStop(0.1,"white");
+		gradient.addColorStop(0.8,e.color);
+		gradient.addColorStop(0.1,"black");
+
+		engine.ctx.fillStyle = gradient;
+		engine.ctx.arc(x,y,e.radius,Math.PI*2,false);
+		engine.ctx.fill();
+	};
+}
+
+Ether.Ether.prototype.drawCoreElements = function(engine){
 	for (var i = 0; i < this.coreElements.length; i++) {
 		var e = this.coreElements[i];
 
@@ -86,7 +124,7 @@ Ether.Ether.prototype.draw = function(engine){
 		//maintain center
 		switch(e.type){
 			case 'core':
-				if(this.getDistanceFromCenter(e) > this.range){ 
+				if(this.getDistanceFromCenter(e) > this.range/2){ 
 					e.x = this.x
 					e.y = this.y
 					//velocity
