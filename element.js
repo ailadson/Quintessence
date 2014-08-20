@@ -58,4 +58,7 @@ Ether.Element = function(type,size){
 	this.x;
 	this.y;
 
+	//jitter
+	this.jitter = -1;
+
 }

@@ -10,6 +10,7 @@ Ether.Ether = function(engine) {
 	//stats
 	this.range = 30;
 	this.mass = 5;
+	this.age = 0;
 }
 
 Ether.Ether.prototype.init = function(){
@@ -32,8 +33,9 @@ Ether.Ether.prototype.drawElements = function(engine){
 		var e = this.elements[i];
 
 		//update the x and y position
-		e.x = this.x + e.xOffset;
+		e.x = this.x + e.xOffset + (e.jitter * (this.getStability()/10));
 		e.y = this.y + e.yOffset;
+		e.jitter *= -1;
 
 		engine.ctx.beginPath();
 
@@ -87,10 +89,19 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 Ether.Ether.prototype.drawElement = function(element,ctx,gradFunc){
 	var gradient = gradFunc(ctx,element);
 
+	/*switch(){
+		case 0 : //pulsating (color)
+		case 1 : // pulsting (size)
+		case 2 : //orbiting
+		//case 3 : ??
+
+	}*/
+
 	ctx.fillStyle = gradient;
 	ctx.arc(element.x,element.y,element.radius,Math.PI*2,false);
 	ctx.fill();
 }
+
 
 Ether.Ether.prototype.getDistanceFromCenter = function(e){
 	var xDif = e.x - this.x;
@@ -106,22 +117,22 @@ Ether.Ether.prototype.getStability = function(){
 	var dif1 = o.f - o.w;
 	var dif2 = o.a - o.e;
 
-	return Math.sqrt((dif1 * dif1)+(dif2 * dif2));
+	return Math.floor(Math.sqrt((dif1 * dif1)+(dif2 * dif2)));
 }
 
 Ether.Ether.prototype.getElementCount = function(){
 	var f=w=a=e = 0;
 
 	for (var i = 0; i < this.elements.length; i++) {
-		var type = this.elements[i].type;
-		switch(type){
-			case 'fire': f++;
+		var ele = this.elements[i];
+		switch(ele.type){
+			case 'fire': f += Math.round((ele.radius/5));
 				break;
-			case 'water': w++;
+			case 'water': w += Math.round((ele.radius/5));
 				break;
-			case 'air': a++;
+			case 'air': a += Math.round((ele.radius/5));
 				break;
-			case 'earth': e++
+			case 'earth': e += Math.round((ele.radius/5));
 				break;
 		}
 	};
