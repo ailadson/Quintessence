@@ -1,54 +1,15 @@
-var Ether = Ether || {};
-
 Ether.Ether = function(engine) {
+
+	//elements
 	this.coreElements = [];
 	this.elements = [];
+
 	this.x = engine.width/2;
 	this.y = engine.height/2;
 
 	//stats
 	this.range = 30;
 	this.mass = 5;
-}
-
-Ether.Ether.prototype.getStability = function(){
-	var o = this.getElementCount();
-
-	var dif1 = o.f - o.w;
-	var dif2 = o.a - o.e;
-
-	return Math.sqrt((dif1 * dif1)+(dif2 * dif2));
-}
-
-Ether.Ether.prototype.getElementCount = function(){
-	var f =w=a=e = 0;
-
-	for (var i = 0; i < this.elements.length; i++) {
-		var type = this.elements[i].type;
-		switch(type){
-			case 'fire': f++;
-				break;
-			case 'water': w++;
-				break;
-			case 'air': a++;
-				break;
-			case 'earth': e++
-				break;
-		}
-	};
-
-	return { f : f, w: w, a: a, e: e}
-}
-
-Ether.Ether.prototype.newElement = function(e){
-	this.increaseMass();
-	e.xOffset = e.x - this.x; 
-	e.yOffset = e.y - this.y;
-	this.elements.push(e);
-}
-
-Ether.Ether.prototype.looseElement = function(){
-
 }
 
 Ether.Ether.prototype.init = function(){
@@ -60,20 +21,8 @@ Ether.Ether.prototype.init = function(){
 	}
 }
 
-Ether.Ether.prototype.increaseMass = function(){
-	var element = new Ether.Element('core');
-	element.x = this.x;
-	element.y = this.y;
-	this.coreElements.push(element)
-}
-
-Ether.Ether.prototype.decreaseMass = function(){
-	this.coreElements.pop();
-}
-
 Ether.Ether.prototype.draw = function(engine){
 	engine.ctx.globalCompositeOperation = "lighter";
-
 	this.drawCoreElements(engine);
 	this.drawElements(engine);
 }
@@ -82,21 +31,22 @@ Ether.Ether.prototype.drawElements = function(engine){
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i];
 
-		var x = this.x + e.xOffset;
-		var y = this.y + e.yOffset;
-
+		//update the x and y position
+		e.x = this.x + e.xOffset;
+		e.y = this.y + e.yOffset;
 
 		engine.ctx.beginPath();
 
-		var gradient = engine.ctx.createRadialGradient(x,y,0,x,y,e.radius);
-		gradient.addColorStop(0.1,"white");
-		gradient.addColorStop(0.1,"white");
-		gradient.addColorStop(0.8,e.color);
-		gradient.addColorStop(0.1,"black");
+		this.drawElement(e, engine.ctx, function(ctx, element){
+			var gradient = engine.ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
+			gradient.addColorStop(0.1,"white");
+			gradient.addColorStop(0.1,"white");
+			gradient.addColorStop(0.8,element.color);
+			gradient.addColorStop(0.1,"black");
 
-		engine.ctx.fillStyle = gradient;
-		engine.ctx.arc(x,y,e.radius,Math.PI*2,false);
-		engine.ctx.fill();
+			return gradient
+		})
+
 	};
 }
 
@@ -106,16 +56,14 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 
 		engine.ctx.beginPath();
 
-		//gradient
-		var gradient = engine.ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,e.radius);
-		gradient.addColorStop(0.5,"white");
-		//gradient.addColorStop(0.4,"white");
-		gradient.addColorStop(0.4,e.color);
-		gradient.addColorStop(1,"black");
+		this.drawElement(e, engine.ctx, function(ctx,element){
+			var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
+			gradient.addColorStop(0.5,"white");
+			gradient.addColorStop(0.4,element.color);
+			gradient.addColorStop(1,"black");
 
-		engine.ctx.fillStyle = gradient;
-		engine.ctx.arc(e.x,e.y,e.radius,Math.PI*2,false);
-		engine.ctx.fill();
+			return gradient;
+		});		
 
 		//velocity
 		e.x += e.vx;
@@ -136,9 +84,77 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 	};
 }
 
+Ether.Ether.prototype.drawElement = function(element,ctx,gradFunc){
+	var gradient = gradFunc(ctx,element);
+
+	ctx.fillStyle = gradient;
+	ctx.arc(element.x,element.y,element.radius,Math.PI*2,false);
+	ctx.fill();
+}
+
 Ether.Ether.prototype.getDistanceFromCenter = function(e){
 	var xDif = e.x - this.x;
 	var yDif = e.y - this.y;
 
 	return Math.sqrt((xDif * xDif) + (yDif * yDif))
+}
+
+//Stats
+Ether.Ether.prototype.getStability = function(){
+	var o = this.getElementCount();
+
+	var dif1 = o.f - o.w;
+	var dif2 = o.a - o.e;
+
+	return Math.sqrt((dif1 * dif1)+(dif2 * dif2));
+}
+
+Ether.Ether.prototype.getElementCount = function(){
+	var f=w=a=e = 0;
+
+	for (var i = 0; i < this.elements.length; i++) {
+		var type = this.elements[i].type;
+		switch(type){
+			case 'fire': f++;
+				break;
+			case 'water': w++;
+				break;
+			case 'air': a++;
+				break;
+			case 'earth': e++
+				break;
+		}
+	};
+
+	return { f : f, w: w, a: a, e: e}
+}
+
+//Interfaces
+Ether.Ether.prototype.newElement = function(e){
+	this.increaseMass();
+	e.xOffset = e.x - this.x; 
+	e.yOffset = e.y - this.y;
+	this.elements.push(e);
+}
+
+Ether.Ether.prototype.looseElement = function(){
+	decreaseMass();
+	//TO DO
+	//remove from elements
+	//add back to world
+}
+
+Ether.Ether.prototype.increaseMass = function(){
+	var element = new Ether.Element('core');
+	element.x = this.x;
+	element.y = this.y;
+	this.coreElements.push(element);
+	this.mass += 1;
+	this.range += 2;
+}
+
+Ether.Ether.prototype.decreaseMass = function(){
+	this.coreElements.pop();
+	this.mass -= 1;
+	this.range -= 2;
 }

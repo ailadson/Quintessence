@@ -2,23 +2,23 @@ Ether = Ether || {}
 
 Ether.World = function (engine) {
 	this.engine = engine;
+
+	//world positioning values
+	this.width = engine.width*15;
+	this.height = engine.height*15;
 	this.x = engine.width/2;
 	this.y = engine.height/2;
 	this.xv = 0;
 	this.yv = 0;
+	this.dragX = false;
+	this.dragY = false;
 
-	this.width = engine.width*15;
-	this.height = engine.height*15;
-
+	//elements
 	this.fire = [];
 	this.water = [];
 	this.earth = [];
 	this.air = [];
-
 	this.elements = [this.earth,this.air,this.fire,this.water];
-
-	this.draggingX = false;
-	this.draggingY = false;
 
 }
 
@@ -30,18 +30,12 @@ Ether.World.prototype.init = function(){
 		var type = eleStrings[i];
 
 		for (var j = 0; j < 150; j++) {
+			//get values that will be used to create element
 			var xOffset = ((Math.random()*(this.width*2)) - this.width)/2;
 			var yOffset = ((Math.random()*(this.height*2)) - this.height)/2;
-
-			/*switch(type){
-				case 'earth' :
-					xOffset = 
-					break;
-			}*/
-
 			var size = this.getDistanceFromCenter({x:xOffset,y:yOffset});
+			
 			var element = new Ether.Element(type,size/600);
-
 			element.xOffset = xOffset;
 			element.yOffset = yOffset;
 			element.jitter = -1;
@@ -60,14 +54,18 @@ Ether.World.prototype.draw = function(engine){
 		for (var j = 0; j < collection.length; j++) {
 			var e = collection[j];
 
+			//reverse direction of jitter
 			e.jitter *= -1;
 
+			//x and y positions determined on the fly
 			var x = this.x + e.xOffset + e.jitter;
 			var y = this.y + e.yOffset;
 
 
+			//start rendering
 			engine.ctx.beginPath();
 
+			//create gradient
 			var gradient = engine.ctx.createRadialGradient(x,y,0,x,y,e.radius);
 			gradient.addColorStop(0.1,"white");
 			gradient.addColorStop(0.1,"white");
@@ -78,11 +76,45 @@ Ether.World.prototype.draw = function(engine){
 			engine.ctx.arc(x,y,e.radius,Math.PI*2,false);
 			engine.ctx.fill();
 
+			//see if the element is in range of the ether
 			this.isInRangeOfEther(e,i,j);
 		};
 	};
 }
 
+
+//rendering
+Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
+	//make sure the element is on the screen
+	if(!this.isInView(e)){ return }
+
+	var ether = this.engine.ethers[0];
+	var range = ether.range + e.radius/2;
+	var x = e.xOffset + this.x;
+	var y = e.yOffset + this.y;
+	var distance = ether.getDistanceFromCenter({x:x,y:y});
+
+	if(distance < range){
+		//give the element an 'x, y' relative to the ether
+		e.x = x;
+		e.y = y;
+		//add to ether.elements[] and remove from world.elements[]
+		this.engine.ethers[0].newElement(e);
+		this.elements[collection].splice(index,1);
+	}
+}
+
+Ether.World.prototype.isInView = function(e){
+	//get the elements x and y position
+	var x = e.xOffset + this.x;
+	var y = e.yOffset + this.y;
+
+	//if they are in the screen boundaries, return true
+	if((x > -10 && x < this.engine.width + 10) &&
+		(y > -10 && y < this.engine.height + 10)){
+		return true
+	}
+}
 
 Ether.World.prototype.getDistanceFromCenter = function(e){
 	var xDif = this.x - Math.abs(e.x);
@@ -91,7 +123,8 @@ Ether.World.prototype.getDistanceFromCenter = function(e){
 	return Math.sqrt((xDif * xDif) + (yDif * yDif))
 }
 
-Ether.World.prototype.moveWorld = function(e){
+//interaction
+Ether.World.prototype.handleKeyDown = function(e){
 	//if(!this.draggingX || !this.draggingY){
 		switch(e){
 			case 38 :
@@ -110,7 +143,7 @@ Ether.World.prototype.moveWorld = function(e){
 	//}
 }
 
-Ether.World.prototype.stopWorld = function(e){
+Ether.World.prototype.handleKeyUp = function(e){
 		switch(e){
 			case 38 :
 				this.yv = 0//this.dragMotion('up',this.yv);
@@ -146,32 +179,3 @@ Ether.World.prototype.dragMotion = function(direction,val){
 
 	return n
 }
-
-Ether.World.prototype.isInView = function(e){
-	var x = e.xOffset + this.x;
-	var y = e.yOffset + this.y;
-
-	if((x > -10 && x < this.engine.width + 10) &&
-		(y > -10 && y < this.engine.height + 10)){
-		return true
-	}
-}
-
-Ether.World.prototype.isInRangeOfEther = function(e,i,j){
-	if(!this.isInView(e)){ return }
-
-	var ether = this.engine.ethers[0];
-	var range = ether.range + e.radius;
-	var x = e.xOffset + this.x;
-	var y = e.yOffset + this.y;
-	var distance = ether.getDistanceFromCenter({x:x,y:y});
-
-	if(distance < range){
-		e.x = x;
-		e.y = y;
-		this.engine.ethers[0].newElement(e);
-		this.elements[i].splice(j,1);
-	}
-}
-
-

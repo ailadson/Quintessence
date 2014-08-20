@@ -2,8 +2,7 @@ var Ether = Ether || {};
 
 Ether.Element = function(type,size){
 	this.type = type;
-	var _size = size || 0.5;
-
+	
 	//color
 	var r = Math.random()*255>>0;
 	var g = Math.random()*255>>0;
@@ -41,6 +40,8 @@ Ether.Element = function(type,size){
 	this.color = "rgba("+r+","+g+","+b+",0.5)";
 
 	//size
+	var _size = size || 0.5;
+
 	switch(type){
 		case 'core' :
 			this.radius = Math.random()*15+(_size*5)
