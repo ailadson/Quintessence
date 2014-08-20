@@ -1,4 +1,5 @@
 Ether.Ether = function(engine) {
+	this.engine = engine
 
 	//elements
 	this.coreElements = [];
@@ -37,17 +38,19 @@ Ether.Ether.prototype.drawElements = function(engine){
 		e.y = this.y + e.yOffset;
 		e.jitter *= -1;
 
-		engine.ctx.beginPath();
+		if(!this.lossElement(e)){
+			engine.ctx.beginPath();
 
-		this.drawElement(e, engine.ctx, function(ctx, element){
-			var gradient = engine.ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-			gradient.addColorStop(0.1,"white");
-			gradient.addColorStop(0.1,"white");
-			gradient.addColorStop(0.8,element.color);
-			gradient.addColorStop(0.1,"black");
+			this.drawElement(e, engine.ctx, function(ctx, element){
+				var gradient = engine.ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
+				gradient.addColorStop(0.1,"white");
+				gradient.addColorStop(0.1,"white");
+				gradient.addColorStop(0.8,element.color);
+				gradient.addColorStop(0.1,"black");
 
-			return gradient
-		})
+				return gradient
+			})
+		}
 
 	};
 }
@@ -140,7 +143,7 @@ Ether.Ether.prototype.getElementCount = function(){
 	return { f : f, w: w, a: a, e: e}
 }
 
-//Interfaces
+//Elements
 Ether.Ether.prototype.newElement = function(e){
 	this.increaseMass();
 	e.xOffset = e.x - this.x; 
@@ -148,11 +151,23 @@ Ether.Ether.prototype.newElement = function(e){
 	this.elements.push(e);
 }
 
-Ether.Ether.prototype.looseElement = function(){
-	decreaseMass();
-	//TO DO
-	//remove from elements
-	//add back to world
+Ether.Ether.prototype.lossElement = function(e){
+	if(this.getDistanceFromCenter(e)-this.mass/2 >= this.range){
+		this.decreaseMass();
+		
+		//remove from elements
+		for (var i = 0; i < this.elements.length; i++) {
+			var ele = this.elements[i];
+
+			if(ele.x == e.x && ele.y == e.y){
+				var worldEle = this.elements.splice(i,1);
+
+				this.engine.world.newElement(worldEle);
+				return true;
+			}
+		};
+
+	}
 }
 
 Ether.Ether.prototype.increaseMass = function(){

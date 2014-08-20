@@ -14,6 +14,7 @@ Ether.Hub.prototype.draw = function(){
 	var hubStab = (stats.stab > 100) ? 0 : (100 - stats.stab)
 
 	ctx.font = this.unit + "px Arial";
+	ctx.fillStyle = "rgba(20,70,200,1)"
 	ctx.fillText("Mass: " + stats.mass, this.unit,this.unit*1.5)
 	ctx.fillText("Stability: " + hubStab, this.unit,this.unit*2.5)
 

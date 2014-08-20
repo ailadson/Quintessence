@@ -4,8 +4,8 @@ Ether.World = function (engine) {
 	this.engine = engine;
 
 	//world positioning values
-	this.width = engine.width*15;
-	this.height = engine.height*15;
+	this.width = engine.width*30;
+	this.height = engine.height*30;
 	this.x = engine.width/2;
 	this.y = engine.height/2;
 	this.xv = 0;
@@ -19,6 +19,7 @@ Ether.World = function (engine) {
 	this.earth = [];
 	this.air = [];
 	this.elements = [this.earth,this.air,this.fire,this.water];
+	this.driftArray = [];
 
 }
 
@@ -29,7 +30,7 @@ Ether.World.prototype.init = function(){
 		var collection = this.elements[i];
 		var type = eleStrings[i];
 
-		for (var j = 0; j < 150; j++) {
+		for (var j = 0; j < 1000; j++) {
 			//get values that will be used to create element
 			var xOffset = ((Math.random()*(this.width*2)) - this.width)/2;
 			var yOffset = ((Math.random()*(this.height*2)) - this.height)/2;
@@ -38,7 +39,6 @@ Ether.World.prototype.init = function(){
 			var element = new Ether.Element(type,size/600);
 			element.xOffset = xOffset;
 			element.yOffset = yOffset;
-			element.jitter = -1;
 			collection.push(element);
 		};
 	};
@@ -53,6 +53,8 @@ Ether.World.prototype.draw = function(engine){
 
 		for (var j = 0; j < collection.length; j++) {
 			var e = collection[j];
+
+			if(!this.isInView(e)){ continue }
 
 			//reverse direction of jitter
 			e.jitter *= -1;
@@ -80,6 +82,8 @@ Ether.World.prototype.draw = function(engine){
 			this.isInRangeOfEther(e,i,j);
 		};
 	};
+
+	//this.drawDriftingElements(engine); //TO DO!!
 }
 
 
@@ -178,4 +182,16 @@ Ether.World.prototype.dragMotion = function(direction,val){
 	}
 
 	return n
+}
+
+//Elements
+Ether.World.prototype.newElement = function(e){
+	//reset coordination variables (x,y,offsets,and drift)
+	e.xOffset = this.x - e.x
+	e.yOffset = this.y - e.y
+
+	e.driftCount = e.jitter * (e.radius/2);
+
+	//place in drifting array
+	this.driftArray.push(e);
 }
