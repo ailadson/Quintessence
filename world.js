@@ -20,9 +20,11 @@ Ether.World = function (engine) {
 	this.air = [];
 	this.elements = [this.earth,this.air,this.fire,this.water];
 	this.driftArray = [];
+	this.sizeOffset = 5000;
 
 }
 
+//WORLD INIT
 Ether.World.prototype.init = function(){
 	var eleStrings = ['earth','air','fire','water'];
 
@@ -36,7 +38,7 @@ Ether.World.prototype.init = function(){
 			var yOffset = ((Math.random()*(this.height*2)) - this.height)/2;
 			var size = this.getDistanceFromCenter({x:xOffset,y:yOffset});
 			
-			var element = new Ether.Element(type,size/600);
+			var element = new Ether.Element(type,size/this.sizeOffset);
 			element.xOffset = xOffset;
 			element.yOffset = yOffset;
 			collection.push(element);
@@ -44,6 +46,8 @@ Ether.World.prototype.init = function(){
 	};
 }
 
+
+//DRAWING
 Ether.World.prototype.draw = function(engine){
 		this.x += this.xv;
 		this.y += this.yv;
@@ -83,11 +87,58 @@ Ether.World.prototype.draw = function(engine){
 		};
 	};
 
-	//this.drawDriftingElements(engine); //TO DO!!
+	this.drawDriftingElements(engine); //TO DO!!
+	this.drawBorder(engine);
 }
 
 
-//rendering
+Ether.World.prototype.drawBorder = function(engine){
+	engine.ctx.fillStyle = "white";
+	this.borderX = this.x - this.width/2;
+	this.borderY = this.y - this.height/2;
+	this.borderW = this.width;
+	this.borderH = this.height;
+
+	engine.ctx.strokeRect(this.borderX,this.borderY,this.borderW,this.borderH);
+}
+
+Ether.World.prototype.drawDriftingElements = function(engine){
+	for (var i = 0; i < this.driftArray.length; i++) {
+		var e = this.driftArray[i];
+		e.xOffset += (e.jitter * e.radius/2);
+
+		//x and y positions determined on the fly
+		var x = this.x + e.xOffset;
+		var y = this.y + e.yOffset;
+
+
+		//start rendering
+		engine.ctx.beginPath();
+
+		//create gradient
+		var gradient = engine.ctx.createRadialGradient(x,y,0,x,y,e.radius);
+		gradient.addColorStop(0.1,"white");
+		gradient.addColorStop(0.1,"white");
+		gradient.addColorStop(0.8,e.color);
+		gradient.addColorStop(0.1,"black");
+
+		engine.ctx.fillStyle = gradient;
+		engine.ctx.arc(x,y,e.radius,Math.PI*2,false);
+		engine.ctx.fill();
+
+		if(!e.newElement){
+			var index = e.type  == 'earth' ? 0 : (e.type == 'air' ? 1 : (e.type == 'fire' ? 2 : (e.type == 'water' ? 3 : undefined)))
+			e.jitter /= 5;
+			this.driftArray.splice(i,1);
+			i--;
+			console.log(index + " || " + e.type)
+			this.elements[index].push(e)
+		} else {
+			e.newElement--;
+		}
+	};
+}
+
 Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 	//make sure the element is on the screen
 	if(!this.isInView(e)){ return }
@@ -114,8 +165,8 @@ Ether.World.prototype.isInView = function(e){
 	var y = e.yOffset + this.y;
 
 	//if they are in the screen boundaries, return true
-	if((x > -10 && x < this.engine.width + 10) &&
-		(y > -10 && y < this.engine.height + 10)){
+	if((x > -e.radius && x < this.engine.width + e.radius) &&
+		(y > -e.radius && y < this.engine.height + e.radius)){
 		return true
 	}
 }
@@ -132,16 +183,16 @@ Ether.World.prototype.handleKeyDown = function(e){
 	//if(!this.draggingX || !this.draggingY){
 		switch(e){
 			case 38 :
-				this.yv = 3//this.dragMotion('up',this.yv);
+				this.yv = 13//this.dragMotion('up',this.yv);
 				break;
 			case 39 :
-				this.xv = -3//this.dragMotion('up',-this.xv) * -1;
+				this.xv = -13//this.dragMotion('up',-this.xv) * -1;
 				break;
 			case 40 :
-				this.yv = -3//this.dragMotion('up',-this.yv) * -1;
+				this.yv = -13//this.dragMotion('up',-this.yv) * -1;
 				break;
 			case 37 :
-				this.xv = 3//this.dragMotion('up',this.xv);
+				this.xv = 13//this.dragMotion('up',this.xv);
 				break;
 		}
 	//}
@@ -186,11 +237,19 @@ Ether.World.prototype.dragMotion = function(direction,val){
 
 //Elements
 Ether.World.prototype.newElement = function(e){
-	//reset coordination variables (x,y,offsets,and drift)
-	e.xOffset = this.x - e.x
-	e.yOffset = this.y - e.y
+	var ether = this.engine.ethers[0]
 
-	e.driftCount = e.jitter * (e.radius/2);
+	//reset coordination variables (x,y,offsets,and drift)
+	e.xOffset = e.x - this.x
+	e.yOffset = e.y - this.y
+	e.newElement = 10;
+	e.jitter *= 4;
+
+	if((e.x < ether.x && e.jitter > 0) ||
+		(e.x > ether.x && e.jitter < 0)){
+		e.jitter *= -1
+	}
+	
 
 	//place in drifting array
 	this.driftArray.push(e);

@@ -16,7 +16,7 @@ Ether.Engine = function() {
 	this.ethers = [new Ether.Ether(self)];
 
 	//Animate
-	this.animate = function(){
+	this.animate = function(time){
 		requestAnimFrame(self.animate);
 
 		//Draw Background
@@ -33,7 +33,7 @@ Ether.Engine = function() {
 		self.world.draw(self);
 
 		//Draw Hub
-		self.hub.draw(self);
+		self.hub.draw(time);
 	}
 }
 

@@ -3,10 +3,15 @@ Ether = Ether || {};
 Ether.Hub = function(engine) {
 	this.engine = engine;
 	this.unit = engine.width/50;
+	this.lastTime = 0;
+	this.messageExist = false;
+	this.messageAlpha = 1;
+	this.currentMessage = "";
+	this.lastMessageTime = 0;
 }
 
 
-Ether.Hub.prototype.draw = function(){
+Ether.Hub.prototype.draw = function(time){
 	var stats = this.getStats();
 	var ctx = this.engine.ctx;
 
@@ -19,6 +24,8 @@ Ether.Hub.prototype.draw = function(){
 	ctx.fillText("Stability: " + hubStab, this.unit,this.unit*2.5)
 
 	this.drawElementStats(stats,ctx);
+	this.drawLifeBar(ctx, time);
+	this.drawMessage(ctx,time);
 }
 
 Ether.Hub.prototype.getStats = function(){
@@ -47,4 +54,77 @@ Ether.Hub.prototype.drawElementStats = function(stats, ctx){
 
 	ctx.fillStyle = "green";
 	ctx.fillText("Earth: " + stats.elementCount.e, this.unit * 3.5, this.unit*4.1);
+}
+
+Ether.Hub.prototype.drawLifeBar = function(ctx, time){
+	var colors = ["green","yellow","orange","red"];
+	var ether = this.engine.ethers[0];
+	var ratio = ether.currentSpan/ether.lifeSpan[ether.age];
+
+	ctx.fillStyle = colors[ether.age];
+	ctx.fillRect(this.engine.width - (this.unit * 0.5), this.unit * 1.5, -(this.unit * 5) * ratio, this.unit * 0.5)
+
+	ctx.strokeStyle = "red";
+	ctx.strokeRect(this.engine.width - (this.unit * 5.5), this.unit * 1.5, this.unit * 5, this.unit * 0.5)
+
+	//MOVE THIS TO ETHER!!???
+	if(time > this.lastTime + 1000 && !ether.inVoid){
+		this.lastTime = time;
+		if(ratio > 0){
+			ether.currentSpan--;
+		} else {
+			ether.age += 1
+			ether.currentSpan = ether.lifeSpan[ether.age];
+		}
+	}
+
+}
+
+//messages
+Ether.Hub.prototype.drawMessage = function(ctx,time){
+	var borderMssg = "in the boundless void, time is not"
+
+	if(!this.messageExist){
+
+		if(this.hasLeftBorder() && this.currentMessage != borderMssg){
+			this.messageExist = true;
+			this.currentMessage = borderMssg;
+		}
+
+	} else {
+		this.renderMessage(ctx,time);
+	}
+}
+
+Ether.Hub.prototype.renderMessage = function(ctx,time){
+	ctx.font = "30px Arial";
+	ctx.fillStyle = "rgba(255,255,255,"+this.messageAlpha+")";
+	var textWidth = ctx.measureText(this.currentMessage).width;
+	ctx.fillText(this.currentMessage,(this.engine.width/2) - (textWidth / 2), (this.engine.height/2)-this.unit);
+
+	if(time > this.lastMessageTime + 100){
+		this.messageAlpha-=0.01;
+
+		if(this.messageAlpha <= 0.01){
+			this.messageExist = false;
+			this.messageAlpha = 1;
+		}
+
+		this.lastMessageTime = time;
+	}
+}
+
+Ether.Hub.prototype.hasLeftBorder = function(){
+	var ether = this.engine.ethers[0];
+	var world = this.engine.world;
+	
+	if((ether.x <= world.borderX) ||
+		(ether.y <= world.borderY) ||
+		(ether.x >= world.borderW) ||
+		(ether.y >= world.borderH)){
+		ether.inVoid = true;
+		return true
+	} else {
+		ether.inVoid = false;
+	}
 }
