@@ -35,21 +35,39 @@ Ether.World.prototype.init = function(){
 
 		switch(this.engine.ethers[0].age){
 			case 0 :
-				this.initElement(type,collection,250,9000,function(e){
-					if(e.radius > 30) e.radius = 20
+				this.initElement(type,collection,300,9000,function(e){
+					if(e.radius > 5) e.radius = 5
 				});
 
 				this.initElement(type,collection,50,100,function(e){
-					if(e.radius < 100) e.radius = 150;
+					if(e.radius < 150) e.radius = 150;
 					if(e.radius > 300) e.radius = 250;
 					e.killer = true;
 				})
 				break;
+
 			case 1 :
+				this.initElement(type,collection,200,3000,function(e){
+					if(e.radius < 10) e.radius = 10;
+					if(e.radius > 70) e.radius = 70;
+				})
+				this.initElement(type,collection,30,1000,function(e){
+					if(e.radius < 150) e.radius = 150;
+					if(e.radius > 200) e.radius = 200;
+				})
 				break;
 			case 2 :
+				this.initElement(type,collection,150,5000,function(e){
+					if(e.radius > 20) e.radius = 20;
+				})
+				this.initElement(type,collection,150,1000,function(e){
+					if(e.radius > 80) e.radius = 80;
+				})
 				break;
 			case 3 :
+				this.initElement(type,collection,250,6000,function(e){
+					if(e.radius > 50) e.radius = 50;
+				})
 				break;
 		}
 

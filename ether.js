@@ -13,18 +13,43 @@ Ether.Ether = function(engine) {
 	this.range = 15;
 	this.mass = 1;
 	this.age = 0;
-	this.lifeSpan = [90,10,10,10]; //in seconds
+	this.lifeSpan = [30,30,30,30]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.dying = false;
 	this.dead = false;
 }
 
 Ether.Ether.prototype.init = function(){
-	for(var i=0;i<this.mass;i++){
-		var element = new Ether.Element('core');
-		element.x = this.x;
-		element.y = this.y;
-		this.coreElements.push(element)
+	switch(this.age){
+		case 0 :
+			var element = new Ether.Element('core');
+			element.x = this.x;
+			element.y = this.y;
+			this.coreElements.push(element);
+			break;
+
+		case 1 : 
+			var count = this.getElementCount();
+			var total = 0;
+
+			for(e in count){
+				console.log(e +" "+count+" "+" "+count[e])
+				count[e] -= 5;
+				total += count[e];
+			}
+
+			this.mass = total;
+			this.range += total*2;
+
+			for (var i = 0; i < total.length; i++) {
+				var element = new Ether.Element('core');
+				element.x = this.x;
+				element.y = this.y;
+				this.coreElements.push(element); 
+				console.log(this.coreElements.length)
+			};
+
+			break;
 	}
 }
 
@@ -180,7 +205,23 @@ Ether.Ether.prototype.getElementCount = function(){
 
 //Elements
 Ether.Ether.prototype.newElement = function(e){
-	this.increaseMass();
+	
+
+	switch(this.age){
+		case 0 :
+			break;
+		
+		case 1 :
+			this.increaseMass(e,1,2);
+			break;
+		
+		case 2 :
+			this.increaseMass(e,2,3);
+			break;
+
+		case 3 :
+			break;
+	}
 	e.xOffset = e.x - this.x; 
 	e.yOffset = e.y - this.y;
 	e.range = this.range;
@@ -211,13 +252,13 @@ Ether.Ether.prototype.lossElement = function(e){
 	}
 }
 
-Ether.Ether.prototype.increaseMass = function(){
+Ether.Ether.prototype.increaseMass = function(e,massOffset,range){
 	var element = new Ether.Element('core');
 	element.x = this.x;
 	element.y = this.y;
 	this.coreElements.push(element);
-	this.mass += element.radius/2;
-	this.range += 2;
+	this.mass += e.radius/massOffset;
+	this.range += range;
 }
 
 Ether.Ether.prototype.decreaseMass = function(){

@@ -8,6 +8,8 @@ Ether.Hub = function(engine) {
 	this.messageAlpha = 1;
 	this.currentMessage = "";
 	this.lastMessageTime = 0;
+	this.betweenAlpha = 0;
+	this.betweenLastTime = 0;
 }
 
 
@@ -23,9 +25,28 @@ Ether.Hub.prototype.draw = function(time){
 	ctx.fillText("Mass: " + stats.mass, this.unit,this.unit*1.5)
 	ctx.fillText("Stability: " + hubStab, this.unit,this.unit*2.5)
 
+	//in between ages?
+	this.drawInbetween(ctx,time);
+
 	this.drawElementStats(stats,ctx);
 	this.drawLifeBar(ctx, time);
 	this.drawMessage(ctx,time);
+}
+
+Ether.Hub.prototype.drawInbetween = function(ctx,time,success){
+	var age = this.engine.ethers[0].age;
+
+	if(this.engine.betweenAges){
+
+		//alpha
+		if(time > this.betweenLastTime + 100){
+			this.betweenAlpha+= 0.002;
+			if(this.betweenAlpha > 1){ this.betweenAlpha = 1 }
+		}
+
+		ctx.fillStyle = "rgba(0,0,0,"+this.betweenAlpha+")";
+		ctx.fillRect(0,0,this.engine.width,this.engine.height);
+	}
 }
 
 Ether.Hub.prototype.getStats = function(){
@@ -57,6 +78,8 @@ Ether.Hub.prototype.drawElementStats = function(stats, ctx){
 }
 
 Ether.Hub.prototype.drawLifeBar = function(ctx, time){
+	if(this.engine.betweenAges) { return }
+
 	var colors = ["green","yellow","orange","red"];
 	var ether = this.engine.ethers[0];
 	var ratio = ether.currentSpan/ether.lifeSpan[ether.age];
@@ -73,8 +96,7 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 		if(ratio > 0){
 			ether.currentSpan--;
 		} else {
-			ether.age += 1
-			ether.currentSpan = ether.lifeSpan[ether.age];
+			this.engine.betweenAges = true;
 		}
 	}
 
@@ -82,14 +104,50 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 
 //messages
 Ether.Hub.prototype.drawMessage = function(ctx,time){
-	var borderMssg = "in the boundless void, time is not"
+	var ether = this.engine.ethers[0];
+
+	var borderMssg = "in the boundless void, time is not";
+	var age0WinMssg = "absorbing the elements, you grow into a fine young ether";
+	var age0FailMssg = "you cannot subsist on the little you've aquired; dead";
+	var age1Mssg = "let your wings spread";
+	var age2Mssg = "you are giant. all things die";
+	var age3Mssg = "dead";
 
 	if(!this.messageExist){
 
-		//console.log(this.hasLeftBorder());
+		//leaving game border
 		if(this.hasLeftBorder() && this.currentMessage != borderMssg){
 			this.messageExist = true;
 			this.currentMessage = borderMssg;
+		
+		//new age
+		} else if(this.engine.betweenAges){
+			this.messageExist = true;
+
+			switch(ether.age){
+				case 0 :
+					if(ether.dead){
+						this.currentMessage = age0FailMssg;
+					} else {
+						this.currentMessage = age0WinMssg;
+					}
+					break;
+
+				case 1 :
+					this.currentMessage = age1Mssg;
+					break;
+
+				case 2 :
+					this.currentMessage = age2Mssg;
+					break;
+
+				case 3 :
+					this.currentMessage = age3Mssg;
+					break;
+
+			}
+
+
 		}
 
 	} else {
@@ -109,10 +167,26 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 		if(this.messageAlpha <= 0.01){
 			this.messageExist = false;
 			this.messageAlpha = 1;
+			
+			//in between message?
+			if(this.engine.betweenAges && !this.engine.ethers[0].dead){
+				this.currentMessage = "";
+				this.betweenAlpha = 0;
+				this.engine.betweenAges = false;
+				this.engine.ethers[0].age++;
+				this.engine.ethers[0].currentSpan = this.engine.ethers[0].lifeSpan[this.engine.ethers[0].age];
+
+				if(this.engine.ethers[0].age < 3){
+					this.engine.init();
+				} else {
+					//TO DO END GAME?!?!?
+				}
+			}
 		}
 
 		this.lastMessageTime = time;
 	}
+
 }
 
 Ether.Hub.prototype.hasLeftBorder = function(){
