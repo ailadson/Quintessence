@@ -10,11 +10,13 @@ Ether.Ether = function(engine) {
 	this.y = engine.height/2;
 
 	//stats
-	this.range = 5;
-	this.mass = 5;
+	this.range = 15;
+	this.mass = 1;
 	this.age = 0;
 	this.lifeSpan = [90,10,10,10]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
+	this.dying = false;
+	this.dead = false;
 }
 
 Ether.Ether.prototype.init = function(){
@@ -44,16 +46,24 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 
 
 			//AGE RELATED FUCTIONS
-			if(this.age == 1){
-				/*if(this.renderToggle == this.renderStyles.length - 1){
-					this.renderToggle = 0;
-				} else {
-					this.renderToggle++;
-				}
+			switch(this.age){
+				case 0 :
+					if(this.dying){
+						this.attractEtherToElement(e);
+					} else if(this.isKillerElement(e)){ 
+						this.dying = true;
+					}
+					break;
 
-				engine.ctx.globalCompositeOperation = this.renderStyles[this.renderToggle];*/
-			} else if(this.age == 2){
-				this.rotateElement(e,time);
+				case 1 :
+					break;
+
+				case 2 : 
+					this.rotateElement(e,time)
+					break;
+
+				case 3 :
+					break;
 			}
 
 			engine.ctx.beginPath();
@@ -124,14 +134,6 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 
 Ether.Ether.prototype.drawElement = function(element,ctx,gradFunc){
 	var gradient = gradFunc(ctx,element);
-
-	/*switch(){
-		case 0 : //pulsating (color)
-		case 1 : // pulsting (size)
-		case 2 : //orbiting
-		//case 3 : ??
-
-	}*/
 
 	ctx.fillStyle = gradient;
 	ctx.arc(element.x,element.y,element.radius,Math.PI*2,false);
@@ -244,6 +246,34 @@ Ether.Ether.prototype.findDegree = function(opp,hyp){
 	return this.engine.util.radToDeg(radian);
 }
 
+Ether.Ether.prototype.isKillerElement = function(e){
+	if(e.killer){ 
+		return true;
+	}
+}
+
+Ether.Ether.prototype.attractEtherToElement = function(e){
+	if(e.x < this.x){
+		this.x--;
+		e.xOffset++;
+	} else if(e.x > this.x){
+		this.x++;
+		e.xOffset--;
+	}
+
+	if(e.y < this.y){
+		this.y--;
+		e.yOffset++;
+	} else if(e.y > this.y){
+		this.y++;
+		e.yOffset--;
+	}
+
+	if((e.x > this.x - 10 && e.x < this.x + 10) &&
+		(e.y > this.y - 10 && e.y < this.y + 10)){
+		 this.dead = true;
+	}
+}
 
 
 

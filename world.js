@@ -30,20 +30,47 @@ Ether.World.prototype.init = function(){
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var collection = this.elements[i];
+		collection.length = 0; //clear out array
 		var type = eleStrings[i];
 
-		for (var j = 0; j < 1000; j++) {
+		switch(this.engine.ethers[0].age){
+			case 0 :
+				this.initElement(type,collection,250,9000,function(e){
+					if(e.radius > 30) e.radius = 20
+				});
+
+				this.initElement(type,collection,50,100,function(e){
+					if(e.radius < 100) e.radius = 150;
+					if(e.radius > 300) e.radius = 250;
+					e.killer = true;
+				})
+				break;
+			case 1 :
+				break;
+			case 2 :
+				break;
+			case 3 :
+				break;
+		}
+
+
+		
+	};
+}
+
+Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,eFunc){
+	for (var j = 0; j < amount; j++) {
 			//get values that will be used to create element
 			var xOffset = ((Math.random()*(this.width*2)) - this.width)/2;
 			var yOffset = ((Math.random()*(this.height*2)) - this.height)/2;
 			var size = this.getDistanceFromCenter({x:xOffset,y:yOffset});
 			
-			var element = new Ether.Element(type,size/this.sizeOffset);
+			var element = new Ether.Element(type,size/sizeOffset);
 			element.xOffset = xOffset;
 			element.yOffset = yOffset;
+			eFunc(element);
 			collection.push(element);
 		};
-	};
 }
 
 

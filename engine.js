@@ -15,26 +15,49 @@ Ether.Engine = function() {
 	//Ethers
 	this.ethers = [new Ether.Ether(self)];
 
+	//endgame
+	this.gameOverAlpha = 0;
+	this.gameOverTime = 0;
+
 	//Animate
 	this.animate = function(time){
 		requestAnimFrame(self.animate);
 
-		//Draw Background
-		self.ctx.fillStyle = "black";
-		self.ctx.fillRect(0,0,self.width,self.height);
+		if(!self.ethers[0].dead){
+			//Draw Background
+			self.ctx.fillStyle = "black";
+			self.ctx.fillRect(0,0,self.width,self.height);
 
-		//Draw Ethers
-		for (var i = 0; i < self.ethers.length; i++) {
-			self.ethers[i].draw(self);
-		};
-		self.ctx.globalCompositeOperation = "source-over";
+			//Draw Ethers
+			for (var i = 0; i < self.ethers.length; i++) {
+				self.ethers[i].draw(self);
+			};
+			self.ctx.globalCompositeOperation = "source-over";
 
-		//Draw World
-		self.world.draw(self);
+			//Draw World
+			self.world.draw(self);
 
-		//Draw Hub
-		self.hub.draw(time);
+			//Draw Hub
+			self.hub.draw(time);
+
+		//gameOver fade
+		} else if(self.ethers[0].dead){
+			if(self.gameOverAlpha < 0.35 && time > self.gameOverTime + 100){
+				self.gameOverAlpha+=0.01;
+				self.gameOverTime = time;
+
+				self.ctx.fillStyle = "rgba(255,255,255,+"+self.gameOverAlpha+");";
+				self.ctx.fillRect(0,0,self.width,self.height);
+			} else if(self.gameOverAlpha >= 0.35){
+			
+				self.ctx.font = "30px Arial"
+				self.ctx.fillStyle = "black";
+				self.ctx.fillText("Dead",self.width/2,self.height/2);
+				console.log('hit')
+			}
+		}
 	}
+
 }
 
 Ether.Engine.prototype.init = function(){

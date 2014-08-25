@@ -86,6 +86,7 @@ Ether.Hub.prototype.drawMessage = function(ctx,time){
 
 	if(!this.messageExist){
 
+		//console.log(this.hasLeftBorder());
 		if(this.hasLeftBorder() && this.currentMessage != borderMssg){
 			this.messageExist = true;
 			this.currentMessage = borderMssg;
@@ -117,14 +118,18 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 Ether.Hub.prototype.hasLeftBorder = function(){
 	var ether = this.engine.ethers[0];
 	var world = this.engine.world;
-	
+
 	if((ether.x <= world.borderX) ||
 		(ether.y <= world.borderY) ||
-		(ether.x >= world.borderW) ||
-		(ether.y >= world.borderH)){
+		(ether.x >= world.vorderX + world.borderW) ||
+		(ether.y >= world.borderY + world.borderH)){
 		ether.inVoid = true;
 		return true
 	} else {
 		ether.inVoid = false;
 	}
+}
+
+Ether.Hub.prototype.gameOver = function(){
+	
 }
