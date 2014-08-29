@@ -13,10 +13,14 @@ Ether.Ether = function(engine) {
 	this.range = 15;
 	this.mass = 1;
 	this.age = 0;
-	this.lifeSpan = [90,30,30,30]; //in seconds
+	this.lifeSpan = [90,90,90,90]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.dying = false;
 	this.dead = false;
+
+	this.rotateLastTime = 0;
+	this.rotateDirection = -1;
+	this.degreeChange = 0;
 }
 
 Ether.Ether.prototype.init = function(){
@@ -33,7 +37,6 @@ Ether.Ether.prototype.init = function(){
 			var total = 0;
 
 			for(e in count){
-				console.log(e +" "+count+" "+" "+count[e])
 				count[e] -= 5;
 				total += count[e];
 			}
@@ -49,7 +52,23 @@ Ether.Ether.prototype.init = function(){
 				console.log(this.coreElements.length)
 			};
 
+			for (var i = 0; i < this.elements.length; i++) {
+				this.elements[i].radius /= 2;
+			};
+
 			break;
+
+		case 2 : 
+			for (var i = 0; i < this.elements.length; i++) {
+				this.elements[i].radius /= 1.5;
+			};
+
+			break;
+
+		case 3 :
+			for (var i = 0; i < this.elements.length; i++) {
+				this.elements[i].radius /= 1.5;
+			};
 	}
 }
 
@@ -68,7 +87,6 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 		e.jitter *= -1;
 
 		if(!this.lossElement(e)){
-
 
 			//AGE RELATED FUCTIONS
 			switch(this.age){
@@ -109,7 +127,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 	};
 
 	//time has to be updated outside of the loop
-	//if(time > this.rotateLastTime + 3) this.rotateLastTime = time;
+	if(this.age == 2 && time > this.rotateLastTime + 500) this.rotateLastTime = time;
 }
 
 Ether.Ether.prototype.drawCoreElements = function(engine){
@@ -265,16 +283,33 @@ Ether.Ether.prototype.decreaseMass = function(){
 }
 
 Ether.Ether.prototype.rotateElement = function(e,time){
-	//if(time > this.rotateLastTime + 278){
-		if(e.degree == 360){
-			e.degree = 0;
-		} else {
-			e.degree++;
-		}
+	if(time > this.rotateLastTime + 500){
 
-		e.xOffset = (e.range * Math.cos(this.engine.util.degToRad(e.degree)));
-		e.yOffset = (e.xOffset * Math.tan(this.engine.util.degToRad(e.degree)));
-	//}
+		if(this.rotateDirection < 0){
+			console.log(this.degreeChange);
+			this.degreeChange += 0.001;
+			if(this.degreeChange > 1) {this.degreeChange = 1 }
+			if(this.currentSpan < (this.lifeSpan[this.age]/3) * 2){ this.rotateDirection++; }
+
+		} else if(this.rotateDirection > 0){
+			this.degreeChange -= 0.001;
+			if(this.degreeChange < 0.001) {this.degreeChange = 0.001 }
+
+		} else {
+			if(this.currentSpan < this.lifeSpan[this.age]/3){ this.rotateDirection++; }
+
+		}
+	}
+
+	if(e.degree == 360){
+		e.degree = 0;
+	} else {
+		e.degree+=this.degreeChange;
+	}
+
+	e.xOffset = (e.range * Math.cos(this.engine.util.degToRad(e.degree)));
+	e.yOffset = (e.xOffset * Math.tan(this.engine.util.degToRad(e.degree)));
+	
 }
 
 Ether.Ether.prototype.findDegree = function(opp,hyp){

@@ -8,7 +8,7 @@ Ether.Hub = function(engine) {
 	this.messageAlpha = 1;
 	this.currentMessage = "";
 	this.lastMessageTime = 0;
-	this.betweenAlpha = 0;
+	this.betweenAlpha = 0.1;
 	this.betweenLastTime = 0;
 }
 
@@ -40,12 +40,12 @@ Ether.Hub.prototype.drawInbetween = function(ctx,time,success){
 
 		//alpha
 		if(time > this.betweenLastTime + 100){
-			this.betweenAlpha+= 0.002;
-			if(this.betweenAlpha > 1){ this.betweenAlpha = 1 }
+			this.betweenLastTime = time;
+			ctx.fillStyle = "rgba(0,0,0,"+this.betweenAlpha+")";
+		    ctx.fillRect(0,0,this.engine.width,this.engine.height);
 		}
 
-		ctx.fillStyle = "rgba(0,0,0,"+this.betweenAlpha+")";
-		ctx.fillRect(0,0,this.engine.width,this.engine.height);
+		
 	}
 }
 

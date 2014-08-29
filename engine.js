@@ -43,7 +43,7 @@ Ether.Engine = function() {
 
 			//Draw Ethers
 			for (var i = 0; i < self.ethers.length; i++) {
-				self.ethers[i].draw(self);
+				self.ethers[i].draw(self,time);
 			};
 			self.ctx.globalCompositeOperation = "source-over";
 
