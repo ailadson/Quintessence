@@ -11,6 +11,7 @@ Ether.Engine = function() {
 	this.world = new Ether.World(this);;
 	this.hub = new Ether.Hub(this);
 	this.util = new Ether.Util(this);
+	this.config = new Ether.Config(this);
 
 	//Ethers
 	this.ethers = [new Ether.Ether(self)];
@@ -26,8 +27,15 @@ Ether.Engine = function() {
 	this.animate = function(time){
 		requestAnimFrame(self.animate);
 
-		if(self.betweenAges){
+		//if configuration is running...
+		if(self.config.running){
+			self.config.draw(time);
+
+		//otherwise, if between ages...
+		} else if(self.betweenAges){
 			self.hub.draw(time);
+
+		//otherwise, if player is not dead...
 		} else if(!self.ethers[0].dead){
 			//Draw Background
 			self.ctx.fillStyle = "black";
@@ -47,7 +55,7 @@ Ether.Engine = function() {
 
 			//
 
-		//gameOver fade
+		//otherwise, if player is dead
 		} else if(self.ethers[0].dead){
 			if(self.gameOverAlpha < 0.35 && time > self.gameOverTime + 100){
 				self.gameOverAlpha+=0.01;

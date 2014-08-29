@@ -2,7 +2,7 @@ var Ether = Ether || {};
 
 Ether.Element = function(type,size){
 	this.type = type;
-	
+
 	//color
 	var r = Math.random()*255>>0;
 	var g = Math.random()*255>>0;

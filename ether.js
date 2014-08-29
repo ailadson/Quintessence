@@ -13,7 +13,7 @@ Ether.Ether = function(engine) {
 	this.range = 15;
 	this.mass = 1;
 	this.age = 0;
-	this.lifeSpan = [30,30,30,30]; //in seconds
+	this.lifeSpan = [90,30,30,30]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.dying = false;
 	this.dead = false;
@@ -167,10 +167,7 @@ Ether.Ether.prototype.drawElement = function(element,ctx,gradFunc){
 
 
 Ether.Ether.prototype.getDistanceFromCenter = function(e){
-	var xDif = e.x - this.x;
-	var yDif = e.y - this.y;
-
-	return Math.sqrt((xDif * xDif) + (yDif * yDif))
+	return this.engine.util.getDistanceFromCenter(this,e);
 }
 
 //Stats

@@ -109,22 +109,24 @@ Ether.World.prototype.draw = function(engine){
 			e.jitter *= -1;
 
 			//x and y positions determined on the fly
-			var x = this.x + e.xOffset + e.jitter;
-			var y = this.y + e.yOffset;
+			e.x = this.x + e.xOffset + e.jitter;
+			e.y = this.y + e.yOffset;
+
+			this.driftTowardsEther(e);
 
 
 			//start rendering
 			engine.ctx.beginPath();
 
 			//create gradient
-			var gradient = engine.ctx.createRadialGradient(x,y,0,x,y,e.radius);
+			var gradient = engine.ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,e.radius);
 			gradient.addColorStop(0.1,"white");
 			gradient.addColorStop(0.1,"white");
 			gradient.addColorStop(0.8,e.color);
 			gradient.addColorStop(0.1,"black");
 
 			engine.ctx.fillStyle = gradient;
-			engine.ctx.arc(x,y,e.radius,Math.PI*2,false);
+			engine.ctx.arc(e.x,e.y,e.radius,Math.PI*2,false);
 			engine.ctx.fill();
 
 			//see if the element is in range of the ether
@@ -134,6 +136,20 @@ Ether.World.prototype.draw = function(engine){
 
 	this.drawDriftingElements(engine); //TO DO!!
 	this.drawBorder(engine);
+}
+
+Ether.World.prototype.driftTowardsEther = function(element){
+	var util = this.engine.util;
+	var ether = this.engine.ethers[0];
+	var radius = element.radius < 40 ? element.radius * 20 : element.radius * 2
+	var speed = element.radius > 50 ? element.radius/50 : element.radius/5
+
+	if(util.getDistanceFromCenter(element,ether) <= radius){
+		if(element.x < ether.x){ element.xOffset+=speed}
+		if(element.x > ether.x){ element.xOffset-=speed}
+		if(element.y < ether.y){ element.yOffset+=speed}
+		if(element.y > ether.y){ element.yOffset-=speed}
+	}
 }
 
 
@@ -217,10 +233,7 @@ Ether.World.prototype.isInView = function(e){
 }
 
 Ether.World.prototype.getDistanceFromCenter = function(e){
-	var xDif = this.x - Math.abs(e.x);
-	var yDif = this.y - Math.abs(e.y);
-
-	return Math.sqrt((xDif * xDif) + (yDif * yDif))
+	return this.engine.util.getDistanceFromCenter(e,this);
 }
 
 //interaction
