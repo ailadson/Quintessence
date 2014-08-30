@@ -68,7 +68,6 @@ Ether.Engine = function() {
 				self.ctx.font = "30px Arial"
 				self.ctx.fillStyle = "black";
 				self.ctx.fillText("Dead",self.width/2,self.height/2);
-				console.log('hit')
 			}
 		}
 	}

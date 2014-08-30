@@ -13,10 +13,15 @@ Ether.Ether = function(engine) {
 	this.range = 15;
 	this.mass = 1;
 	this.age = 0;
-	this.lifeSpan = [90,90,90,90]; //in seconds
+
+	//life and death
+	this.health = 5000;
+	this.lifeSpan = [30,10,10,90]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
+	this.totalLifeSpan = 0;
 	this.dying = false;
 	this.dead = false;
+	this.ageLastTime = 0;
 
 	this.rotateLastTime = 0;
 	this.rotateDirection = -1;
@@ -30,6 +35,10 @@ Ether.Ether.prototype.init = function(){
 			element.x = this.x;
 			element.y = this.y;
 			this.coreElements.push(element);
+
+			for (var i = 0; i < this.lifeSpan.length; i++) {
+				this.totalLifeSpan += this.lifeSpan[i]
+			};
 			break;
 
 		case 1 : 
@@ -86,7 +95,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 		e.y = this.y + e.yOffset;
 		e.jitter *= -1;
 
-		if(!this.lossElement(e)){
+		//if(!this.loseElement(e)){
 
 			//AGE RELATED FUCTIONS
 			switch(this.age){
@@ -106,6 +115,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 					break;
 
 				case 3 :
+					this.ageEther(time);
 					break;
 			}
 
@@ -122,7 +132,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 			})
 
 			if(e.newElement) e.newElement--;
-		}
+		//}
 
 	};
 
@@ -188,7 +198,25 @@ Ether.Ether.prototype.getDistanceFromCenter = function(e){
 	return this.engine.util.getDistanceFromCenter(this,e);
 }
 
+Ether.Ether.prototype.ageEther = function(time){
+	//console.log("time: "+time); console.log("lastTime: " + this.ageLastTime); console.log((time > this.ageLastTime + this.healthRate(time)) )
+	if(time > this.ageLastTime + this.healthRate(time)){
+		this.ageLastTime = time;
+		
+		if(this.elements.length != 0){
+			this.loseElement(this.elements[this.elements.length-1],true)
+		} else {
+			console.log('elements array is 0')
+		}
+	}
+}
+
 //Stats
+Ether.Ether.prototype.healthRate = function(time){
+	var aging = (time - this.totalLifeSpan * 1000);
+	return this.health + this.mass - aging - this.getStability();
+}
+
 Ether.Ether.prototype.getStability = function(){
 	var o = this.getElementCount();
 
@@ -245,12 +273,13 @@ Ether.Ether.prototype.newElement = function(e){
 	this.elements.push(e);
 }
 
-Ether.Ether.prototype.lossElement = function(e){
-	if(e.newElement) { return }
+Ether.Ether.prototype.loseElement = function(e,override){
+	if(e.newElement && !override) { return }
 
-	if(Math.floor(this.getDistanceFromCenter(e) + (e.radius/4) - this.mass) >= this.range - (this.getStability() * 2)){
+	//if(Math.floor(this.getDistanceFromCenter(e) + (e.radius/4) - this.mass) >= this.range - (this.getStability() * 2)){
 		//console.log(this.getDistanceFromCenter(e)+ (e.radius/2) -this.mass);
 		//console.log(this.range - this.getStability() * 2);
+		console.log(e)
 		this.decreaseMass();
 		
 		//remove from elements
@@ -264,7 +293,7 @@ Ether.Ether.prototype.lossElement = function(e){
 			}
 		};
 
-	}
+	//}
 }
 
 Ether.Ether.prototype.increaseMass = function(e,massOffset,range){
@@ -286,7 +315,6 @@ Ether.Ether.prototype.rotateElement = function(e,time){
 	if(time > this.rotateLastTime + 500){
 
 		if(this.rotateDirection < 0){
-			console.log(this.degreeChange);
 			this.degreeChange += 0.001;
 			if(this.degreeChange > 1) {this.degreeChange = 1 }
 			if(this.currentSpan < (this.lifeSpan[this.age]/3) * 2){ this.rotateDirection++; }

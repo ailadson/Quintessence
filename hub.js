@@ -171,7 +171,6 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 			//in between message?
 			if(this.engine.betweenAges && !this.engine.ethers[0].dead){
 				this.currentMessage = "";
-				this.betweenAlpha = 0;
 				this.engine.betweenAges = false;
 				this.engine.ethers[0].age++;
 				this.engine.ethers[0].currentSpan = this.engine.ethers[0].lifeSpan[this.engine.ethers[0].age];

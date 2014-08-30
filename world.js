@@ -145,10 +145,42 @@ Ether.World.prototype.driftTowardsEther = function(element){
 	var speed = element.radius > 50 ? element.radius/50 : element.radius/5
 
 	if(util.getDistanceFromCenter(element,ether) <= radius){
-		if(element.x < ether.x){ element.xOffset+=speed}
-		if(element.x > ether.x){ element.xOffset-=speed}
-		if(element.y < ether.y){ element.yOffset+=speed}
-		if(element.y > ether.y){ element.yOffset-=speed}
+
+		var check;
+
+		while(!check){
+			var x = Math.floor(Math.random()*4);
+
+			switch(x){
+				case 0 :
+					if(element.x < ether.x+5){ 
+						element.xOffset+=speed
+						check = true;
+					}
+					break;
+
+				case 1 :
+					if(element.x > ether.x-5){
+						element.xOffset-=speed
+						check = true;
+					}
+					break;
+
+				case 2 :
+					if(element.y < ether.y+5){ 
+						element.yOffset+=speed
+						check = true;
+					}
+					break;
+
+				case 3 :
+					if(element.y > ether.y-5){ 
+						element.yOffset-=speed
+						check = true;
+					}
+					break;
+			}
+		}
 	}
 }
 
