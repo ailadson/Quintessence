@@ -26,10 +26,13 @@ Ether.Engine = function() {
 	//Animate
 	this.animate = function(time){
 		requestAnimFrame(self.animate);
+		//Draw Background
+		self.ctx.fillStyle = "black";
+		self.ctx.fillRect(0,0,self.width,self.height);
 
 		//if configuration is running...
-		if(self.config.running){
-			self.config.draw(time);
+		if(self.hub.intro){
+			self.hub.drawIntro(time);
 
 		//otherwise, if between ages...
 		} else if(self.betweenAges){
@@ -37,9 +40,6 @@ Ether.Engine = function() {
 
 		//otherwise, if player is not dead...
 		} else if(!self.ethers[0].dead){
-			//Draw Background
-			self.ctx.fillStyle = "black";
-			self.ctx.fillRect(0,0,self.width,self.height);
 
 			//Draw Ethers
 			for (var i = 0; i < self.ethers.length; i++) {
@@ -96,6 +96,8 @@ Ether.Engine.prototype.init = function(){
 		self.world.handleKeyUp(evt.keyCode,self)
 	}
 
+	this.hub.init();
+	
 	this.world.init();
 
 	//start animation

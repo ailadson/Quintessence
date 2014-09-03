@@ -224,7 +224,6 @@ Ether.World.prototype.drawDriftingElements = function(engine){
 			e.jitter /= 5;
 			this.driftArray.splice(i,1);
 			i--;
-			console.log(index + " || " + e.type)
 			this.elements[index].push(e)
 		} else {
 			e.newElement--;

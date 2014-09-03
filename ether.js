@@ -16,12 +16,13 @@ Ether.Ether = function(engine) {
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [30,10,10,90]; //in seconds
+	this.lifeSpan = [30,30,30,90]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.totalLifeSpan = 0;
 	this.dying = false;
 	this.dead = false;
 	this.ageLastTime = 0;
+	this.finalElementLength = 1;
 
 	this.rotateLastTime = 0;
 	this.rotateDirection = -1;
@@ -29,6 +30,7 @@ Ether.Ether = function(engine) {
 }
 
 Ether.Ether.prototype.init = function(){
+	console.log("ether init age is: " + this.age)
 	switch(this.age){
 		case 0 :
 			var element = new Ether.Element('core');
@@ -78,6 +80,10 @@ Ether.Ether.prototype.init = function(){
 			for (var i = 0; i < this.elements.length; i++) {
 				this.elements[i].radius /= 1.5;
 			};
+
+			this.finalElementLength = this.elements.length;
+			console.log("finalElementLength set to :" + this.finalElementLength)
+			break;
 	}
 }
 

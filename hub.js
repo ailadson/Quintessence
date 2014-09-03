@@ -1,6 +1,8 @@
 Ether = Ether || {};
 
 Ether.Hub = function(engine) {
+	var self = this;
+
 	this.engine = engine;
 	this.unit = engine.width/50;
 	this.lastTime = 0;
@@ -10,8 +12,129 @@ Ether.Hub = function(engine) {
 	this.lastMessageTime = 0;
 	this.betweenAlpha = 0.1;
 	this.betweenLastTime = 0;
+	this.showInfo = true;
+
+	//intro
+	this.intro = true;
+	this.lastIntroTime = 0;
+	this.choice1Alpha = 0.2;
+	this.choice2Alpha = 0.2;
+	this.introAlpha = 0;
+	this.question = 0;
+	this.introText = ["An ether is born","you are born","Collect the four elements","grow into yourself","and die, as all things that are born must","To reach the next stage of life collect 5 of each element","don't bite off more than you can chew","seek balance","go"];
+	this.introIndex = 0;
+	this.timeOffset = 0
+
+
+	//mousemove
+	this.mousemove = function(e){
+		var x = e.x;
+		var y = e.y;
+
+		if(x <= self.engine.width/2){
+			self.choice1Alpha = 0.5;
+			self.choice2Alpha = 0.2;
+		} else {
+			self.choice1Alpha = 0.2;
+			self.choice2Alpha = 0.5;
+		}
+	}
+
+	this.handleClick = function(e){
+		switch(self.question){
+			case 0 :
+				self.showInfo = (self.choice1Alpha > self.choice2Alpha) ? true : false
+				break;
+		}
+
+		self.question++;
+		self.introAlpha = 0;
+		if(self.question == 2) self.timeOffset = self.lastIntroTime;
+	}
+
 }
 
+Ether.Hub.prototype.init = function(){
+	if(this.intro == false){
+		window.onmousemove = undefined;
+		window.onclick = undefined;
+		return
+	} 
+
+	window.onmousemove = this.mousemove;
+	window.onclick = this.handleClick;
+}
+
+Ether.Hub.prototype.drawIntro = function(time){
+	var ctx = this.engine.ctx;
+	if(this.question <= 2){
+		this.drawAnswerBoxes(ctx,time);
+		this.drawQuestionText(ctx,time);
+	} else {
+		this.drawIntroText(ctx,time)
+	}
+}
+
+Ether.Hub.prototype.drawIntroText = function(ctx,time){
+	if(time > this.lastIntroTime + 50){
+		this.introAlpha += 0.05;
+		this.lastIntroTime = time;
+		if(this.introAlpha > 1) this.introAlpha = 1;
+		console.log(this.timeOffset)
+		if(this.lastIntroTime-this.timeOffset > 4000){
+			this.timeOffset = this.lastIntroTime;
+			this.introAlpha = 0;
+			this.introIndex++;
+			if(this.introIndex == this.introText.length){ this.intro = false }
+		}
+	}
+
+	var txt = this.introText[this.introIndex];
+	var iWidth = ctx.measureText(txt).width;
+	ctx.fillStyle="rgba(255,255,255,"+this.introAlpha+")"
+	ctx.fillText(txt,(this.engine.width/2)-(iWidth/2),this.engine.height/2)
+}
+
+Ether.Hub.prototype.drawQuestionText = function(ctx,time){
+	var questions = ["Which is more true?","To which place are you destined?","Which is more desireable?"];
+
+	var answers = [["Knowledge is power.","The unknown is reality."],
+					["The journey of a galaxy","The home of concious life"],
+					["A Butterfly","A Snail"]];
+
+	var currentQuestion = questions[this.question];
+	var currentAnswers = answers[this.question];
+	var qWidth = ctx.measureText(currentQuestion).width;
+
+	if(time > this.lastIntroTime + 50){
+		this.lastIntroTime = time;
+		this.introAlpha += 0.05;
+		if(this.introAlpha > 1) this.introAlpha = 1;
+	}
+
+	//quetion
+	ctx.font = "28pt Arial"
+	ctx.fillStyle="rgba(255,255,255,"+this.introAlpha+")";
+	ctx.fillText(currentQuestion,(this.engine.width/2)-(qWidth/2),this.unit * 2);
+
+	//answers
+	var aWidth0 = ctx.measureText(currentAnswers[0]).width;
+	var aWidth1 = ctx.measureText(currentAnswers[1]).width;
+
+	ctx.fillText(currentAnswers[0],(this.engine.width/4)-(aWidth0/2),this.engine.height/2)
+	ctx.fillText(currentAnswers[1],((this.engine.width/4) * 3)-(aWidth1/2),this.engine.height/2)
+}
+
+Ether.Hub.prototype.drawAnswerBoxes = function(ctx){
+	var width = this.engine.width;
+	var height = this.engine.height;
+
+	ctx.fillStyle = "rgba(75,100,75,"+this.choice1Alpha+")";
+	ctx.fillRect(0,0,width/2,height);
+
+	ctx.fillStyle = "rgba(75,75,100,"+this.choice2Alpha+")";
+	ctx.fillRect(width/2,0,width/2,height)
+}
 
 Ether.Hub.prototype.draw = function(time){
 	var stats = this.getStats();
@@ -20,15 +143,17 @@ Ether.Hub.prototype.draw = function(time){
 	//convert stability
 	var hubStab = (stats.stab > 100) ? 0 : (100 - stats.stab)
 
-	ctx.font = this.unit + "px Arial";
-	ctx.fillStyle = "rgba(20,70,200,1)"
-	ctx.fillText("Mass: " + stats.mass, this.unit,this.unit*1.5)
-	ctx.fillText("Stability: " + hubStab, this.unit,this.unit*2.5)
+	if(this.showInfo){
+		ctx.font = this.unit + "px Arial";
+		ctx.fillStyle = "rgba(20,70,200,1)"
+		ctx.fillText("Mass: " + stats.mass, this.unit,this.unit*1.5)
+		ctx.fillText("Stability: " + hubStab, this.unit,this.unit*2.5)
+	}
 
 	//in between ages?
 	this.drawInbetween(ctx,time);
 
-	this.drawElementStats(stats,ctx);
+	if(this.showInfo) this.drawElementStats(stats,ctx);
 	this.drawLifeBar(ctx, time);
 	this.drawMessage(ctx,time);
 }
@@ -82,7 +207,7 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 
 	var colors = ["green","yellow","orange","red"];
 	var ether = this.engine.ethers[0];
-	var ratio = ether.currentSpan/ether.lifeSpan[ether.age];
+	var ratio = (ether.age != 3) ? (ether.currentSpan/ether.lifeSpan[ether.age]) : (ether.elements.length/ether.finalElementLength)
 
 	ctx.fillStyle = colors[ether.age];
 	ctx.fillRect(this.engine.width - (this.unit * 0.5), this.unit * 1.5, -(this.unit * 5) * ratio, this.unit * 0.5)
@@ -175,7 +300,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 				this.engine.ethers[0].age++;
 				this.engine.ethers[0].currentSpan = this.engine.ethers[0].lifeSpan[this.engine.ethers[0].age];
 
-				if(this.engine.ethers[0].age < 3){
+				if(this.engine.ethers[0].age < 4){
 					this.engine.init();
 				} else {
 					//TO DO END GAME?!?!?
