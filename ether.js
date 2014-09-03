@@ -16,7 +16,7 @@ Ether.Ether = function(engine) {
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [30,30,30,90]; //in seconds
+	this.lifeSpan = [90,90,90,90]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.totalLifeSpan = 0;
 	this.dying = false;
@@ -27,6 +27,7 @@ Ether.Ether = function(engine) {
 	this.rotateLastTime = 0;
 	this.rotateDirection = -1;
 	this.degreeChange = 0;
+
 }
 
 Ether.Ether.prototype.init = function(){

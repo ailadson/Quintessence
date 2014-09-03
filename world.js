@@ -10,8 +10,8 @@ Ether.World = function (engine) {
 	this.y = engine.height/2;
 	this.xv = 0;
 	this.yv = 0;
-	this.dragX = false;
-	this.dragY = false;
+	this.dragLastTime = 0;
+	this.speedUp = {x:false,y:false}
 
 	//elements
 	this.fire = [];
@@ -93,7 +93,13 @@ Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,e
 
 
 //DRAWING
-Ether.World.prototype.draw = function(engine){
+Ether.World.prototype.draw = function(engine,time){
+		this.xv = this.adjustVelocity("x",this.xv,time);
+		this.yv = this.adjustVelocity("y",this.yv,time);
+
+		//velocity time
+		if(time > this.dragLastTime + 200){this.dragLastTime = time}
+
 		this.x += this.xv;
 		this.y += this.yv;
 
@@ -267,21 +273,67 @@ Ether.World.prototype.getDistanceFromCenter = function(e){
 	return this.engine.util.getDistanceFromCenter(e,this);
 }
 
+Ether.World.prototype.adjustVelocity = function(axis,val,time){
+	if(time > this.dragLastTime + 200){
+		if(this.speedUp[axis]){
+			if(val > 0 && val <= 13){
+				val+=2;
+				if(val > 13) val = 13
+			} else if(val < 0 && val >= -13){
+				val-=2;
+				if(val < -13) val = -13
+			}
+		} else if (val != 0){
+			if(val > 0){
+				val-=2;
+				if(val < 0) val = 0
+			} else if(val < 0){
+				val+=2;
+				if(val > 0) val = 0
+			}
+		}
+	}
+	return val
+}
 //interaction
 Ether.World.prototype.handleKeyDown = function(e){
 	//if(!this.draggingX || !this.draggingY){
 		switch(e){
 			case 38 :
-				this.yv = 13//this.dragMotion('up',this.yv);
+				if(!this.speedUp.y && this.yv >= -5){ 
+					this.speedUp.y = true;
+					this.yv = 1;
+
+				} else if(this.yv < -5){
+					this.speedUp.y = false
+				}
 				break;
 			case 39 :
-				this.xv = -13//this.dragMotion('up',-this.xv) * -1;
+				if(!this.speedUp.x && this.xv <= 5){ 
+					this.speedUp.x = true;
+					this.xv = -1;
+
+				} else if(this.xv > 5){
+					this.speedUp.x = false
+				}
 				break;
 			case 40 :
-				this.yv = -13//this.dragMotion('up',-this.yv) * -1;
+				if(!this.speedUp.y && this.yv <= 5){ 
+					this.speedUp.y = true;
+					this.yv = -1;
+
+				} else if(this.yv > 5){
+					this.speedUp.y = false
+				}
 				break;
 			case 37 :
-				this.xv = 13//this.dragMotion('up',this.xv);
+				if(!this.speedUp.x && this.xv >= -5){ 
+					this.speedUp.x = true;
+					this.xv = 1;
+
+				} else if(this.xv < -5){
+					this.speedUp.x = false
+				}
 				break;
 		}
 	//}
@@ -290,38 +342,25 @@ Ether.World.prototype.handleKeyDown = function(e){
 Ether.World.prototype.handleKeyUp = function(e){
 		switch(e){
 			case 38 :
-				this.yv = 0//this.dragMotion('up',this.yv);
+				this.speedUp.y = false//this.dragMotion('up',this.yv);
 				break;
 			case 39 :
-				this.xv = 0//this.dragMotion('up',-this.xv) * -1;
+				this.speedUp.x = false//this.dragMotion('up',-this.xv) * -1;
 				break;
 			case 40 :
-				this.yv = 0//this.dragMotion('up',-this.yv) * -1;
+				this.speedUp.y = false//this.dragMotion('up',-this.yv) * -1;
 				break;
 			case 37 :
-				this.xv = 0//this.dragMotion('up',this.xv);
+				this.speedUp.x = false//this.dragMotion('up',this.xv);
 				break;
 		}
 }
 
 Ether.World.prototype.dragMotion = function(direction,val){
-	var n = val;
+	if(time)
+	if(faster){
 
-	if(direction == 'up'){
-		if(n <= 1){
-			n += 0.05;
-		} else {
-			n = 1
-		}
-	}else{
-		if(n >= 0){
-			n -= 0.05;
-		} else {
-			n = 0
-		}
 	}
-
-	return n
 }
 
 //Elements

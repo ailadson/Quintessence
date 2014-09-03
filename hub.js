@@ -49,7 +49,10 @@ Ether.Hub = function(engine) {
 
 		self.question++;
 		self.introAlpha = 0;
-		if(self.question == 2) self.timeOffset = self.lastIntroTime;
+		if(self.question >= 2){
+			self.timeOffset = self.lastIntroTime;
+			self.introIndex++;
+		}
 	}
 
 }

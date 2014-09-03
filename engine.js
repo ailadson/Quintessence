@@ -48,7 +48,7 @@ Ether.Engine = function() {
 			self.ctx.globalCompositeOperation = "source-over";
 
 			//Draw World
-			self.world.draw(self);
+			self.world.draw(self,time);
 
 			//Draw Hub
 			self.hub.draw(time);
@@ -97,7 +97,7 @@ Ether.Engine.prototype.init = function(){
 	}
 
 	this.hub.init();
-	
+
 	this.world.init();
 
 	//start animation
