@@ -47,11 +47,15 @@ Ether.Hub = function(engine) {
 				break;
 		}
 
-		self.question++;
-		self.introAlpha = 0;
-		if(self.question >= 2){
+		
+		if(self.question > 2 && self.introIndex + 1 < self.introText.length){
 			self.timeOffset = self.lastIntroTime;
 			self.introIndex++;
+			if(self.introIndex != self.introText.length -1) self.introAlpha = 0;	
+
+		} else {
+			self.question++;
+			self.introAlpha = 0;	
 		}
 	}
 
@@ -149,7 +153,7 @@ Ether.Hub.prototype.draw = function(time){
 	if(this.showInfo){
 		ctx.font = this.unit + "px Arial";
 		ctx.fillStyle = "rgba(20,70,200,1)"
-		ctx.fillText("Mass: " + stats.mass, this.unit,this.unit*1.5)
+		ctx.fillText("Mass: " + Math.floor(stats.mass), this.unit,this.unit*1.5)
 		ctx.fillText("Stability: " + hubStab, this.unit,this.unit*2.5)
 	}
 

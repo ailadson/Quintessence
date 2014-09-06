@@ -11,7 +11,6 @@ Ether.Engine = function() {
 	this.world = new Ether.World(this);;
 	this.hub = new Ether.Hub(this);
 	this.util = new Ether.Util(this);
-	this.config = new Ether.Config(this);
 
 	//Ethers
 	this.ethers = [new Ether.Ether(self)];

@@ -23,6 +23,7 @@ Ether.Ether = function(engine) {
 	this.dead = false;
 	this.ageLastTime = 0;
 	this.finalElementLength = 1;
+	this.stabilityLastTime = 0;
 
 	this.rotateLastTime = 0;
 	this.rotateDirection = -1;
@@ -31,7 +32,6 @@ Ether.Ether = function(engine) {
 }
 
 Ether.Ether.prototype.init = function(){
-	console.log("ether init age is: " + this.age)
 	switch(this.age){
 		case 0 :
 			var element = new Ether.Element('core');
@@ -61,7 +61,6 @@ Ether.Ether.prototype.init = function(){
 				element.x = this.x;
 				element.y = this.y;
 				this.coreElements.push(element); 
-				console.log(this.coreElements.length)
 			};
 
 			for (var i = 0; i < this.elements.length; i++) {
@@ -91,6 +90,8 @@ Ether.Ether.prototype.init = function(){
 Ether.Ether.prototype.draw = function(engine,time){
 	this.drawCoreElements(engine);
 	this.drawElements(engine,time);
+	this.stabilityCheck(time);
+	if(this.elements.length = 0) this.dead = true;
 }
 
 Ether.Ether.prototype.drawElements = function(engine,time){
@@ -200,13 +201,41 @@ Ether.Ether.prototype.drawElement = function(element,ctx,gradFunc){
 	ctx.fill();
 }
 
+Ether.Ether.prototype.stabilityCheck = function(time){
+	var stability = this.getStability();
+
+	if(stability >= 50 && this.age < 3){
+		if(time > this.stabilityLastTime + 2000 - stability){
+			this.stabilityLastTime = time;
+			var random = Math.floor(Math.random() * this.elements.length)
+		
+			if(this.elements.length != 0){
+				this.loseElement(this.elements[this.elements.length-1],true)
+			} else {
+				console.log('elements array is 0')
+			}
+
+			if(this.elements.length != 0){
+				this.loseElement(this.elements[random],true)
+			} else {
+				console.log('elements array is 0')
+			}
+
+			if(this.elements.length != 0){
+				this.loseElement(this.elements[random],true)
+			} else {
+				console.log('elements array is 0')
+			}
+		}
+	}
+}
 
 Ether.Ether.prototype.getDistanceFromCenter = function(e){
 	return this.engine.util.getDistanceFromCenter(this,e);
 }
 
 Ether.Ether.prototype.ageEther = function(time){
-	//console.log("time: "+time); console.log("lastTime: " + this.ageLastTime); console.log((time > this.ageLastTime + this.healthRate(time)) )
+	console.log(this.healthRate(time));
 	if(time > this.ageLastTime + this.healthRate(time)){
 		this.ageLastTime = time;
 		
@@ -221,7 +250,10 @@ Ether.Ether.prototype.ageEther = function(time){
 //Stats
 Ether.Ether.prototype.healthRate = function(time){
 	var aging = (time - this.totalLifeSpan * 1000);
-	return this.health + this.mass - aging - this.getStability();
+	var val = this.health + this.mass - aging - this.getStability();
+	var returnVal = (val > 200) ? val : 200;
+	
+	return returnVal; 
 }
 
 Ether.Ether.prototype.getStability = function(){
@@ -286,7 +318,6 @@ Ether.Ether.prototype.loseElement = function(e,override){
 	//if(Math.floor(this.getDistanceFromCenter(e) + (e.radius/4) - this.mass) >= this.range - (this.getStability() * 2)){
 		//console.log(this.getDistanceFromCenter(e)+ (e.radius/2) -this.mass);
 		//console.log(this.range - this.getStability() * 2);
-		console.log(e)
 		this.decreaseMass();
 		
 		//remove from elements
