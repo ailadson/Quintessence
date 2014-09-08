@@ -22,6 +22,9 @@ Ether.Engine = function() {
 	this.gameOverAlpha = 0;
 	this.gameOverTime = 0;
 
+	//award
+	this.awardDelay = -5000;
+
 	//Animate
 	this.animate = function(time){
 		requestAnimFrame(self.animate);
@@ -40,6 +43,8 @@ Ether.Engine = function() {
 		//otherwise, if player is not dead...
 		} else if(!self.ethers[0].dead){
 
+			//check awards
+			self.checkAwards(time);
 			//Draw Ethers
 			for (var i = 0; i < self.ethers.length; i++) {
 				self.ethers[i].draw(self,time);
@@ -104,7 +109,39 @@ Ether.Engine.prototype.init = function(){
 		window.requestAnimFrame(this.animate);
 }
 
+Ether.Engine.prototype.checkAwards = function(time){
+	var stats = this.ethers[0].getElementCount();
 
+	if(time > this.awardDelay + 5000){
+		this.awardLastTime = time;
+
+		for (var i = 0; i < this.awards.length; i++) {
+			var award = this.awards[i];
+
+			//if the award has been awarded, contiue to the next one
+			if(award.awarded){ continue }
+
+			var elements = award.elements.split();
+
+			for (var j = 0; j < elements.length; j++) {
+				if(stats[elements[j]] >= award.amount){
+					if(j == elements.length-1){
+						award.awarded = true;
+						this.hub.newAward(award.text);
+						this.ethers[0].receiveAward(award.award);
+						this.awardDelay = time;
+					}
+				} else {
+					break;
+				}
+			};
+		};
+	}
+}
+
+Ether.Engine.prototype.setAwards = function(type){
+	this.awards = Ether.awards[type];
+}
 //////////////////
 //////////////////
 

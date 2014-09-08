@@ -25,6 +25,8 @@ Ether.Hub = function(engine) {
 	this.introIndex = 0;
 	this.timeOffset = 0
 
+	this.awardMssg = "";
+
 
 	//mousemove
 	this.mousemove = function(e){
@@ -44,6 +46,12 @@ Ether.Hub = function(engine) {
 		switch(self.question){
 			case 0 :
 				self.showInfo = (self.choice1Alpha > self.choice2Alpha) ? true : false
+				break;
+			case 1 :
+				if(self.choice1Alpha > self.choice2Alpha)
+					self.engine.setAwards("matter") 
+				else
+					self.engine.setAwards("consciousness") 
 				break;
 		}
 
@@ -87,7 +95,7 @@ Ether.Hub.prototype.drawIntroText = function(ctx,time){
 		this.introAlpha += 0.05;
 		this.lastIntroTime = time;
 		if(this.introAlpha > 1) this.introAlpha = 1;
-		console.log(this.timeOffset)
+
 		if(this.lastIntroTime-this.timeOffset > 4000){
 			this.timeOffset = this.lastIntroTime;
 			this.introAlpha = 0;
@@ -103,10 +111,10 @@ Ether.Hub.prototype.drawIntroText = function(ctx,time){
 }
 
 Ether.Hub.prototype.drawQuestionText = function(ctx,time){
-	var questions = ["Which is more true?","To which place are you destined?","Which is more desireable?"];
+	var questions = ["Which is more true?","To which are you destined?","Which is more desireable?"];
 
-	var answers = [["Knowledge is power.","The unknown is reality."],
-					["The journey of a galaxy","The home of concious life"],
+	var answers = [["Knowledge is Power.","Reality is Unknown."],
+					["Matter","Consciousness"],
 					["A Butterfly","A Snail"]];
 
 	var currentQuestion = questions[this.question];
@@ -181,6 +189,12 @@ Ether.Hub.prototype.drawInbetween = function(ctx,time,success){
 	}
 }
 
+Ether.Hub.prototype.newAward = function(text){
+	this.awardMssg = text;
+	this.drawMessage(0,0,true);
+	this.awardMssg = "";
+}
+
 Ether.Hub.prototype.getStats = function(){
 	var o = {};
 	var e = this.engine.ethers[0];
@@ -235,7 +249,7 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 }
 
 //messages
-Ether.Hub.prototype.drawMessage = function(ctx,time){
+Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 	var ether = this.engine.ethers[0];
 
 	var borderMssg = "in the boundless void, time is not";
@@ -245,10 +259,16 @@ Ether.Hub.prototype.drawMessage = function(ctx,time){
 	var age2Mssg = "you are giant. all things die";
 	var age3Mssg = "dead";
 
+	if(award){this.messageExist = false}
+
 	if(!this.messageExist){
 
+		if(this.awardMssg){
+			this.messageExist = true;
+			this.currentMessage = this.awardMssg;
+
 		//leaving game border
-		if(this.hasLeftBorder() && this.currentMessage != borderMssg){
+		} else if(this.hasLeftBorder() && this.currentMessage != borderMssg){
 			this.messageExist = true;
 			this.currentMessage = borderMssg;
 		
@@ -283,7 +303,7 @@ Ether.Hub.prototype.drawMessage = function(ctx,time){
 		}
 
 	} else {
-		this.renderMessage(ctx,time);
+		if(!award) this.renderMessage(ctx,time);
 	}
 }
 

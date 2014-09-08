@@ -91,7 +91,7 @@ Ether.Ether.prototype.draw = function(engine,time){
 	this.drawCoreElements(engine);
 	this.drawElements(engine,time);
 	this.stabilityCheck(time);
-	if(this.elements.length = 0) this.dead = true;
+	//if(this.elements.length = 0) this.dead = true;
 }
 
 Ether.Ether.prototype.drawElements = function(engine,time){
@@ -414,5 +414,8 @@ Ether.Ether.prototype.attractEtherToElement = function(e){
 	}
 }
 
-
+//awards
+Ether.Ether.prototype.receiveAward = function(amount){
+	this.currentSpan += amount;
+}
 
