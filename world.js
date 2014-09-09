@@ -276,12 +276,12 @@ Ether.World.prototype.getDistanceFromCenter = function(e){
 Ether.World.prototype.adjustVelocity = function(axis,val,time){
 	if(time > this.dragLastTime + 200){
 		if(this.speedUp[axis]){
-			if(val > 0 && val <= 13){
+			if(val > 0 && val <= this.engine.ethers[0].speed){
 				val+=2;
-				if(val > 13) val = 13
-			} else if(val < 0 && val >= -13){
+				if(val > this.engine.ethers[0].speed) val = this.engine.ethers[0].speed
+			} else if(val < 0 && val >= -this.engine.ethers[0].speed){
 				val-=2;
-				if(val < -13) val = -13
+				if(val < -this.engine.ethers[0].speed) val = -this.engine.ethers[0].speed
 			}
 		} else if (val != 0){
 			if(val > 0){

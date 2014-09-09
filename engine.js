@@ -29,8 +29,10 @@ Ether.Engine = function() {
 	this.animate = function(time){
 		requestAnimFrame(self.animate);
 		//Draw Background
-		self.ctx.fillStyle = "black";
-		self.ctx.fillRect(0,0,self.width,self.height);
+		if(!this.ethers[0].dead){
+			self.ctx.fillStyle = "black";
+			self.ctx.fillRect(0,0,self.width,self.height);
+		}
 
 		//if configuration is running...
 		if(self.hub.intro){
@@ -44,7 +46,7 @@ Ether.Engine = function() {
 		} else if(!self.ethers[0].dead){
 
 			//check awards
-			self.checkAwards(time);
+			if(!this.engine.ethers[0].dead){ self.checkAwards(time) };
 			//Draw Ethers
 			for (var i = 0; i < self.ethers.length; i++) {
 				self.ethers[i].draw(self,time);
@@ -141,6 +143,13 @@ Ether.Engine.prototype.checkAwards = function(time){
 
 Ether.Engine.prototype.setAwards = function(type){
 	this.awards = Ether.awards[type];
+
+	var amount = 1;
+
+	for (var i = 0; i < this.awards.length; i++) {
+		this.awards[i].amount = amount;
+		amount += 3;
+	};
 }
 //////////////////
 //////////////////

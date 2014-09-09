@@ -13,10 +13,11 @@ Ether.Ether = function(engine) {
 	this.range = 15;
 	this.mass = 1;
 	this.age = 0;
+	this.speed = 7;
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [90,90,90,90]; //in seconds
+	this.lifeSpan = [100,100,100,100]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.totalLifeSpan = 0;
 	this.dying = false;
