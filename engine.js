@@ -28,6 +28,7 @@ Ether.Engine = function() {
 	//Animate
 	this.animate = function(time){
 		requestAnimFrame(self.animate);
+
 		//Draw Background
 		if(!self.ethers[0].dead){
 			self.ctx.fillStyle = "black";

@@ -21,11 +21,13 @@ Ether.Hub = function(engine) {
 	this.choice2Alpha = 0.2;
 	this.introAlpha = 0;
 	this.question = 0;
-	this.introText = ["An ether is born","you are born","Collect the four elements","grow into yourself","and die, as all things that are born must","To reach the next stage of life collect 5 of each element","don't bite off more than you can chew","seek balance","go"];
+	this.introText = ["an ether is born","you are born","collect the four elements","grow into yourself","and die","as all things that are born must","Collect 5 of each element...","...to reach the next stage of life","Seek balance","Go"];
 	this.introIndex = 0;
 	this.timeOffset = 0
 
 	this.awardMssg = "";
+
+	this.showControl = true;
 
 
 	//mousemove
@@ -61,7 +63,7 @@ Ether.Hub = function(engine) {
 			self.introIndex++;
 			if(self.introIndex != self.introText.length -1) self.introAlpha = 0;	
 
-		} else {
+		} else if(self.introIndex + 1 != self.introText.length){
 			self.question++;
 			self.introAlpha = 0;	
 		}
@@ -92,11 +94,11 @@ Ether.Hub.prototype.drawIntro = function(time){
 
 Ether.Hub.prototype.drawIntroText = function(ctx,time){
 	if(time > this.lastIntroTime + 50){
-		this.introAlpha += 0.05;
+		this.introAlpha += 0.1;
 		this.lastIntroTime = time;
 		if(this.introAlpha > 1) this.introAlpha = 1;
 
-		if(this.lastIntroTime-this.timeOffset > 4000){
+		if(this.lastIntroTime-this.timeOffset > 3000){
 			this.timeOffset = this.lastIntroTime;
 			this.introAlpha = 0;
 			this.introIndex++;
@@ -128,7 +130,7 @@ Ether.Hub.prototype.drawQuestionText = function(ctx,time){
 	}
 
 	//quetion
-	ctx.font = "28pt Arial"
+	ctx.font = "28pt Verdana"
 	ctx.fillStyle="rgba(255,255,255,"+this.introAlpha+")";
 	ctx.fillText(currentQuestion,(this.engine.width/2)-(qWidth/2),this.unit * 2);
 
@@ -159,7 +161,7 @@ Ether.Hub.prototype.draw = function(time){
 	var hubStab = (stats.stab > 100) ? 0 : (100 - stats.stab)
 
 	if(this.showInfo){
-		ctx.font = this.unit + "px Arial";
+		ctx.font = this.unit + "30px Verdana";
 		ctx.fillStyle = "rgba(20,70,200,1)"
 		ctx.fillText("Mass: " + Math.floor(stats.mass), this.unit,this.unit*1.5)
 		ctx.fillText("Stability: " + hubStab, this.unit,this.unit*2.5)
@@ -208,7 +210,7 @@ Ether.Hub.prototype.getStats = function(){
 }
 
 Ether.Hub.prototype.drawElementStats = function(stats, ctx){
-	ctx.font = this.unit/2 + "px Arial";
+	ctx.font = this.unit/2 + "px Verdana";
 
 	ctx.fillStyle = "red";
 	ctx.fillText("Fire: " + stats.elementCount.f, this.unit, this.unit*3.2);
@@ -252,7 +254,8 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 	var ether = this.engine.ethers[0];
 
-	var borderMssg = "in the boundless void, time is not";
+	var controlMssg = "wsad / arrow keys"
+	var borderMssg = "there is no time in the boundless void";
 	var age0WinMssg = "absorbing the elements, you grow into a fine young ether";
 	var age0FailMssg = "you cannot subsist on the little you've aquired; dead";
 	var age1Mssg = "let your wings spread";
@@ -262,8 +265,12 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 	if(award){this.messageExist = false}
 
 	if(!this.messageExist){
-
-		if(this.awardMssg){
+		if(this.showControl){
+			this.showControl = false;
+			this.messageExist = true;
+			this.currentMessage = controlMssg;
+			//award
+		} else if(this.awardMssg){
 			this.messageExist = true;
 			this.currentMessage = this.awardMssg;
 
@@ -308,10 +315,17 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 }
 
 Ether.Hub.prototype.renderMessage = function(ctx,time){
-	ctx.font = "30px Arial";
-	ctx.fillStyle = "rgba(255,255,255,"+this.messageAlpha+")";
 	var textWidth = ctx.measureText(this.currentMessage).width;
-	ctx.fillText(this.currentMessage,(this.engine.width/2) - (textWidth / 2), (this.engine.height/2)-this.unit);
+	var x = (this.engine.width/2) - (textWidth / 2);
+	var y = (this.engine.height/2)-this.unit;
+
+	ctx.font = "30px Verdana";
+
+	ctx.fillStyle = "rgba(0,0,0,"+this.messageAlpha+")";
+	ctx.fillText(this.currentMessage,x+2,y+2);
+
+	ctx.fillStyle = "rgba(255,255,255,"+this.messageAlpha+")";
+	ctx.fillText(this.currentMessage,x,y);
 
 	if(time > this.lastMessageTime + 100){
 		this.messageAlpha-=0.01;
