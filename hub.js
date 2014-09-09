@@ -51,7 +51,7 @@ Ether.Hub = function(engine) {
 				if(self.choice1Alpha > self.choice2Alpha)
 					self.engine.setAwards("matter") 
 				else
-					self.engine.setAwards("consciousness") 
+					self.engine.setAwards("consciousness"); 
 				break;
 		}
 

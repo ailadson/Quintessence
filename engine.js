@@ -29,7 +29,7 @@ Ether.Engine = function() {
 	this.animate = function(time){
 		requestAnimFrame(self.animate);
 		//Draw Background
-		if(!this.ethers[0].dead){
+		if(!self.ethers[0].dead){
 			self.ctx.fillStyle = "black";
 			self.ctx.fillRect(0,0,self.width,self.height);
 		}
@@ -46,7 +46,7 @@ Ether.Engine = function() {
 		} else if(!self.ethers[0].dead){
 
 			//check awards
-			if(!this.engine.ethers[0].dead){ self.checkAwards(time) };
+			if(!self.ethers[0].dying){ self.checkAwards(time) };
 			//Draw Ethers
 			for (var i = 0; i < self.ethers.length; i++) {
 				self.ethers[i].draw(self,time);
@@ -63,13 +63,13 @@ Ether.Engine = function() {
 
 		//otherwise, if player is dead
 		} else if(self.ethers[0].dead){
-			if(self.gameOverAlpha < 0.35 && time > self.gameOverTime + 100){
+			if(time > self.gameOverTime + 100){//self.gameOverAlpha < 0.35){
 				self.gameOverAlpha+=0.01;
 				self.gameOverTime = time;
 
 				self.ctx.fillStyle = "rgba(255,255,255,+"+self.gameOverAlpha+");";
 				self.ctx.fillRect(0,0,self.width,self.height);
-			} else if(self.gameOverAlpha >= 0.35){
+			//} else if(self.gameOverAlpha >= 0.35){
 			
 				self.ctx.font = "30px Arial"
 				self.ctx.fillStyle = "black";
