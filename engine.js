@@ -149,7 +149,7 @@ Ether.Engine.prototype.setAwards = function(type){
 
 	for (var i = 0; i < this.awards.length; i++) {
 		this.awards[i].amount = amount;
-		amount += 3;
+		amount += 1;
 	};
 }
 //////////////////
