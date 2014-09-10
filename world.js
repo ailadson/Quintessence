@@ -112,6 +112,12 @@ Ether.World.prototype.draw = function(engine,time){
 		this.x += this.xv;
 		this.y += this.yv;
 
+		this.engine.ethers[0].xv = this.xv;
+		this.engine.ethers[0].yv = this.yv;
+
+		engine.xv = this.xv;
+		engine.yv = this.yv;
+
 	for (var i = 0; i < this.elements.length; i++) {
 		var collection = this.elements[i];
 

@@ -8,6 +8,8 @@ Ether.Ether = function(engine) {
 
 	this.x = engine.width/2;
 	this.y = engine.height/2;
+	this.xv;
+	this.yv;
 
 	//stats
 	this.range = 15;
@@ -26,10 +28,14 @@ Ether.Ether = function(engine) {
 	this.finalElementLength = 1;
 	this.stabilityLastTime = 0;
 
+	this.transformation;
+	this.transformations = [this.rotateElement,this.createSludge]
+
+	this.sludgeLastTime = 0;
+
 	this.rotateLastTime = 0;
 	this.rotateDirection = -1;
 	this.degreeChange = 0;
-
 }
 
 Ether.Ether.prototype.init = function(){
@@ -120,7 +126,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 					break;
 
 				case 2 : 
-					this.rotateElement(e,time)
+					this.transformation(e,time)
 					break;
 
 				case 3 :
@@ -236,7 +242,6 @@ Ether.Ether.prototype.getDistanceFromCenter = function(e){
 }
 
 Ether.Ether.prototype.ageEther = function(time){
-	console.log(this.healthRate(time));
 	if(time > this.ageLastTime + this.healthRate(time)){
 		this.ageLastTime = time;
 		
@@ -350,35 +355,6 @@ Ether.Ether.prototype.decreaseMass = function(){
 	this.range -= 2;
 }
 
-Ether.Ether.prototype.rotateElement = function(e,time){
-	if(time > this.rotateLastTime + 500){
-
-		if(this.rotateDirection < 0){
-			this.degreeChange += 0.001;
-			if(this.degreeChange > 1) {this.degreeChange = 1 }
-			if(this.currentSpan < (this.lifeSpan[this.age]/3) * 2){ this.rotateDirection++; }
-
-		} else if(this.rotateDirection > 0){
-			this.degreeChange -= 0.001;
-			if(this.degreeChange < 0.001) {this.degreeChange = 0.001 }
-
-		} else {
-			if(this.currentSpan < this.lifeSpan[this.age]/3){ this.rotateDirection++; }
-
-		}
-	}
-
-	if(e.degree == 360){
-		e.degree = 0;
-	} else {
-		e.degree+=this.degreeChange;
-	}
-
-	e.xOffset = (e.range * Math.cos(this.engine.util.degToRad(e.degree)));
-	e.yOffset = (e.xOffset * Math.tan(this.engine.util.degToRad(e.degree)));
-	
-}
-
 Ether.Ether.prototype.findDegree = function(opp,hyp){
 	var ratio = opp/hyp;
 	var radian = Math.acos(ratio);
@@ -425,3 +401,129 @@ Ether.Ether.prototype.receiveAward = function(amount){
 	}
 }
 
+
+//lifestages
+Ether.Ether.prototype.rotateElement = function(e,time){
+	if(time > this.rotateLastTime + 500){
+
+		if(this.rotateDirection < 0){
+			this.degreeChange += 0.001;
+			if(this.degreeChange > 1) {this.degreeChange = 1 }
+			if(this.currentSpan < (this.lifeSpan[this.age]/3) * 2){ this.rotateDirection++; }
+
+		} else if(this.rotateDirection > 0){
+			this.degreeChange -= 0.001;
+			if(this.degreeChange < 0.001) {this.degreeChange = 0.001 }
+
+		} else {
+			if(this.currentSpan < this.lifeSpan[this.age]/3){ this.rotateDirection++; }
+
+		}
+	}
+
+	if(e.degree == 360){
+		e.degree = 0;
+	} else {
+		e.degree+=this.degreeChange;
+	}
+
+	e.xOffset = (e.range * Math.cos(this.engine.util.degToRad(e.degree)));
+	e.yOffset = (e.xOffset * Math.tan(this.engine.util.degToRad(e.degree)));
+	
+}
+
+Ether.Ether.prototype.createSludge = function(e,time){
+	if(time > this.sludgeLastTime + 500){
+		this.sludgeLastTime = time;
+		
+		var sludge = new Sludge(this.engine,this);
+
+		for (var i = 0; i < this.elements.length; i++) {
+			var e = this.elements[i];
+
+			//create sludge based on direction
+			if(this.xv > 0 && (e.x > this.x)){
+				var ele = new Ether.Element(0,0,e);
+				sludge.elements.push(ele);
+				continue; 
+			} else if(this.xv < 0 && e.x < this.x){
+				var ele = new Ether.Element(0,0,e);
+				sludge.elements.push(ele);
+				continue;
+			}
+
+			if(this.yv > 0 && (e.y > this.y)){
+				var ele = new Ether.Element(0,0,e);
+				sludge.elements.push(ele);
+			} else if(this.yv < 0 && (e.x < this.x)){
+				var ele = new Ether.Element(0,0,e);
+				sludge.elements.push(ele);
+			}
+		};
+
+		this.engine.ethers.push(sludge) 
+	}
+}
+
+//DEBUG!!!
+Sludge = function(engine,player){
+	var self = this;
+
+	this.engine = engine;
+	this.world = engine.world;
+	this.player = player;
+
+	this.elements = [];
+	this.alpha = 0.5
+	this.alphaTime = 0;
+	this.nTime = 0;
+	this.x = player.x;
+	this.y = player.y;
+	this.xOffset = this.x - this.world.x;
+	this.yOffset = this.y - this.world.y;
+
+	this.draw = function(engine,time){
+		self.x = this.world.x + this.xOffset;
+		self.y = this.world.y + this.yOffset;
+
+		//alpha decay
+		if(time > self.alphaTime + 200){ 
+			self.alphaTime = time;
+			if(self.alpha == 0){
+				self.destroy();
+				return
+			}
+			self.alpha -= 0.1;
+			if(self.alpha < 0) self.alpha = 0;
+		}
+
+		//drawing elements
+		for (var i = 0; i < self.elements.length; i++) {
+			var ele = self.elements[i];
+
+			//radius
+			if(time > self.nTime + 50){
+				if(i == self.elements.length-1) self.nTime = time;
+
+				ele.radius+= 1;
+			}
+
+			ele.x = self.x + ele.xOffset;
+			ele.y = self.y + ele.yOffset;
+
+			if((ele.x > -(ele.radius+3) && ele.x < engine.width+ ele.radius+3) &&
+				(ele.y > -(ele.radius+3) && ele.y < engine.height + ele.radius + 3)){
+				engine.ctx.beginPath();
+
+				self.player.drawElement(ele,engine.ctx,function(ctx,e){
+					var color = "rgba("+e.rgb.r+","+e.rgb.g+","+e.rgb.b+","+self.alpha+")"
+					return color;
+				});
+			}
+		};
+	}
+
+	this.destroy = function(){
+		self.engine.removeEther(self);
+	}
+}

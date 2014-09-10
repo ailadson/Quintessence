@@ -1,12 +1,14 @@
 var Ether = Ether || {};
 
-Ether.Element = function(type,size){
-	this.type = type;
+Ether.Element = function(type,size,config){
+	var config = config || {};
+	this.type = config.type || type;
 
 	//color
-	var r = Math.random()*255>>0;
-	var g = Math.random()*255>>0;
-	var b = Math.random()*255>>0;
+	config.rgb = config.rgb || {};
+	var r = config.rgb.r || Math.random()*255>>0;
+	var g = config.rgb.g || Math.random()*255>>0;
+	var b = config.rgb.b || Math.random()*255>>0;
 		
 	switch(type){
 		case 'core' :
@@ -38,16 +40,20 @@ Ether.Element = function(type,size){
 	}
 	
 	this.color = "rgba("+r+","+g+","+b+",0.5)";
+	this.rgb = {r : r, g : g, b : b}
 
 	//size
 	var _size = size || 0.5;
+	this.radius = config.radius;
 
-	switch(type){
-		case 'core' :
-			this.radius = Math.random()*15+(_size*5)
-		default :
-			this.radius = Math.random()*15+(_size*5)
+	if(!this.radius){
+		switch(type){
+			case 'core' :
+				this.radius = Math.random()*15+(_size*5)
+			default :
+				this.radius = Math.random()*15+(_size*5)
 
+		}
 	}
 
 	//velocity
@@ -57,6 +63,8 @@ Ether.Element = function(type,size){
 	//position
 	this.x;
 	this.y;
+	this.xOffset = config.xOffset;
+	this.yOffset = config.yOffset;
 
 	//jitter
 	this.jitter = -1;

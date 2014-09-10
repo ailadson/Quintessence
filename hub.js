@@ -26,6 +26,8 @@ Ether.Hub = function(engine) {
 	this.timeOffset = 0
 
 	this.awardMssg = "";
+	this.lifeStageMssg = "";
+	this.lifeStageOpts = ["spread your wings","watch your trail"]
 
 	this.showControl = true;
 
@@ -55,6 +57,10 @@ Ether.Hub = function(engine) {
 				else
 					self.engine.setAwards("consciousness"); 
 				break;
+			case 2 :
+				var ether = self.engine.ethers[0];
+				ether.transformation = (self.choice1Alpha > self.choice2Alpha) ? ether.transformations[0] : ether.transformations[1];
+				self.lifeStageMssg = (self.choice1Alpha > self.choice2Alpha) ? self.lifeStageOpts[0] : self.lifeStageOpts[1];
 		}
 
 		
@@ -258,7 +264,6 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 	var borderMssg = "there is no time in the boundless void";
 	var age0WinMssg = "absorbing the elements, you grow into a fine young ether";
 	var age0FailMssg = "you cannot subsist on the little you've aquired; dead";
-	var age1Mssg = "let your wings spread";
 	var age2Mssg = "you are giant. all things die";
 	var age3Mssg = "dead";
 
@@ -293,7 +298,7 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 					break;
 
 				case 1 :
-					this.currentMessage = age1Mssg;
+					this.currentMessage = this.lifeStageMssg;
 					break;
 
 				case 2 :

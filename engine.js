@@ -6,6 +6,8 @@ Ether.Engine = function() {
 	this.ctx = this.canvas.getContext('2d');
 	this.width = window.innerWidth;
 	this.height = window.innerHeight;
+	this.xv;
+	this.yv;
 
 	//components
 	this.world = new Ether.World(this);;
@@ -124,8 +126,8 @@ Ether.Engine.prototype.checkAwards = function(time){
 			//if the award has been awarded, contiue to the next one
 			if(award.awarded){ continue }
 
-			var elements = award.elements.split();
-
+			var elements = award.elements.split("");
+			console.log(elements); console.log(award.amount)
 			for (var j = 0; j < elements.length; j++) {
 				if(stats[elements[j]] >= award.amount){
 					if(j == elements.length-1){
@@ -138,6 +140,8 @@ Ether.Engine.prototype.checkAwards = function(time){
 					break;
 				}
 			};
+
+			break; //awards must be won in order
 		};
 	}
 }
@@ -146,10 +150,23 @@ Ether.Engine.prototype.setAwards = function(type){
 	this.awards = Ether.awards[type];
 
 	var amount = 1;
+	var award = 1;
 
 	for (var i = 0; i < this.awards.length; i++) {
 		this.awards[i].amount = amount;
-		amount += 1;
+		this.awards[i].award = Math.floor(award/2);
+		console.log(this.awards[i].amount)
+		amount += Math.round(i/5) + 1;
+		award++;
+	};
+}
+
+Ether.Engine.prototype.removeEther = function (ether){
+	for (var i = this.ethers.length; i > 0; i--) {
+		if(this.ethers[i] && this.ethers[i].x == ether.x && this.ethers[i].y == ether.y){
+			this.ethers.splice(i,1);
+			return
+		}
 	};
 }
 //////////////////
