@@ -21,7 +21,7 @@ Ether.Hub = function(engine) {
 	this.choice2Alpha = 0.2;
 	this.introAlpha = 0;
 	this.question = 0;
-	this.introText = ["an ether is born","you are born","collect the four elements","grow into yourself","and die","as all things that are born must","Collect 5 of each element...","...to reach the next stage of life","Seek balance","Go"];
+	this.introText = ["","an ether is born","you are born","collect the four elements","grow into yourself","and die","as all things that are born must","Collect 5 of each element...","...to reach the next stage of life","Seek balance","Go"];
 	this.introIndex = 0;
 	this.timeOffset = 0
 

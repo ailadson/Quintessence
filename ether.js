@@ -417,10 +417,11 @@ Ether.Ether.prototype.attractEtherToElement = function(e){
 
 //awards
 Ether.Ether.prototype.receiveAward = function(amount){
-	if(this.currentSpan += amount > this.lifeSpan[this.age]){
+	var a = amount;
+	if(this.currentSpan + a > this.lifeSpan[this.age]){
 		this.currentSpan = this.lifeSpan[this.age];
 	} else {
-		this.currentSpan += amount;
+		this.currentSpan += a;
 	}
 }
 
