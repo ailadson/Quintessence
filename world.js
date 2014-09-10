@@ -39,11 +39,20 @@ Ether.World.prototype.init = function(){
 					if(e.radius > 5) e.radius = 5
 				});
 
-				this.initElement(type,collection,50,100,function(e){
+				this.initElement(type,collection,50,100,function(e,self){
 					if(e.radius < 150) e.radius = 150;
 					if(e.radius > 300) e.radius = 250;
 					e.killer = true;
-				})
+
+					//To prevent 1 hit KOs
+					e.x = self.x + e.xOffset;
+					e.y = self.y + e.yOffset;
+					
+					if((e.x >= 0 && e.x <= self.engine.width) &&
+						(e.y >= 0 && e.y <= self.engine.height)){
+						e.xOffset += (e.radius + self.engine.width)
+					}
+				},this)
 				break;
 
 			case 1 :
@@ -76,7 +85,7 @@ Ether.World.prototype.init = function(){
 	};
 }
 
-Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,eFunc){
+Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,eFunc,ctx){
 	for (var j = 0; j < amount; j++) {
 			//get values that will be used to create element
 			var xOffset = ((Math.random()*(this.width*2)) - this.width)/2;
@@ -86,7 +95,7 @@ Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,e
 			var element = new Ether.Element(type,size/sizeOffset);
 			element.xOffset = xOffset;
 			element.yOffset = yOffset;
-			eFunc(element);
+			eFunc(element,ctx);
 			collection.push(element);
 		};
 }
