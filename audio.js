@@ -22,7 +22,6 @@ Ether.Audio.prototype.loadSounds = function(index){
 	var index = index || 0;
 	var self = this;
 	var url = urls[index];
-	console.log(index)
 	
 	this.audio[url] = new Audio("audio/"+url+".wav");
 	

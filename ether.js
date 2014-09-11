@@ -56,12 +56,11 @@ Ether.Ether.prototype.init = function(){
 			var total = 0;
 
 			for(e in count){
-				count[e] -= 5;
 				total += count[e];
 			}
 
 			this.mass = total;
-			this.range += total*2;
+			this.range += total;
 
 			for (var i = 0; i < total.length; i++) {
 				var element = new Ether.Element('core');
@@ -118,7 +117,8 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 					if(this.dying){
 						this.attractEtherToElement(e);
 					} else if(this.isKillerElement(e)){ 
-						this.dying = true;
+						this.tripleLoss();
+						engine.hub.killerElement = true;
 					}
 					break;
 
@@ -211,33 +211,41 @@ Ether.Ether.prototype.drawElement = function(element,ctx,gradFunc){
 Ether.Ether.prototype.stabilityCheck = function(time){
 	var stability = this.getStability();
 
+	if(stability > 40 && this.age < 3){
+		this.engine.hub.unstable = true 
+	} else if(stability > 20 && this.age < 3){
+		this.engine.hub.stableWarned = false 
+	}
+
 	if(stability >= 50 && this.age < 3){
 		if(time > this.stabilityLastTime + 2000 - stability){
-			this.stabilityLastTime = time;
-			var random = Math.floor(Math.random() * this.elements.length)
-		
-			if(this.elements.length != 0){
-				this.loseElement(this.elements[this.elements.length-1],true)
-			} else {
-				console.log('elements array is 0')
-			}
-
-			var random = Math.floor(Math.random() * this.elements.length)
-			
-			if(this.elements.length != 0){
-				this.loseElement(this.elements[random],true)
-			} else {
-				console.log('elements array is 0')
-			}
-
-			random = Math.floor(Math.random() * this.elements.length)
-			
-			if(this.elements.length != 0){
-				this.loseElement(this.elements[random],true)
-			} else {
-				console.log('elements array is 0')
-			}
+			this.stabilityLastTime = time;		
+			this.tripleLoss();
 		}
+	}
+}
+
+Ether.Ether.prototype.tripleLoss = function(){
+	if(this.elements.length != 0){
+		this.loseElement(this.elements[this.elements.length-1],true)
+	} else {
+		console.log('elements array is 0')
+	}
+
+	var random = Math.floor(Math.random() * this.elements.length)
+	
+	if(this.elements.length != 0){
+		this.loseElement(this.elements[random],true)
+	} else {
+		console.log('elements array is 0')
+	}
+
+	random = Math.floor(Math.random() * this.elements.length)
+
+	if(this.elements.length != 0){
+		this.loseElement(this.elements[random],true)
+	} else {
+		console.log('elements array is 0')
 	}
 }
 
@@ -353,9 +361,10 @@ Ether.Ether.prototype.increaseMass = function(e,massOffset,range){
 }
 
 Ether.Ether.prototype.decreaseMass = function(){
-	this.coreElements.pop();
-	this.mass -= 1;
-	this.range -= 2;
+	if(this.coreElements.length > 1) this.coreElements.pop();
+
+	if(this.mass > 0) this.mass -= 1;
+	if(this.range > 2)this.range -= 2;
 }
 
 Ether.Ether.prototype.findDegree = function(opp,hyp){

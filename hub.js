@@ -21,7 +21,7 @@ Ether.Hub = function(engine) {
 	this.choice2Alpha = 0.2;
 	this.introAlpha = 0;
 	this.question = 0;
-	this.introText = ["","an ether is born","you are born","collect the four elements","grow into yourself","and die","as all things that are born must","Collect 5 of each element...","...to reach the next stage of life","Seek balance","Go"];
+	this.introText = ["","an ether is born","you are born","collect the four elements","grow into yourself","and die","as all things that are born must","Seek balance","Go"];
 	this.introIndex = 0;
 	this.timeOffset = 0
 
@@ -73,6 +73,15 @@ Ether.Hub = function(engine) {
 			self.question++;
 			self.introAlpha = 0;	
 		}
+	}
+
+	this.handleKeyDown = function(){
+			if(self.question > 2 && self.introIndex + 1 < self.introText.length){
+				self.timeOffset = self.lastIntroTime;
+				self.introIndex++;
+				if(self.introIndex != self.introText.length -1) self.introAlpha = 0;	
+
+			}	
 	}
 
 }
@@ -170,7 +179,7 @@ Ether.Hub.prototype.draw = function(time){
 		ctx.font = this.unit + "30px Verdana";
 		ctx.fillStyle = "rgba(20,70,200,1)"
 		ctx.fillText("Mass: " + Math.floor(stats.mass), this.unit,this.unit*1.5)
-		ctx.fillText("Stability: " + hubStab, this.unit,this.unit*2.5)
+		ctx.fillText("Balance: " + hubStab, this.unit,this.unit*2.5)
 	}
 
 	//in between ages?
@@ -181,18 +190,20 @@ Ether.Hub.prototype.draw = function(time){
 	this.drawMessage(ctx,time);
 }
 
-Ether.Hub.prototype.drawInbetween = function(ctx,time,success){
+Ether.Hub.prototype.drawInbetween = function(ctx,time){
 	var age = this.engine.ethers[0].age;
 
 	if(this.engine.betweenAges){
-
-		//alpha
-		if(time > this.betweenLastTime + 100){
-			this.betweenLastTime = time;
-			ctx.fillStyle = "rgba(0,0,0,"+this.betweenAlpha+")";
-		    ctx.fillRect(0,0,this.engine.width,this.engine.height);
+		if(age < 3){
+			//alpha
+			if(time > this.betweenLastTime + 100){
+				this.betweenLastTime = time;
+				ctx.fillStyle = "rgba(0,0,0,"+this.betweenAlpha+")";
+			    ctx.fillRect(0,0,this.engine.width,this.engine.height);
+			}
+		} else{
+			this.gameOver(ctx,time)
 		}
-
 		
 	}
 }
@@ -261,10 +272,11 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 
 	var controlMssg = "wsad / arrow keys"
 	var borderMssg = "there is no time in the boundless void";
-	var age0WinMssg = "you are here";
-	var age0FailMssg = "you were not meant to be";
+	var age0Mssg = "you are here";
 	var age2Mssg = "you are ancient and fresh";
 	var age3Mssg = "";
+	var killerMssg = "Save the big ones for post-infancy"
+	var stableMssg = "You are becoming too unstable"
 
 	if(award){this.messageExist = false}
 
@@ -283,17 +295,23 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 			this.messageExist = true;
 			this.currentMessage = borderMssg;
 		
+		//killer element
+		} else if(this.killerElement){
+			this.messageExist = true;
+			this.currentMessage = killerMssg;
+
+		//stability
+		} else if(this.unstable && !this.stableWarned){
+			this.messageExist = true;
+			this.stableWarned = true;
+			this.currentMessage = stableMssg;
 		//new age
 		} else if(this.engine.betweenAges){
 			this.messageExist = true;
 
 			switch(ether.age){
 				case 0 :
-					if(ether.dead){
-						this.currentMessage = age0FailMssg;
-					} else {
-						this.currentMessage = age0WinMssg;
-					}
+						this.currentMessage = age0Mssg;
 					break;
 
 				case 1 :
@@ -337,6 +355,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 			this.messageExist = false;
 			this.messageAlpha = 1;
 			this.awardMssg = "";
+			this.killerElement = false;
 			
 			//in between message?
 			if(this.engine.betweenAges && !this.engine.ethers[0].dead){
@@ -373,6 +392,18 @@ Ether.Hub.prototype.hasLeftBorder = function(){
 	}
 }
 
-Ether.Hub.prototype.gameOver = function(){
-	
+Ether.Hub.prototype.gameOver = function(ctx,time){
+	this.gameOverLastTime = 0;
+	this.gameOverAlpha = 0;
+
+	if(time > this.gameOverLastTime + 100 && this.gameOverAlpha != 1){
+		this.gameOverAlpha+= 0.02;
+		if(this.gameOverAlpha > 1) this.gameOverAlpha = 1
+	}
+
+	ctx.fillStyle = "rgba(255,255,255,"+this.gameOverAlpha+")";
+	ctx.font = "1em Courier";
+	var s = "Restart"
+	var width = ctx.measureText(s).width;
+	ctx.fillText(s, this.engine.width-width*1.5, this.engine.height-10)
 }

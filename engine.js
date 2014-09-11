@@ -51,7 +51,7 @@ Ether.Engine = function() {
 
 			//Draw World
 			self.world.draw(self,time);
-			
+
 			//check awards
 			if(!self.ethers[0].dying){ self.checkAwards(time) };
 			//Draw Ethers
@@ -101,6 +101,7 @@ Ether.Engine.prototype.init = function(){
 	//set up world
 	window.onkeydown = function(evt){
 		self.world.handleKeyDown(evt.keyCode,self)
+		self.hub.handleKeyDown();
 	}
 
 	window.onkeyup = function(evt){
