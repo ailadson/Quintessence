@@ -31,6 +31,9 @@ Ether.Hub = function(engine) {
 
 	this.showControl = true;
 
+	this.gameOverLastTime = 0;
+	this.gameOverAlpha = 0;
+
 
 	//mousemove
 	this.mousemove = function(e){
@@ -282,7 +285,7 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 
 	if(award){this.messageExist = false}
 
-	if(!this.messageExist){
+	if(!this.messageExist && !this.engine.betweenAges){
 		if(this.showControl){
 			this.showControl = false;
 			this.messageExist = true;
@@ -395,9 +398,6 @@ Ether.Hub.prototype.hasLeftBorder = function(){
 }
 
 Ether.Hub.prototype.gameOver = function(ctx,time){
-	this.gameOverLastTime = 0;
-	this.gameOverAlpha = 0;
-
 	if(time > this.gameOverLastTime + 100 && this.gameOverAlpha != 1){
 		this.gameOverAlpha+= 0.02;
 		if(this.gameOverAlpha > 1) this.gameOverAlpha = 1
