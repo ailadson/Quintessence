@@ -366,6 +366,7 @@ Ether.World.prototype.handleKeyDown = function(e){
 				} else if(this.yv < -5){
 					this.speedUp.y = false
 				}
+				this.engine.ethers[0].moved = true
 				break;
 			case 39 :
 				if(!this.speedUp.x && this.xv <= 5){ 
@@ -375,6 +376,7 @@ Ether.World.prototype.handleKeyDown = function(e){
 				} else if(this.xv > 5){
 					this.speedUp.x = false
 				}
+				this.engine.ethers[0].moved = true
 				break;
 			case 40 :
 				if(!this.speedUp.y && this.yv <= 5){ 
@@ -384,6 +386,7 @@ Ether.World.prototype.handleKeyDown = function(e){
 				} else if(this.yv > 5){
 					this.speedUp.y = false
 				}
+				this.engine.ethers[0].moved = true
 				break;
 			case 37 :
 				if(!this.speedUp.x && this.xv >= -5){ 
@@ -393,6 +396,7 @@ Ether.World.prototype.handleKeyDown = function(e){
 				} else if(this.xv < -5){
 					this.speedUp.x = false
 				}
+				this.engine.ethers[0].moved = true
 				break;
 		}
 	//}

@@ -27,7 +27,8 @@ Ether.Ether = function(engine) {
 	this.ageLastTime = 0;
 	this.finalElementLength = 1;
 	this.stabilityLastTime = 0;
-
+	this.moved;
+	
 	this.transformation;
 	this.transformations = [this.rotateElement,this.createSludge]
 
@@ -36,6 +37,7 @@ Ether.Ether = function(engine) {
 	this.rotateLastTime = 0;
 	this.rotateDirection = -1;
 	this.degreeChange = 0;
+
 }
 
 Ether.Ether.prototype.init = function(){

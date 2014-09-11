@@ -255,6 +255,8 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 	ctx.strokeRect(this.engine.width - (this.unit * 5.5), this.unit * 1.5, this.unit * 5, this.unit * 0.5)
 
 	//MOVE THIS TO ETHER!!???
+	if(!ether.moved){return}
+		
 	if(time > this.lastTime + 1000 && !ether.inVoid){
 		this.lastTime = time;
 		if(ratio > 0){
