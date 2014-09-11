@@ -200,7 +200,6 @@ Ether.Hub.prototype.drawInbetween = function(ctx,time,success){
 Ether.Hub.prototype.newAward = function(text){
 	this.awardMssg = text;
 	this.drawMessage(0,0,true);
-	this.awardMssg = "";
 }
 
 Ether.Hub.prototype.getStats = function(){
@@ -262,10 +261,10 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 
 	var controlMssg = "wsad / arrow keys"
 	var borderMssg = "there is no time in the boundless void";
-	var age0WinMssg = "absorbing the elements, you grow into a fine young ether";
-	var age0FailMssg = "you cannot subsist on the little you've aquired; dead";
-	var age2Mssg = "you are giant. all things die";
-	var age3Mssg = "dead";
+	var age0WinMssg = "you are here";
+	var age0FailMssg = "you were not meant to be";
+	var age2Mssg = "you are ancient and fresh";
+	var age3Mssg = "";
 
 	if(award){this.messageExist = false}
 
@@ -320,11 +319,10 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 }
 
 Ether.Hub.prototype.renderMessage = function(ctx,time){
+	ctx.font = (this.currentMessage == this.awardMssg) ? "90px Verdana" : "30px Verdana";
 	var textWidth = ctx.measureText(this.currentMessage).width;
 	var x = (this.engine.width/2) - (textWidth / 2);
 	var y = (this.engine.height/2)-this.unit;
-
-	ctx.font = "30px Verdana";
 
 	ctx.fillStyle = "rgba(0,0,0,"+this.messageAlpha+")";
 	ctx.fillText(this.currentMessage,x+2,y+2);
@@ -338,6 +336,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 		if(this.messageAlpha <= 0.01){
 			this.messageExist = false;
 			this.messageAlpha = 1;
+			this.awardMssg = "";
 			
 			//in between message?
 			if(this.engine.betweenAges && !this.engine.ethers[0].dead){

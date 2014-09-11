@@ -13,6 +13,7 @@ Ether.Engine = function() {
 	this.world = new Ether.World(this);;
 	this.hub = new Ether.Hub(this);
 	this.util = new Ether.Util(this);
+	this.audio = new Ether.Audio(this);
 
 	//Ethers
 	this.ethers = [new Ether.Ether(self)];
@@ -48,6 +49,9 @@ Ether.Engine = function() {
 		//otherwise, if player is not dead...
 		} else if(!self.ethers[0].dead){
 
+			//Draw World
+			self.world.draw(self,time);
+			
 			//check awards
 			if(!self.ethers[0].dying){ self.checkAwards(time) };
 			//Draw Ethers
@@ -55,9 +59,6 @@ Ether.Engine = function() {
 				self.ethers[i].draw(self,time);
 			};
 			self.ctx.globalCompositeOperation = "source-over";
-
-			//Draw World
-			self.world.draw(self,time);
 
 			//Draw Hub
 			self.hub.draw(time);
@@ -92,6 +93,7 @@ Ether.Engine.prototype.init = function(){
 	this.ctx.fillStyle = "rgba(0,0,0,0.3)";
 	this.ctx.fillRect(0,0,this.width,this.height);
 
+
 	//create player
 	//this.ethers.push(new Ether.Ether(this));
 	this.ethers[0].init();
@@ -108,6 +110,8 @@ Ether.Engine.prototype.init = function(){
 	this.hub.init();
 
 	this.world.init();
+
+	this.audio.init();
 
 	//start animation
 	if(this.ethers[0].age == 0)
@@ -127,7 +131,7 @@ Ether.Engine.prototype.checkAwards = function(time){
 			if(award.awarded){ continue }
 
 			var elements = award.elements.split("");
-			console.log(elements); console.log(award.amount)
+		//	console.log(elements); console.log(award.amount)
 			for (var j = 0; j < elements.length; j++) {
 				if(stats[elements[j]] >= award.amount){
 					if(j == elements.length-1){
@@ -155,7 +159,7 @@ Ether.Engine.prototype.setAwards = function(type){
 	for (var i = 0; i < this.awards.length; i++) {
 		this.awards[i].amount = amount;
 		this.awards[i].award = Math.floor(award/2);
-		console.log(this.awards[i].amount)
+		//console.log(this.awards[i].amount)
 		amount += Math.round(i/5) + 1;
 		award++;
 	};

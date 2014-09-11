@@ -222,12 +222,16 @@ Ether.Ether.prototype.stabilityCheck = function(time){
 				console.log('elements array is 0')
 			}
 
+			var random = Math.floor(Math.random() * this.elements.length)
+			
 			if(this.elements.length != 0){
 				this.loseElement(this.elements[random],true)
 			} else {
 				console.log('elements array is 0')
 			}
 
+			random = Math.floor(Math.random() * this.elements.length)
+			
 			if(this.elements.length != 0){
 				this.loseElement(this.elements[random],true)
 			} else {
@@ -293,8 +297,7 @@ Ether.Ether.prototype.getElementCount = function(){
 
 //Elements
 Ether.Ether.prototype.newElement = function(e){
-	
-
+	this.engine.audio.playSound(e)
 	switch(this.age){
 		case 0 :
 			break;

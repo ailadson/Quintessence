@@ -1,0 +1,32 @@
+<html>
+	<head>
+		<title>The Ether</title>
+		<style type="text/css">
+			body {
+				margin: 0px
+			}
+
+		</style>
+		<script>
+			window.requestAnimFrame = (function(){
+			  return  window.requestAnimationFrame       ||
+			          window.webkitRequestAnimationFrame ||
+			          window.mozRequestAnimationFrame    ||
+			          function( callback ){
+			            window.setTimeout(callback, 1000 / 60);
+			          };
+			})();
+		</script>
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+		<script src="element.js"></script>
+		<script src="awards.js"></script>
+		<script src="util.js"></script>
+		<script src="ether.js"></script>
+		<script src="world.js"></script>
+		<script src="hub.js"></script>
+		<script src="audio.js"></script>
+		<script src="engine.js"></script>
+	</body>
+</html>

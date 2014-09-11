@@ -22,11 +22,17 @@ Ether.World = function (engine) {
 	this.driftArray = [];
 	this.sizeOffset = 5000;
 
+	this.hills = [];
+	this.hillWidth = this.engine.width/4;
+	this.hillHeight = this.engine.height/2;
+
 }
 
 //WORLD INIT
 Ether.World.prototype.init = function(){
 	var eleStrings = ['earth','air','fire','water'];
+
+	this.initBackground();
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var collection = this.elements[i];
@@ -105,7 +111,7 @@ Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,e
 Ether.World.prototype.draw = function(engine,time){
 		this.xv = this.adjustVelocity("x",this.xv,time);
 		this.yv = this.adjustVelocity("y",this.yv,time);
-
+		this.drawBackground(this.xv,this.yv);
 		//velocity time
 		if(time > this.dragLastTime + 200){this.dragLastTime = time}
 
@@ -117,6 +123,8 @@ Ether.World.prototype.draw = function(engine,time){
 
 		engine.xv = this.xv;
 		engine.yv = this.yv;
+
+		
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var collection = this.elements[i];
@@ -157,6 +165,42 @@ Ether.World.prototype.draw = function(engine,time){
 
 	this.drawDriftingElements(engine); //TO DO!!
 	this.drawBorder(engine);
+}
+
+Ether.World.prototype.initBackground = function(){
+	for (var i = 0; i < 3; i++) {
+		var hills = [];
+		for (var j = 0; j < 5; j++) {
+			hills[j] = {x: (this.hillWidth*j), y: (this.hillHeight*i)}
+		};
+		this.hills.push(hills);
+	};
+}
+
+Ether.World.prototype.drawBackground = function(xv,yv){
+	for (var j = 0; j < this.hills.length; j++) {
+		var row = this.hills[j]
+
+		for (var i = 0; i < row.length; i++) {
+			var hill = row[i];
+
+			hill.x += xv
+			hill.y += yv
+
+			if(hill.x+this.hillWidth < 0) hill.x = this.engine.width
+			if(hill.x > this.engine.width) hill.x = -this.hillWidth
+			if(hill.y+this.hillHeight < 0) hill.y = this.engine.height
+			if(hill.y > this.engine.height) hill.y = -this.hillHeight
+
+			//console.log(hill.x)
+			var gradient = this.engine.ctx.createLinearGradient(hill.x,hill.y,hill.x+this.hillWidth,hill.y+this.hillHeight);
+			gradient.addColorStop(0.05,"rgba(0,0,0,1)");
+			gradient.addColorStop(0.95,"rgba(20,20,20,1)")
+			this.engine.ctx.fillStyle = gradient;
+			this.engine.ctx.fillRect(hill.x,hill.y,this.hillWidth+5,this.hillHeight+5)
+		};
+	}
+
 }
 
 Ether.World.prototype.driftTowardsEther = function(element){
