@@ -67,6 +67,7 @@ Ether.Hub = function(engine) {
 				break;
 			case 3 :
 				self.engine.badGuys = (self.choice1Alpha > self.choice2Alpha) ? true : false
+				if(!self.engine.badGuys){ self.engine.world.removeBadElements()}
 		}
 
 		

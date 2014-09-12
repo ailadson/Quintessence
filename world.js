@@ -291,6 +291,20 @@ Ether.World.prototype.driftTowardsEther = function(element){
 	}
 }
 
+Ether.World.prototype.removeBadElements = function(){
+	for (var j = 0; j < this.elements.length; j++) {
+		var collection = this.elements[j];
+
+		for (var i = 0; i < collection.length; i+=1) {
+			var e = collection[i]
+			if(e.bad){
+				collection.splice(i,1);
+				i-=1;
+			}
+		};		
+	};
+}
+
 
 Ether.World.prototype.drawBorder = function(engine){
 	engine.ctx.fillStyle = "white";
