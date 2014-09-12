@@ -48,8 +48,8 @@ Ether.World.prototype.init = function(){
 				});
 
 				this.initElement(type,collection,50,100,function(e,self){
-					if(e.radius < 150) e.radius = 150;
-					if(e.radius > 300) e.radius = 250;
+					if(e.radius < 200) e.radius = 200;
+					if(e.radius > 300) e.radius = 300;
 					e.killer = true;
 
 					//To prevent 1 hit KOs
@@ -70,16 +70,16 @@ Ether.World.prototype.init = function(){
 			case 1 :
 				this.initElement(type,collection,250,3000,function(e){
 					if(e.radius < 10) e.radius = 10;
-					if(e.radius > 70) e.radius = 70;
+					if(e.radius > 80) e.radius = 80;
 				})
 				this.initElement(type,collection,50,1000,function(e){
-					if(e.radius < 150) e.radius = 150;
-					if(e.radius > 200) e.radius = 200;
+					if(e.radius < 180) e.radius = 180;
+					if(e.radius > 250) e.radius = 250;
 				})
 				if(this.engine.badGuys){
 					this.initElement(type,collection,20,1000,function(e){
-						if(e.radius < 150) e.radius = 150;
-						if(e.radius > 200) e.radius = 200;
+						if(e.radius < 100) e.radius = 100;
+						if(e.radius > 160) e.radius = 160;
 					},this,true)
 				}
 				break;
@@ -97,7 +97,7 @@ Ether.World.prototype.init = function(){
 				}
 				break;
 			case 3 :
-				this.initElement(type,collection,250,6000,function(e){
+				this.initElement(type,collection,270,6000,function(e){
 					if(e.radius > 50) e.radius = 50;
 				})
 				break;
@@ -422,6 +422,7 @@ Ether.World.prototype.adjustVelocity = function(axis,val,time){
 Ether.World.prototype.handleKeyDown = function(e){
 	//if(!this.draggingX || !this.draggingY){
 		switch(e){
+			case 87:
 			case 38 :
 				if(!this.speedUp.y && this.yv >= -5){ 
 					this.speedUp.y = true;
@@ -432,6 +433,7 @@ Ether.World.prototype.handleKeyDown = function(e){
 				}
 				this.engine.ethers[0].moved = true
 				break;
+			case 68 :
 			case 39 :
 				if(!this.speedUp.x && this.xv <= 5){ 
 					this.speedUp.x = true;
@@ -442,6 +444,7 @@ Ether.World.prototype.handleKeyDown = function(e){
 				}
 				this.engine.ethers[0].moved = true
 				break;
+			case 83 : 
 			case 40 :
 				if(!this.speedUp.y && this.yv <= 5){ 
 					this.speedUp.y = true;
@@ -452,6 +455,7 @@ Ether.World.prototype.handleKeyDown = function(e){
 				}
 				this.engine.ethers[0].moved = true
 				break;
+			case 65 :
 			case 37 :
 				if(!this.speedUp.x && this.xv >= -5){ 
 					this.speedUp.x = true;

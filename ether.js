@@ -21,7 +21,7 @@ Ether.Ether = function(engine) {
 	this.health = 5000;
 	this.lifeSpan = [100,100,100,100]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
-	this.totalLifeSpan = 0;
+	this.totalLifeSpan;
 	this.dying = false;
 	this.dead = false;
 	this.ageLastTime = 0;
@@ -47,10 +47,6 @@ Ether.Ether.prototype.init = function(){
 			element.x = this.x;
 			element.y = this.y;
 			this.coreElements.push(element);
-
-			for (var i = 0; i < this.lifeSpan.length; i++) {
-				this.totalLifeSpan += this.lifeSpan[i]
-			};
 			break;
 
 		case 1 : 
@@ -76,11 +72,11 @@ Ether.Ether.prototype.init = function(){
 			break;
 
 		case 2 : 
-			this.zoomOut(1.5)
+			this.zoomOut(2)
 			break;
 
 		case 3 :
-			this.zoomOut(1.5);
+			this.zoomOut(2);
 
 			this.finalElementLength = this.elements.length;
 			break;
@@ -271,10 +267,13 @@ Ether.Ether.prototype.ageEther = function(time){
 
 //Stats
 Ether.Ether.prototype.healthRate = function(time){
-	var aging = (time - this.totalLifeSpan * 1000);
-	var val = this.health + this.mass - aging - this.getStability();
-	var returnVal = (val > 200) ? val : 200;
-	
+	if(!this.totalLifeSpan) 
+		this.totalLifeSpan = time + 70000
+
+	var aging = (time - this.totalLifeSpan);
+	var val = this.health + (this.mass*10) - aging - this.getStability();
+	var returnVal = (val > 50) ? val : 50;
+
 	return returnVal; 
 }
 
