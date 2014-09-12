@@ -19,7 +19,7 @@ Ether.Ether = function(engine) {
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [100,100,100,100]; //in seconds
+	this.lifeSpan = [1,1,1,10]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.totalLifeSpan = 0;
 	this.dying = false;
@@ -83,7 +83,6 @@ Ether.Ether.prototype.init = function(){
 			this.zoomOut(1.5);
 
 			this.finalElementLength = this.elements.length;
-			console.log("finalElementLength set to :" + this.finalElementLength)
 			break;
 	}
 }

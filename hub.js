@@ -33,12 +33,28 @@ Ether.Hub = function(engine) {
 
 	this.gameOverLastTime = 0;
 	this.gameOverAlpha = 0;
+	this.gameOverWidth;
+	this.gameOverColor = "rgba(255,255,255,"
 
 
 	//mousemove
 	this.mousemove = function(e){
 		var x = e.x;
 		var y = e.y;
+
+		if(self.gameOverWidth){
+
+			if((self.gameOverColor != "rgba(255,0,0,") &&
+				(e.x > self.engine.width-self.gameOverWidth*2) &&
+				(e.y > self.engine.height-self.gameOverWidth*2)){
+				self.gameOverColor = "rgba(255,0,0,"
+			} else {
+				self.gameOverColor = "rgba(255,255,255,"
+			}
+			return
+		}
+
+		//if(!this.intro) return
 
 		if(x <= self.engine.width/2){
 			self.choice1Alpha = 0.5;
@@ -50,6 +66,17 @@ Ether.Hub = function(engine) {
 	}
 
 	this.handleClick = function(e){
+
+		if(self.gameOverWidth){
+			if((e.x > self.engine.width-self.gameOverWidth*2) &&
+				(e.y > self.engine.height-self.gameOverWidth*2)){
+				window.location.href = "index.html"
+			}
+			return
+		}
+
+	//	if(!this.intro) return
+
 		switch(self.question){
 			case 0 :
 				self.showInfo = (self.choice1Alpha > self.choice2Alpha) ? true : false
@@ -94,12 +121,6 @@ Ether.Hub = function(engine) {
 }
 
 Ether.Hub.prototype.init = function(){
-	if(this.intro == false){
-		window.onmousemove = undefined;
-		window.onclick = undefined;
-		return
-	} 
-
 	window.onmousemove = this.mousemove;
 	window.onclick = this.handleClick;
 }
@@ -416,9 +437,9 @@ Ether.Hub.prototype.gameOver = function(ctx,time){
 		if(this.gameOverAlpha > 1) this.gameOverAlpha = 1
 	}
 
-	ctx.fillStyle = "rgba(255,255,255,"+this.gameOverAlpha+")";
+	ctx.fillStyle = this.gameOverColor+this.gameOverAlpha+")";
 	ctx.font = "1em Courier";
 	var s = "Restart"
-	var width = ctx.measureText(s).width;
-	ctx.fillText(s, this.engine.width-width*1.5, this.engine.height-10)
+	this.gameOverWidth = ctx.measureText(s).width;
+	ctx.fillText(s, this.engine.width-this.gameOverWidth*1.5, this.engine.height-10)
 }

@@ -97,8 +97,7 @@ Ether.Engine.prototype.init = function(){
 	//create player
 	//this.ethers.push(new Ether.Ether(this));
 	this.ethers[0].init();
-	console.log("engine.init/after ether init")
-
+	
 	//set up world
 	window.onkeydown = function(evt){
 		self.world.handleKeyDown(evt.keyCode,self)

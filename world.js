@@ -255,7 +255,6 @@ Ether.World.prototype.driftTowardsEther = function(element){
 		var check;
 
 		while(!check){
-			console.log('inside')
 			var x = Math.floor(Math.random()*4);
 
 			switch(x){
