@@ -23,15 +23,17 @@ Ether.World = function (engine) {
 	this.sizeOffset = 5000;
 
 	this.hills = [];
-	this.hillWidth = this.engine.width/4;
-	this.hillHeight = this.engine.height/2;
+	this.hillWidthAmount = 4
+	this.hillHeightAmount = 2;
+	this.hillWidth = this.engine.width/this.hillWidthAmount;
+	this.hillHeight = this.engine.height/this.hillHeightAmount;
 
 }
 
 //WORLD INIT
 Ether.World.prototype.init = function(){
 	var eleStrings = ['earth','air','fire','water'];
-
+	if(this.engine.ethers[0].age != 0) this.zoomOut(2)
 	this.initBackground();
 
 	for (var i = 0; i < this.elements.length; i++) {
@@ -59,25 +61,40 @@ Ether.World.prototype.init = function(){
 						e.xOffset += (e.radius + self.engine.width)
 					}
 				},this)
+
+				this.initElement(type,collection,120,300,function(e){
+					if(e.radius < 150) e.radius = 150
+				},this,true)
 				break;
 
 			case 1 :
-				this.initElement(type,collection,200,3000,function(e){
+				this.initElement(type,collection,250,3000,function(e){
 					if(e.radius < 10) e.radius = 10;
 					if(e.radius > 70) e.radius = 70;
 				})
-				this.initElement(type,collection,30,1000,function(e){
+				this.initElement(type,collection,50,1000,function(e){
 					if(e.radius < 150) e.radius = 150;
 					if(e.radius > 200) e.radius = 200;
 				})
+				if(this.engine.badGuys){
+					this.initElement(type,collection,20,1000,function(e){
+						if(e.radius < 150) e.radius = 150;
+						if(e.radius > 200) e.radius = 200;
+					},this,true)
+				}
 				break;
 			case 2 :
-				this.initElement(type,collection,150,5000,function(e){
+				this.initElement(type,collection,200,5000,function(e){
 					if(e.radius > 20) e.radius = 20;
 				})
-				this.initElement(type,collection,150,1000,function(e){
+				this.initElement(type,collection,200,1000,function(e){
 					if(e.radius > 80) e.radius = 80;
 				})
+				if(this.engine.badGuys){
+					this.initElement(type,collection,20,1000,function(e){
+						if(e.radius > 80) e.radius = 80;
+					},this,true)
+				}
 				break;
 			case 3 :
 				this.initElement(type,collection,250,6000,function(e){
@@ -91,14 +108,21 @@ Ether.World.prototype.init = function(){
 	};
 }
 
-Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,eFunc,ctx){
+Ether.World.prototype.zoomOut = function(val){
+	this.hillHeightAmount *= val;
+	this.hillWidthAmount *= val;
+	this.hillWidth = this.engine.width/this.hillWidthAmount;
+	this.hillHeight = this.engine.height/this.hillHeightAmount;
+}
+
+Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,eFunc,ctx,bad){
 	for (var j = 0; j < amount; j++) {
 			//get values that will be used to create element
 			var xOffset = ((Math.random()*(this.width*2)) - this.width)/2;
 			var yOffset = ((Math.random()*(this.height*2)) - this.height)/2;
 			var size = this.getDistanceFromCenter({x:xOffset,y:yOffset});
 			
-			var element = new Ether.Element(type,size/sizeOffset);
+			var element = new Ether.Element(type,size/sizeOffset,{},bad);
 			element.xOffset = xOffset;
 			element.yOffset = yOffset;
 			eFunc(element,ctx);
@@ -132,6 +156,7 @@ Ether.World.prototype.draw = function(engine,time){
 		for (var j = 0; j < collection.length; j++) {
 			var e = collection[j];
 
+			//if(e.bad){this.driftTowardsEther(e)}
 			if(!this.isInView(e)){ continue }
 
 			//reverse direction of jitter
@@ -141,18 +166,26 @@ Ether.World.prototype.draw = function(engine,time){
 			e.x = this.x + e.xOffset + e.jitter;
 			e.y = this.y + e.yOffset;
 
-			this.driftTowardsEther(e);
-
+			this.driftTowardsEther(e)
 
 			//start rendering
 			engine.ctx.beginPath();
 
-			//create gradient
-			var gradient = engine.ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,e.radius);
-			gradient.addColorStop(0.1,"white");
-			gradient.addColorStop(0.1,"white");
-			gradient.addColorStop(0.8,e.color);
-			gradient.addColorStop(0.1,"black");
+			//create 
+			if(e.bad){
+				var gradient = engine.ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,e.radius);
+				gradient.addColorStop(0.1,"rgba("+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+",1)");
+				gradient.addColorStop(0.3,"black");
+				gradient.addColorStop(0.7,"black");
+				gradient.addColorStop(0.9,"rgba("+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+",1)");
+
+			} else {
+				var gradient = engine.ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,e.radius);
+				gradient.addColorStop(0.1,"white");
+				gradient.addColorStop(0.1,"white");
+				gradient.addColorStop(0.8,e.color);
+				gradient.addColorStop(0.1,"black");
+			}
 
 			engine.ctx.fillStyle = gradient;
 			engine.ctx.arc(e.x,e.y,e.radius,Math.PI*2,false);
@@ -168,9 +201,9 @@ Ether.World.prototype.draw = function(engine,time){
 }
 
 Ether.World.prototype.initBackground = function(){
-	for (var i = 0; i < 3; i++) {
+	for (var i = 0; i < this.hillHeightAmount + 1; i++) {
 		var hills = [];
-		for (var j = 0; j < 5; j++) {
+		for (var j = 0; j < this.hillWidthAmount+1; j++) {
 			hills[j] = {x: (this.hillWidth*j), y: (this.hillHeight*i)}
 		};
 		this.hills.push(hills);
@@ -207,13 +240,22 @@ Ether.World.prototype.driftTowardsEther = function(element){
 	var util = this.engine.util;
 	var ether = this.engine.ethers[0];
 	var radius = element.radius < 40 ? element.radius * 20 : element.radius * 2
-	var speed = element.radius > 50 ? element.radius/50 : element.radius/5
+	var speed;
 
-	if(util.getDistanceFromCenter(element,ether) <= radius){
+	 if(element.bad){
+	 	speed = ether.speed-2
+	 }else if(element.radius > 50){ 
+	 	speed = element.radius/50 
+	 }else{ 
+	 	speed = element.radius/5
+	 }
+
+	if(element.bad || util.getDistanceFromCenter(element,ether) <= radius){
 
 		var check;
 
 		while(!check){
+			console.log('inside')
 			var x = Math.floor(Math.random()*4);
 
 			switch(x){
@@ -307,12 +349,18 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 	var distance = ether.getDistanceFromCenter({x:x,y:y});
 
 	if(distance < range){
-		//give the element an 'x, y' relative to the ether
-		e.x = x;
-		e.y = y;
-		//add to ether.elements[] and remove from world.elements[]
-		this.engine.ethers[0].newElement(e);
-		this.elements[collection].splice(index,1);
+		if(!e.bad){
+			//give the element an 'x, y' relative to the ether
+			e.x = x;
+			e.y = y;
+			//add to ether.elements[] and remove from world.elements[]
+			ether.newElement(e);
+			this.elements[collection].splice(index,1);
+		} else {
+			this.engine.audio.playSound(e)
+			ether.tripleLoss();
+			if(ether.elements.length > 6) ether.tripleLoss();
+		}
 	}
 }
 
@@ -320,6 +368,9 @@ Ether.World.prototype.isInView = function(e){
 	//get the elements x and y position
 	var x = e.xOffset + this.x;
 	var y = e.yOffset + this.y;
+
+	//update the "bad elements"
+
 
 	//if they are in the screen boundaries, return true
 	if((x > -e.radius && x < this.engine.width + e.radius) &&

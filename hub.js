@@ -64,10 +64,13 @@ Ether.Hub = function(engine) {
 				var ether = self.engine.ethers[0];
 				ether.transformation = (self.choice1Alpha > self.choice2Alpha) ? ether.transformations[0] : ether.transformations[1];
 				self.lifeStageMssg = (self.choice1Alpha > self.choice2Alpha) ? self.lifeStageOpts[0] : self.lifeStageOpts[1];
+				break;
+			case 3 :
+				self.engine.badGuys = (self.choice1Alpha > self.choice2Alpha) ? true : false
 		}
 
 		
-		if(self.question > 2 && self.introIndex + 1 < self.introText.length){
+		if(self.question > 3 && self.introIndex + 1 < self.introText.length){
 			self.timeOffset = self.lastIntroTime;
 			self.introIndex++;
 			if(self.introIndex != self.introText.length -1) self.introAlpha = 0;	
@@ -102,7 +105,7 @@ Ether.Hub.prototype.init = function(){
 
 Ether.Hub.prototype.drawIntro = function(time){
 	var ctx = this.engine.ctx;
-	if(this.question <= 2){
+	if(this.question <= 3){
 		this.drawAnswerBoxes(ctx,time);
 		this.drawQuestionText(ctx,time);
 	} else {
@@ -131,11 +134,12 @@ Ether.Hub.prototype.drawIntroText = function(ctx,time){
 }
 
 Ether.Hub.prototype.drawQuestionText = function(ctx,time){
-	var questions = ["Which is more true?","To which are you destined?","Which is more desireable?"];
+	var questions = ["Which is more true?","To which are you destined?","Which is your body?","Which do you desire?"];
 
 	var answers = [["Knowledge is Power.","Reality is Unknown."],
 					["Matter","Consciousness"],
-					["A Butterfly","A Snail"]];
+					["A Butterfly","A Snail"],
+					["Struggle","Peace"]];
 
 	var currentQuestion = questions[this.question];
 	var currentAnswers = answers[this.question];
@@ -266,6 +270,7 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 			ether.currentSpan--;
 		} else {
 			this.engine.betweenAges = true;
+			this.messageExist = false;
 		}
 	}
 
@@ -277,36 +282,36 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 
 	var controlMssg = "wsad / arrow keys"
 	var borderMssg = "there is no time in the boundless void";
-	var age0Mssg = "you are here";
-	var age2Mssg = "you are ancient and fresh";
-	var age3Mssg = "";
+	var age0Mssg = "you are no longer an infant";
+	var age2Mssg = "you are ancient";
+	var age3Mssg = "you give back what you borrowed";
 	var killerMssg = "Save the big ones for post-infancy"
 	var stableMssg = "You are becoming too unstable"
 
 	if(award){this.messageExist = false}
 
-	if(!this.messageExist && !this.engine.betweenAges){
+	if(!this.messageExist){
 		if(this.showControl){
 			this.showControl = false;
 			this.messageExist = true;
 			this.currentMessage = controlMssg;
 			//award
-		} else if(this.awardMssg){
+		} else if(this.awardMssg && !this.engine.betweenAges){
 			this.messageExist = true;
 			this.currentMessage = this.awardMssg;
 
 		//leaving game border
-		} else if(this.hasLeftBorder() && this.currentMessage != borderMssg){
+		} else if(this.hasLeftBorder() && this.currentMessage != borderMssg && !this.engine.betweenAges){
 			this.messageExist = true;
 			this.currentMessage = borderMssg;
 		
 		//killer element
-		} else if(this.killerElement){
+		} else if(this.killerElement && !this.engine.betweenAges){
 			this.messageExist = true;
 			this.currentMessage = killerMssg;
 
 		//stability
-		} else if(this.unstable && !this.stableWarned){
+		} else if(this.unstable && !this.stableWarned && !this.engine.betweenAges){
 			this.messageExist = true;
 			this.stableWarned = true;
 			this.currentMessage = stableMssg;
@@ -344,6 +349,12 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 Ether.Hub.prototype.renderMessage = function(ctx,time){
 	ctx.font = (this.currentMessage == this.awardMssg) ? "90px Verdana" : "30px Verdana";
 	var textWidth = ctx.measureText(this.currentMessage).width;
+
+	if(textWidth > this.engine.width - 10){ 
+		ctx.font = "70px Verdana"
+		textWidth = ctx.measureText(this.currentMessage).width
+	}
+
 	var x = (this.engine.width/2) - (textWidth / 2);
 	var y = (this.engine.height/2)-this.unit;
 
@@ -370,6 +381,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 				this.engine.ethers[0].currentSpan = this.engine.ethers[0].lifeSpan[this.engine.ethers[0].age];
 
 				if(this.engine.ethers[0].age < 4){
+					console.log("hub/before init/age: " + this.engine.ethers[0].age)
 					this.engine.init();
 				} else {
 					//TO DO END GAME?!?!?

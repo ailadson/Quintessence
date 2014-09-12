@@ -19,7 +19,7 @@ Ether.Ether = function(engine) {
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [5,5,5,5]; //in seconds
+	this.lifeSpan = [100,100,100,100]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.totalLifeSpan = 0;
 	this.dying = false;
@@ -71,23 +71,16 @@ Ether.Ether.prototype.init = function(){
 				this.coreElements.push(element); 
 			};
 
-			for (var i = 0; i < this.elements.length; i++) {
-				this.elements[i].radius /= 2;
-			};
+			this.zoomOut(2);
 
 			break;
 
 		case 2 : 
-			for (var i = 0; i < this.elements.length; i++) {
-				this.elements[i].radius /= 1.5;
-			};
-
+			this.zoomOut(1.5)
 			break;
 
 		case 3 :
-			for (var i = 0; i < this.elements.length; i++) {
-				this.elements[i].radius /= 1.5;
-			};
+			this.zoomOut(1.5);
 
 			this.finalElementLength = this.elements.length;
 			console.log("finalElementLength set to :" + this.finalElementLength)
@@ -215,8 +208,6 @@ Ether.Ether.prototype.stabilityCheck = function(time){
 
 	if(stability > 40 && this.age < 3){
 		this.engine.hub.unstable = true 
-	} else if(stability > 20 && this.age < 3){
-		this.engine.hub.stableWarned = false 
 	}
 
 	if(stability >= 50 && this.age < 3){
@@ -225,6 +216,18 @@ Ether.Ether.prototype.stabilityCheck = function(time){
 			this.tripleLoss();
 		}
 	}
+}
+
+Ether.Ether.prototype.zoomOut = function(val){
+	this.range /= val;
+
+	for (var i = 0; i < this.elements.length; i++) {
+		this.elements[i].radius /= val;
+	};
+
+	for (var i = 0; i < this.coreElements.length; i++) {
+		this.coreElements[i].radius /= val;
+	};
 }
 
 Ether.Ether.prototype.tripleLoss = function(){
@@ -308,21 +311,10 @@ Ether.Ether.prototype.getElementCount = function(){
 //Elements
 Ether.Ether.prototype.newElement = function(e){
 	this.engine.audio.playSound(e)
-	switch(this.age){
-		case 0 :
-			break;
-		
-		case 1 :
-			this.increaseMass(e,1,2);
-			break;
-		
-		case 2 :
-			this.increaseMass(e,2,3);
-			break;
-
-		case 3 :
-			break;
+	if(this.age != 3){
+		this.increaseMass(e);
 	}
+			
 	e.xOffset = e.x - this.x; 
 	e.yOffset = e.y - this.y;
 	e.range = this.range;
@@ -353,20 +345,20 @@ Ether.Ether.prototype.loseElement = function(e,override){
 	//}
 }
 
-Ether.Ether.prototype.increaseMass = function(e,massOffset,range){
+Ether.Ether.prototype.increaseMass = function(e){
 	var element = new Ether.Element('core');
 	element.x = this.x;
 	element.y = this.y;
 	this.coreElements.push(element);
-	this.mass += e.radius/massOffset;
-	this.range += range;
+	this.mass += 1//e.radius/massOffset;
+	this.range += this.age+1//range;
 }
 
 Ether.Ether.prototype.decreaseMass = function(){
 	if(this.coreElements.length > 1) this.coreElements.pop();
 
 	if(this.mass > 0) this.mass -= 1;
-	if(this.range > 2)this.range -= 2;
+	if(this.range > this.age + 2) this.range -= this.age+1;
 }
 
 Ether.Ether.prototype.findDegree = function(opp,hyp){

@@ -31,24 +31,11 @@ Ether.Audio.prototype.loadSounds = function(index){
 	} else {
 		self.loaded = true;
 	}
-	/*request.open('GET',"audio/"+url+".wav",true);
-	request.responseType = 'arraybuffer';
-
-	request.onload = function(){
-		self.decodeAudioData(request.response, function(buffer){
-			self.buffer[url] = buffer;
-			
-		})
-	}
-
-	request.send();
-
-	//};*/
 }
 
 
 Ether.Audio.prototype.playSound = function(element){
-	var volume = element.radius/125;
+	var volume = element.bad ? 1 : element.radius/125;
 	if(volume > 1) volume = 1
 	this.audio[element.type].volume = volume;
 	this.audio[element.type].play();

@@ -97,6 +97,7 @@ Ether.Engine.prototype.init = function(){
 	//create player
 	//this.ethers.push(new Ether.Ether(this));
 	this.ethers[0].init();
+	console.log("engine.init/after ether init")
 
 	//set up world
 	window.onkeydown = function(evt){
@@ -131,7 +132,7 @@ Ether.Engine.prototype.checkAwards = function(time){
 			//if the award has been awarded, contiue to the next one
 			if(award.awarded){ continue }
 
-			var elements = award.elements.split("");
+			var elements = ["f","w","e","a"]
 		//	console.log(elements); console.log(award.amount)
 			for (var j = 0; j < elements.length; j++) {
 				if(stats[elements[j]] >= award.amount){
@@ -159,10 +160,10 @@ Ether.Engine.prototype.setAwards = function(type){
 
 	for (var i = 0; i < this.awards.length; i++) {
 		this.awards[i].amount = amount;
-		this.awards[i].award = Math.floor(award/2);
+		this.awards[i].award = Math.ceil(award/2);
 		//console.log(this.awards[i].amount)
-		amount += Math.round(i/5) + 1;
-		award++;
+		amount += 4;
+		award = i+1;
 	};
 }
 
