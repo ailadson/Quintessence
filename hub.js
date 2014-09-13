@@ -403,7 +403,6 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 				this.engine.ethers[0].currentSpan = this.engine.ethers[0].lifeSpan[this.engine.ethers[0].age];
 
 				if(this.engine.ethers[0].age < 4){
-					console.log("hub/before init/age: " + this.engine.ethers[0].age)
 					this.engine.init();
 				} else {
 					//TO DO END GAME?!?!?

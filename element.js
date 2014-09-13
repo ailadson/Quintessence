@@ -2,7 +2,7 @@ var Ether = Ether || {};
 
 Ether.Element = function(type,size,config,bad){
 	var config = config || {};
-	this.type = config.type || type;
+	this["type"] = config["type"] || type;
 	this.bad = bad;
 
 	//color

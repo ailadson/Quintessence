@@ -11,7 +11,10 @@ Ether.World = function (engine) {
 	this.xv = 0;
 	this.yv = 0;
 	this.dragLastTime = 0;
-	this.speedUp = {x:false,y:false}
+	this.speedUp = {}
+
+	this.speedUp["x"] = false;
+	this.speedUp["y"] = false;
 
 	//elements
 	this.fire = [];
@@ -50,7 +53,6 @@ Ether.World.prototype.init = function(){
 				this.initElement(type,collection,50,100,function(e,self){
 					if(e.radius < 200) e.radius = 200;
 					if(e.radius > 300) e.radius = 300;
-					e.killer = true;
 
 					//To prevent 1 hit KOs
 					e.x = self.x + e.xOffset;
@@ -97,7 +99,7 @@ Ether.World.prototype.init = function(){
 				}
 				break;
 			case 3 :
-				this.initElement(type,collection,270,6000,function(e){
+				this.initElement(type,collection,300,6000,function(e){
 					if(e.radius > 50) e.radius = 50;
 				})
 				break;
@@ -371,7 +373,7 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 			this.elements[collection].splice(index,1);
 		} else {
 			this.engine.audio.playSound(e)
-			ether.tripleLoss();
+			ether.loseElements(1);
 			if(ether.elements.length > 6) ether.tripleLoss();
 		}
 	}

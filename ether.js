@@ -1,10 +1,15 @@
-Ether.Ether = function(engine) {
-	this.engine = engine
+/**
+ * @constructor
+ */
+ Ether.Ether = function(engine) {
+	this.engine = engine;
+	this.util = engine.util
 	this.rotateLastTime = 0;
 
 	//elements
 	this.coreElements = [];
 	this.elements = [];
+	this.moved;
 
 	this.x = engine.width/2;
 	this.y = engine.height/2;
@@ -15,19 +20,18 @@ Ether.Ether = function(engine) {
 	this.range = 15;
 	this.mass = 1;
 	this.age = 0;
-	this.speed = 7;
+	this.speed = 8;
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [100,100,100,100]; //in seconds
+	this.lifeSpan = [100,95,90,70]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.totalLifeSpan;
-	this.dying = false;
 	this.dead = false;
 	this.ageLastTime = 0;
 	this.finalElementLength = 1;
 	this.stabilityLastTime = 0;
-	this.moved;
+	
 	
 	this.transformation;
 	this.transformations = [this.rotateElement,this.createSludge]
@@ -43,41 +47,16 @@ Ether.Ether = function(engine) {
 Ether.Ether.prototype.init = function(){
 	switch(this.age){
 		case 0 :
-			var element = new Ether.Element('core');
-			element.x = this.x;
-			element.y = this.y;
-			this.coreElements.push(element);
+			this.createCoreElement();
 			break;
 
 		case 1 : 
-			var count = this.getElementCount();
-			var total = 0;
-
-			for(e in count){
-				total += count[e];
-			}
-
-			this.mass = total;
-			this.range += total;
-
-			for (var i = 0; i < total.length; i++) {
-				var element = new Ether.Element('core');
-				element.x = this.x;
-				element.y = this.y;
-				this.coreElements.push(element); 
-			};
-
-			this.zoomOut(2);
-
-			break;
-
 		case 2 : 
 			this.zoomOut(2)
 			break;
 
 		case 3 :
 			this.zoomOut(2);
-
 			this.finalElementLength = this.elements.length;
 			break;
 	}
@@ -86,11 +65,15 @@ Ether.Ether.prototype.init = function(){
 Ether.Ether.prototype.draw = function(engine,time){
 	this.drawCoreElements(engine);
 	this.drawElements(engine,time);
-	this.stabilityCheck(time);
-	//if(this.elements.length = 0) this.dead = true;
+	this.stabilityCheck(engine,time);
 }
 
 Ether.Ether.prototype.drawElements = function(engine,time){
+	var self = this;
+
+	//age ether during the thried life stage
+	if(this.age == 3)this.ageEther(time)
+
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i];
 
@@ -99,45 +82,16 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 		e.y = this.y + e.yOffset;
 		e.jitter *= -1;
 
-		//if(!this.loseElement(e)){
+		//Butterfly//Snail Transformation
+		if(this.age==2)this.transformation(e,time)
 
-			//AGE RELATED FUCTIONS
-			switch(this.age){
-				case 0 :
-					if(this.dying){
-						this.attractEtherToElement(e);
-					} else if(this.isKillerElement(e)){ 
-						this.tripleLoss();
-						engine.hub.killerElement = true;
-					}
-					break;
+		//Draw Ether Elements
+		engine.ctx.beginPath();
 
-				case 1 :
-					break;
-
-				case 2 : 
-					this.transformation(e,time)
-					break;
-
-				case 3 :
-					this.ageEther(time);
-					break;
-			}
-
-			engine.ctx.beginPath();
-
-			this.drawElement(e, engine.ctx, function(ctx, element){
-				var gradient = engine.ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-				gradient.addColorStop(0.1,"white");
-				gradient.addColorStop(0.1,"white");
-				gradient.addColorStop(0.8,element.color);
-				gradient.addColorStop(0.1,"black");
-
-				return gradient
-			})
-
-			if(e.newElement) e.newElement--;
-		//}
+		self.util.drawElement(e, engine.ctx, function(ctx, element){
+			var gradient = engine.ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
+			return self.util.createGradient(gradient,[[0.1,"white"],[0.1,"white"],[0.8,element.color],[0.1,"black"]])
+		})
 
 	};
 
@@ -146,28 +100,23 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 }
 
 Ether.Ether.prototype.drawCoreElements = function(engine){
+	var self = this;
+	engine.ctx.globalCompositeOperation = "lighter";
+
 	for (var i = 0; i < this.coreElements.length; i++) {
 		var e = this.coreElements[i];
 
 		engine.ctx.beginPath();
-		engine.ctx.globalCompositeOperation = "lighter";
-
+		
 		if(this.age == 0){
-			this.drawElement(e, engine.ctx, function(ctx,element){
+			self.util.drawElement(e, engine.ctx, function(ctx,element){
 				var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-				gradient.addColorStop(0.5,"white");
-				gradient.addColorStop(1,"black");
-
-				return gradient;
+				return self.util.createGradient(gradient,[[0.5,"white"],[1,"black"]])
 			});	
 		} else {
-			this.drawElement(e, engine.ctx, function(ctx,element){
+			self.util.drawElement(e, engine.ctx, function(ctx,element){
 				var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-				gradient.addColorStop(0.5,"white");
-				gradient.addColorStop(0.4,element.color);
-				gradient.addColorStop(1,"black");
-
-				return gradient;
+				return self.util.createGradient(gradient,[[0.5,"white"],[0.4,element.color],[1,"black"]])
 			});	
 		}	
 
@@ -176,39 +125,27 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 		e.y += e.vy;
 
 		//maintain center
-		switch(e.type){
-			case 'core':
-				if(this.getDistanceFromCenter(e) > this.range/2){ 
-					e.x = this.x
-					e.y = this.y
-					//velocity
-					this.vx = Math.random()*10-5;
-					this.vy = Math.random()*10-5;
-				}
-				
+		if(this.getDistanceFromCenter(e) > this.range){ 
+			e.x = this.x
+			e.y = this.y
+			//velocity
+			this.vx = Math.random()*10-5;
+			this.vy = Math.random()*10-5;
 		}
 	};
 }
 
-Ether.Ether.prototype.drawElement = function(element,ctx,gradFunc){
-	var gradient = gradFunc(ctx,element);
-
-	ctx.fillStyle = gradient;
-	ctx.arc(element.x,element.y,element.radius,Math.PI*2,false);
-	ctx.fill();
-}
-
-Ether.Ether.prototype.stabilityCheck = function(time){
+Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	var stability = this.getStability();
 
 	if(stability > 40 && this.age < 3){
-		this.engine.hub.unstable = true 
-	}
+		engine.hub.unstable = true 
 
-	if(stability >= 50 && this.age < 3){
-		if(time > this.stabilityLastTime + 2000 - stability){
-			this.stabilityLastTime = time;		
-			this.tripleLoss();
+		if(stability >= 50){
+			if(time > this.stabilityLastTime + 2000 - stability){
+				this.stabilityLastTime = time;		
+				this.loseElements(3);
+			}
 		}
 	}
 }
@@ -217,7 +154,10 @@ Ether.Ether.prototype.zoomOut = function(val){
 	this.range /= val;
 
 	for (var i = 0; i < this.elements.length; i++) {
-		this.elements[i].radius /= val;
+		var e = this.elements[i]
+		e.radius /= val;
+		e.xOffset /= val;
+		e.yOffset /= val;
 	};
 
 	for (var i = 0; i < this.coreElements.length; i++) {
@@ -225,32 +165,15 @@ Ether.Ether.prototype.zoomOut = function(val){
 	};
 }
 
-Ether.Ether.prototype.tripleLoss = function(){
-	if(this.elements.length != 0){
-		this.loseElement(this.elements[this.elements.length-1],true)
-	} else {
-		console.log('elements array is 0')
-	}
-
-	var random = Math.floor(Math.random() * this.elements.length)
-	
-	if(this.elements.length != 0){
-		this.loseElement(this.elements[random],true)
-	} else {
-		console.log('elements array is 0')
-	}
-
-	random = Math.floor(Math.random() * this.elements.length)
-
-	if(this.elements.length != 0){
-		this.loseElement(this.elements[random],true)
-	} else {
-		console.log('elements array is 0')
-	}
+Ether.Ether.prototype.getDistanceFromCenter = function(e){
+	return this.util.getDistanceFromCenter(this,e);
 }
 
-Ether.Ether.prototype.getDistanceFromCenter = function(e){
-	return this.engine.util.getDistanceFromCenter(this,e);
+Ether.Ether.prototype.findDegree = function(opp,hyp){
+	var ratio = opp/hyp;
+	var radian = Math.acos(ratio);
+
+	return this.util.radToDeg(radian);
 }
 
 Ether.Ether.prototype.ageEther = function(time){
@@ -259,8 +182,6 @@ Ether.Ether.prototype.ageEther = function(time){
 		
 		if(this.elements.length != 0){
 			this.loseElement(this.elements[this.elements.length-1],true)
-		} else {
-			console.log('elements array is 0')
 		}
 	}
 }
@@ -280,8 +201,8 @@ Ether.Ether.prototype.healthRate = function(time){
 Ether.Ether.prototype.getStability = function(){
 	var o = this.getElementCount();
 
-	var dif1 = o.f - o.w;
-	var dif2 = o.a - o.e;
+	var dif1 = o["f"] - o["w"];
+	var dif2 = o["a"] - o["e"];
 
 	return Math.floor(Math.sqrt((dif1 * dif1)+(dif2 * dif2)));
 }
@@ -303,7 +224,12 @@ Ether.Ether.prototype.getElementCount = function(){
 		}
 	};
 
-	return { f : f, w: w, a: a, e: e}
+	var obj = {}
+	obj["f"] = f;
+	obj["w"] = w;
+	obj["a"] = a;
+	obj["e"] = e;
+	return obj
 }
 
 //Elements
@@ -316,88 +242,60 @@ Ether.Ether.prototype.newElement = function(e){
 	e.xOffset = e.x - this.x; 
 	e.yOffset = e.y - this.y;
 	e.range = this.range;
-	e.degree = (e.yOffset,this.getDistanceFromCenter(e));
+	e.degree = this.findDegree(e.yOffset,this.getDistanceFromCenter(e));
 	e.newElement = this.mass/2;
 	this.elements.push(e);
 }
 
-Ether.Ether.prototype.loseElement = function(e,override){
-	if(e.newElement && !override) { return }
+Ether.Ether.prototype.loseElement = function(e){
 
-	//if(Math.floor(this.getDistanceFromCenter(e) + (e.radius/4) - this.mass) >= this.range - (this.getStability() * 2)){
-		//console.log(this.getDistanceFromCenter(e)+ (e.radius/2) -this.mass);
-		//console.log(this.range - this.getStability() * 2);
-		this.decreaseMass();
-		
-		//remove from elements
-		for (var i = 0; i < this.elements.length; i++) {
-			var ele = this.elements[i];
+	this.decreaseMass(e);
+	
+	//remove from elements
+	for (var i = 0; i < this.elements.length; i++) {
+		var ele = this.elements[i];
 
-			if(ele.x == e.x && ele.y == e.y){
-				var worldEle = this.elements.splice(i,1)[0];
-				this.engine.world.newElement(worldEle);
-				return true;
-			}
-		};
+		if(ele.x == e.x && ele.y == e.y){
+			var worldEle = this.elements.splice(i,1)[0];
+			this.engine.world.newElement(worldEle);
+			return true;
+		}
+	};
+}
 
-	//}
+Ether.Ether.prototype.loseElements = function(val){
+	for(var i = 0; i < val; i++){
+		random = Math.floor(Math.random() * this.elements.length)
+
+		if(this.elements.length != 0){
+			this.loseElement(this.elements[random],true)
+		}
+	}
+}
+
+Ether.Ether.prototype.createCoreElement = function(){
+	var e = new Ether.Element('core');
+	e.x = this.x;
+	e.y = this.y;
+	this.coreElements.push(e); 
 }
 
 Ether.Ether.prototype.increaseMass = function(e){
-	var element = new Ether.Element('core');
-	element.x = this.x;
-	element.y = this.y;
-	this.coreElements.push(element);
+	this.createCoreElement();
 	this.mass += 1//e.radius/massOffset;
-	this.range += this.age+1//range;
+	this.range += (e.radius/3)
 }
 
-Ether.Ether.prototype.decreaseMass = function(){
+Ether.Ether.prototype.decreaseMass = function(e){
 	if(this.coreElements.length > 1) this.coreElements.pop();
-
 	if(this.mass > 0) this.mass -= 1;
-	if(this.range > this.age + 2) this.range -= this.age+1;
-}
-
-Ether.Ether.prototype.findDegree = function(opp,hyp){
-	var ratio = opp/hyp;
-	var radian = Math.acos(ratio);
-
-	return this.engine.util.radToDeg(radian);
-}
-
-Ether.Ether.prototype.isKillerElement = function(e){
-	if(e.killer){ 
-		return true;
-	}
-}
-
-Ether.Ether.prototype.attractEtherToElement = function(e){
-	if(e.x < this.x){
-		this.x--;
-		e.xOffset++;
-	} else if(e.x > this.x){
-		this.x++;
-		e.xOffset--;
-	}
-
-	if(e.y < this.y){
-		this.y--;
-		e.yOffset++;
-	} else if(e.y > this.y){
-		this.y++;
-		e.yOffset--;
-	}
-
-	if((e.x > this.x - 10 && e.x < this.x + 10) &&
-		(e.y > this.y - 10 && e.y < this.y + 10)){
-		 this.dead = true;
-	}
+	if(this.range > 2) this.range -= (e.radius/3);
 }
 
 //awards
-Ether.Ether.prototype.receiveAward = function(amount){
-	var a = amount;
+Ether.Ether.prototype.receiveAward = function(a){
+	//make sure the award wont put the player past the cap
+	//givien by the engine
 	if(this.currentSpan + a > this.lifeSpan[this.age]){
 		this.currentSpan = this.lifeSpan[this.age];
 	} else {
@@ -410,7 +308,7 @@ Ether.Ether.prototype.receiveAward = function(amount){
 Ether.Ether.prototype.rotateElement = function(e,time){
 	if(time > this.rotateLastTime + 500){
 
-		if(this.rotateDirection < 0){
+		if(this.rotateDirection < 0){ //rDir starts at -1
 			this.degreeChange += 0.001;
 			if(this.degreeChange > 1) {this.degreeChange = 1 }
 			if(this.currentSpan < (this.lifeSpan[this.age]/3) * 2){ this.rotateDirection++; }
@@ -431,14 +329,14 @@ Ether.Ether.prototype.rotateElement = function(e,time){
 		e.degree+=this.degreeChange;
 	}
 
-	e.xOffset = (e.range * Math.cos(this.engine.util.degToRad(e.degree)));
-	e.yOffset = (e.xOffset * Math.tan(this.engine.util.degToRad(e.degree)));
+	e.xOffset = (e.range * Math.cos(this.util.degToRad(e.degree)));
+	e.yOffset = (e.xOffset * Math.tan(this.util.degToRad(e.degree)));
 	
 }
 
 Ether.Ether.prototype.createSludge = function(e,time){
 	if(time > this.sludgeLastTime + 500){
-		this.sludgeLastTime = time;
+		this.sludgeLastTime = time; //lock after 1st iteration. for the sake of delay.
 		
 		var sludge = new Sludge(this.engine,this);
 
@@ -447,21 +345,17 @@ Ether.Ether.prototype.createSludge = function(e,time){
 
 			//create sludge based on direction
 			if(this.xv > 0 && (e.x > this.x)){
-				var ele = new Ether.Element(0,0,e);
-				sludge.elements.push(ele);
+				this.pushSludge(sludge,e);
 				continue; 
 			} else if(this.xv < 0 && e.x < this.x){
-				var ele = new Ether.Element(0,0,e);
-				sludge.elements.push(ele);
+				this.pushSludge(sludge,e);
 				continue;
 			}
 
 			if(this.yv > 0 && (e.y > this.y)){
-				var ele = new Ether.Element(0,0,e);
-				sludge.elements.push(ele);
+				this.pushSludge(sludge,e);
 			} else if(this.yv < 0 && (e.x < this.x)){
-				var ele = new Ether.Element(0,0,e);
-				sludge.elements.push(ele);
+				this.pushSludge(sludge,e);
 			}
 		};
 
@@ -469,10 +363,16 @@ Ether.Ether.prototype.createSludge = function(e,time){
 	}
 }
 
-//DEBUG!!!
+Ether.Ether.prototype.pushSludge = function(s,e){
+	var ele = new Ether.Element(0,0,e);
+	s.elements.push(ele);
+}
+
+/**
+ * @constructor
+ */
 Sludge = function(engine,player){
 	var self = this;
-
 	this.engine = engine;
 	this.world = engine.world;
 	this.player = player;
@@ -519,7 +419,7 @@ Sludge = function(engine,player){
 				(ele.y > -(ele.radius+3) && ele.y < engine.height + ele.radius + 3)){
 				engine.ctx.beginPath();
 
-				self.player.drawElement(ele,engine.ctx,function(ctx,e){
+				self.engine.util.drawElement(ele,engine.ctx,function(ctx,e){
 					var color = "rgba("+e.rgb.r+","+e.rgb.g+","+e.rgb.b+","+self.alpha+")"
 					return color;
 				});

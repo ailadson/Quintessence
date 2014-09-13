@@ -28,3 +28,19 @@ Ether.Util.prototype.getDistanceFromCenter = function(e,source){
 
 	return Math.sqrt((xDif * xDif) + (yDif * yDif))
 }
+
+Ether.Util.prototype.createGradient = function(grad,set){
+	for (var i = 0; i < set.length; i++) {
+		var stop = set[i];
+		grad.addColorStop(stop[0],stop[1])
+	};
+	return grad
+}
+
+Ether.Util.prototype.drawElement = function(element,ctx,gradFunc){
+	var gradient = gradFunc(ctx,element);
+
+	ctx.fillStyle = gradient;
+	ctx.arc(element.x,element.y,element.radius,Math.PI*2,false);
+	ctx.fill();
+}
