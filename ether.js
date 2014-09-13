@@ -358,7 +358,7 @@ Ether.Ether.prototype.createSludge = function(e,time){
 
 			if(this.yv > 0 && (e.y > this.y)){
 				this.pushSludge(sludge,e);
-			} else if(this.yv < 0 && (e.x < this.x)){
+			} else if(this.yv < 0 && (e.y < this.y)){
 				this.pushSludge(sludge,e);
 			}
 		};

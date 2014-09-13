@@ -1,4 +1,7 @@
-Ether.Engine = function() {	
+/**
+ * @constructor
+ */
+ Ether.Engine = function() {	
 	var self = this;
 
 	//Canvas
@@ -17,6 +20,7 @@ Ether.Engine = function() {
 
 	//Ethers
 	this.ethers = [new Ether.Ether(self)];
+	this.player = this.ethers[0];
 
 	//level
 	this.betweenAges = false;
@@ -33,7 +37,7 @@ Ether.Engine = function() {
 		requestAnimFrame(self.animate);
 
 		//Draw Background
-		if(!self.ethers[0].dead){
+		if(!self.player.dead){
 			self.ctx.fillStyle = "black";
 			self.ctx.fillRect(0,0,self.width,self.height);
 		}
@@ -47,13 +51,13 @@ Ether.Engine = function() {
 			self.hub.draw(time);
 
 		//otherwise, if player is not dead...
-		} else if(!self.ethers[0].dead){
+		} else if(!self.player.dead){
 
 			//Draw World
 			self.world.draw(self,time);
 
 			//check awards
-			if(!self.ethers[0].dying){ self.checkAwards(time) };
+			if(!self.player.dying){ self.checkAwards(time) };
 			//Draw Ethers
 			for (var i = 0; i < self.ethers.length; i++) {
 				self.ethers[i].draw(self,time);
@@ -66,7 +70,7 @@ Ether.Engine = function() {
 			//
 
 		//otherwise, if player is dead
-		} else if(self.ethers[0].dead){
+		} else if(self.player.dead){
 			if(time > self.gameOverTime + 100){//self.gameOverAlpha < 0.35){
 				self.gameOverAlpha+=0.01;
 				self.gameOverTime = time;
@@ -96,7 +100,7 @@ Ether.Engine.prototype.init = function(){
 
 	//create player
 	//this.ethers.push(new Ether.Ether(this));
-	this.ethers[0].init();
+	this.player.init();
 	
 	//set up world
 	window.onkeydown = function(evt){
@@ -115,12 +119,12 @@ Ether.Engine.prototype.init = function(){
 	this.audio.init();
 
 	//start animation
-	if(this.ethers[0].age == 0)
+	if(this.player.age == 0)
 		window.requestAnimFrame(this.animate);
 }
 
 Ether.Engine.prototype.checkAwards = function(time){
-	var stats = this.ethers[0].getElementCount();
+	var stats = this.player.getElementCount();
 
 	if(time > this.awardDelay + 5000){
 		this.awardLastTime = time;
@@ -138,7 +142,7 @@ Ether.Engine.prototype.checkAwards = function(time){
 					if(j == elements.length-1){
 						award.awarded = true;
 						this.hub.newAward(award.text);
-						this.ethers[0].receiveAward(award.award);
+						this.player.receiveAward(award.award);
 						this.awardDelay = time;
 					}
 				} else {
