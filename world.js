@@ -1,7 +1,10 @@
-Ether = Ether || {}
-
-Ether.World = function (engine) {
+/**
+ * @constructor
+ */
+ Ether.World = function (engine) {
 	this.engine = engine;
+	this.util;
+	this.player;
 
 	//world positioning values
 	this.width = engine.width*30;
@@ -28,15 +31,22 @@ Ether.World = function (engine) {
 	this.hills = [];
 	this.hillWidthAmount = 4
 	this.hillHeightAmount = 2;
-	this.hillWidth = this.engine.width/this.hillWidthAmount;
-	this.hillHeight = this.engine.height/this.hillHeightAmount;
+	this.hillWidth = engine.width/this.hillWidthAmount;
+	this.hillHeight = engine.height/this.hillHeightAmount;
 
 }
 
 //WORLD INIT
-Ether.World.prototype.init = function(){
+Ether.World.prototype.init = function(engine){
 	var eleStrings = ['earth','air','fire','water'];
-	if(this.engine.ethers[0].age != 0) this.zoomOut(2)
+	
+	if(engine.ethers[0].age != 0){ 
+		this.zoomOut(2) 
+	} else {
+		this.player = engine.ethers[0]
+		this.util = engine.util;
+	}
+
 	this.initBackground();
 
 	for (var i = 0; i < this.elements.length; i++) {
@@ -44,80 +54,49 @@ Ether.World.prototype.init = function(){
 		collection.length = 0; //clear out array
 		var type = eleStrings[i];
 
-		switch(this.engine.ethers[0].age){
+		switch(engine.ethers[0].age){
 			case 0 :
-				this.initElement(type,collection,300,9000,function(e){
-					if(e.radius > 5) e.radius = 5
-				});
-
-				this.initElement(type,collection,50,100,function(e,self){
-					if(e.radius < 200) e.radius = 200;
-					if(e.radius > 300) e.radius = 300;
-
-					//To prevent 1 hit KOs
-					e.x = self.x + e.xOffset;
-					e.y = self.y + e.yOffset;
-					
-					if((e.x >= 0 && e.x <= self.engine.width) &&
-						(e.y >= 0 && e.y <= self.engine.height)){
-						e.xOffset += (e.radius + self.engine.width)
-					}
-				},this)
-
-				this.initElement(type,collection,120,300,function(e){
-					if(e.radius < 150) e.radius = 150
-				},this,true)
+				this.initElements(type,collection,[5,300],[0,200],[300,50],[9000,100])
+				this.initBadGuys(type,collection,120,true);
 				break;
 
 			case 1 :
-				this.initElement(type,collection,250,3000,function(e){
-					if(e.radius < 10) e.radius = 10;
-					if(e.radius > 80) e.radius = 80;
-				})
-				this.initElement(type,collection,50,1000,function(e){
-					if(e.radius < 180) e.radius = 180;
-					if(e.radius > 250) e.radius = 250;
-				})
-				if(this.engine.badGuys){
-					this.initElement(type,collection,20,1000,function(e){
-						if(e.radius < 100) e.radius = 100;
-						if(e.radius > 160) e.radius = 160;
-					},this,true)
-				}
+				this.initElements(type,collection,[70,200],[10,180],[250,50],[7000,2000])
+				//this.initBadGuys(type,collection,90);
 				break;
 			case 2 :
-				this.initElement(type,collection,200,5000,function(e){
-					if(e.radius > 20) e.radius = 20;
-				})
-				this.initElement(type,collection,200,1000,function(e){
-					if(e.radius > 80) e.radius = 80;
-				})
-				if(this.engine.badGuys){
-					this.initElement(type,collection,20,1000,function(e){
-						if(e.radius > 80) e.radius = 80;
-					},this,true)
-				}
+				this.initElements(type,collection,[],[20,80],[200,200],[5000,1000])
+				this.initBadGuys(type,collection,60);
 				break;
 			case 3 :
-				this.initElement(type,collection,300,6000,function(e){
-					if(e.radius > 50) e.radius = 50;
-				})
+				this.initElements(type,collection,[0],[50],[300],[6000])
+				this.initBadGuys(type,collection,30);
 				break;
-		}
-
-
-		
+		}		
 	};
 }
 
-Ether.World.prototype.zoomOut = function(val){
-	this.hillHeightAmount *= val;
-	this.hillWidthAmount *= val;
-	this.hillWidth = this.engine.width/this.hillWidthAmount;
-	this.hillHeight = this.engine.height/this.hillHeightAmount;
+Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffset){
+	for (var i = 0; i < n.length; i++) {
+		this.initElement(type,collection,n[i],sizeOffset[i],function(e){
+			if(min[i] && e.radius > min[i]) e.radius = min[i];
+			if(max[i] && e.radius < max[i]) e.radius = max[i];
+		})
+	};
+
+	
 }
 
-Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,eFunc,ctx,bad){
+Ether.World.prototype.initBadGuys = function(type,collection,max,t){
+	var bool = t || this.engine.badGuys;
+	if(bool){
+			this.initElement(type,collection,25,100,function(e){
+				if(e.radius > max) e.radius = max;
+			},true)
+		}
+}
+
+Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,eFunc,bad){
 	for (var j = 0; j < amount; j++) {
 			//get values that will be used to create element
 			var xOffset = ((Math.random()*(this.width*2)) - this.width)/2;
@@ -125,27 +104,40 @@ Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,e
 			var size = this.getDistanceFromCenter({x:xOffset,y:yOffset});
 			
 			var element = new Ether.Element(type,size/sizeOffset,{},bad);
+			eFunc(element)
 			element.xOffset = xOffset;
 			element.yOffset = yOffset;
-			eFunc(element,ctx);
 			collection.push(element);
 		};
 }
 
+Ether.World.prototype.initBackground = function(){
+	for (var i = 0; i < this.hillHeightAmount + 2; i++) {
+		var hills = [];
+		for (var j = 0; j < this.hillWidthAmount+2; j++) {
+			hills[j] = {x: (this.hillWidth*j), y: (this.hillHeight*i)}
+		};
+		this.hills.push(hills);
+	};
+}
 
 //DRAWING
 Ether.World.prototype.draw = function(engine,time){
 		this.xv = this.adjustVelocity("x",this.xv,time);
 		this.yv = this.adjustVelocity("y",this.yv,time);
+	
+		//drag timer
+		if(time > this.dragLastTime + 200){ this.dragLastTime = time }
+		
+		//DrawBackground
 		this.drawBackground(this.xv,this.yv);
-		//velocity time
-		if(time > this.dragLastTime + 200){this.dragLastTime = time}
-
+		
+		//update x+y
 		this.x += this.xv;
 		this.y += this.yv;
 
-		this.engine.ethers[0].xv = this.xv;
-		this.engine.ethers[0].yv = this.yv;
+		this.player.xv = this.xv;
+		this.player.yv = this.yv;
 
 		engine.xv = this.xv;
 		engine.yv = this.yv;
@@ -158,7 +150,6 @@ Ether.World.prototype.draw = function(engine,time){
 		for (var j = 0; j < collection.length; j++) {
 			var e = collection[j];
 
-			//if(e.bad){this.driftTowardsEther(e)}
 			if(!this.isInView(e)){ continue }
 
 			//reverse direction of jitter
@@ -174,19 +165,18 @@ Ether.World.prototype.draw = function(engine,time){
 			engine.ctx.beginPath();
 
 			//create 
+			var gradient = engine.ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,e.radius);
+
 			if(e.bad){
-				var gradient = engine.ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,e.radius);
-				gradient.addColorStop(0.1,"rgba("+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+",1)");
-				gradient.addColorStop(0.3,"black");
-				gradient.addColorStop(0.7,"black");
-				gradient.addColorStop(0.9,"rgba("+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+",1)");
+				this.util.createGradient(gradient,[
+					[0.1,"rgba("+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+",1)"],
+					[0.3,"black"],
+					[0.7,"black"],
+					[0.9,"rgba("+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+","+(Math.round(Math.random()*255))+",1)"]
+				]);
 
 			} else {
-				var gradient = engine.ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,e.radius);
-				gradient.addColorStop(0.1,"white");
-				gradient.addColorStop(0.1,"white");
-				gradient.addColorStop(0.8,e.color);
-				gradient.addColorStop(0.1,"black");
+				this.util.createGradient(gradient,[[0.1,"white"],[0.1,"white"],[0.8,e.color],[0.1,"black"]])
 			}
 
 			engine.ctx.fillStyle = gradient;
@@ -202,14 +192,13 @@ Ether.World.prototype.draw = function(engine,time){
 	this.drawBorder(engine);
 }
 
-Ether.World.prototype.initBackground = function(){
-	for (var i = 0; i < this.hillHeightAmount + 1; i++) {
-		var hills = [];
-		for (var j = 0; j < this.hillWidthAmount+1; j++) {
-			hills[j] = {x: (this.hillWidth*j), y: (this.hillHeight*i)}
-		};
-		this.hills.push(hills);
-	};
+
+
+Ether.World.prototype.zoomOut = function(val){
+	this.hillHeightAmount *= val;
+	this.hillWidthAmount *= val;
+	this.hillWidth = this.engine.width/this.hillWidthAmount;
+	this.hillHeight = this.engine.height/this.hillHeightAmount;
 }
 
 Ether.World.prototype.drawBackground = function(xv,yv){
@@ -227,11 +216,8 @@ Ether.World.prototype.drawBackground = function(xv,yv){
 			if(hill.y+this.hillHeight < 0) hill.y = this.engine.height
 			if(hill.y > this.engine.height) hill.y = -this.hillHeight
 
-			//console.log(hill.x)
 			var gradient = this.engine.ctx.createLinearGradient(hill.x,hill.y,hill.x+this.hillWidth,hill.y+this.hillHeight);
-			gradient.addColorStop(0.05,"rgba(0,0,0,1)");
-			gradient.addColorStop(0.95,"rgba(20,20,20,1)")
-			this.engine.ctx.fillStyle = gradient;
+			this.engine.ctx.fillStyle = this.util.createGradient(gradient,[[0.05,"rgba(0,0,0,1)"],[0.95,"rgba(20,20,20,1)"]]);
 			this.engine.ctx.fillRect(hill.x,hill.y,this.hillWidth+5,this.hillHeight+5)
 		};
 	}
@@ -239,8 +225,7 @@ Ether.World.prototype.drawBackground = function(xv,yv){
 }
 
 Ether.World.prototype.driftTowardsEther = function(element){
-	var util = this.engine.util;
-	var ether = this.engine.ethers[0];
+	var ether = this.player;
 	var radius = element.radius < 40 ? element.radius * 20 : element.radius * 2
 	var speed;
 
@@ -252,7 +237,7 @@ Ether.World.prototype.driftTowardsEther = function(element){
 	 	speed = element.radius/5
 	 }
 
-	if(element.bad || util.getDistanceFromCenter(element,ether) <= radius){
+	if(element.bad || this.util.getDistanceFromCenter(element,ether) <= radius){
 
 		var check;
 
@@ -332,12 +317,8 @@ Ether.World.prototype.drawDriftingElements = function(engine){
 
 		//create gradient
 		var gradient = engine.ctx.createRadialGradient(x,y,0,x,y,e.radius);
-		gradient.addColorStop(0.1,"white");
-		gradient.addColorStop(0.1,"white");
-		gradient.addColorStop(0.8,e.color);
-		gradient.addColorStop(0.1,"black");
-
-		engine.ctx.fillStyle = gradient;
+		
+		engine.ctx.fillStyle = this.util.createGradient(gradient,[[0.1,"white"],[0.1,"white"],[0.8,e.color],[0.1,"black"]]);
 		engine.ctx.arc(x,y,e.radius,Math.PI*2,false);
 		engine.ctx.fill();
 
@@ -357,7 +338,7 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 	//make sure the element is on the screen
 	if(!this.isInView(e)){ return }
 
-	var ether = this.engine.ethers[0];
+	var ether = this.player;
 	var range = ether.range + e.radius/2;
 	var x = e.xOffset + this.x;
 	var y = e.yOffset + this.y;
@@ -384,9 +365,6 @@ Ether.World.prototype.isInView = function(e){
 	var x = e.xOffset + this.x;
 	var y = e.yOffset + this.y;
 
-	//update the "bad elements"
-
-
 	//if they are in the screen boundaries, return true
 	if((x > -e.radius && x < this.engine.width + e.radius) &&
 		(y > -e.radius && y < this.engine.height + e.radius)){
@@ -401,12 +379,12 @@ Ether.World.prototype.getDistanceFromCenter = function(e){
 Ether.World.prototype.adjustVelocity = function(axis,val,time){
 	if(time > this.dragLastTime + 200){
 		if(this.speedUp[axis]){
-			if(val > 0 && val <= this.engine.ethers[0].speed){
+			if(val > 0 && val <= this.player.speed){
 				val+=2;
-				if(val > this.engine.ethers[0].speed) val = this.engine.ethers[0].speed
-			} else if(val < 0 && val >= -this.engine.ethers[0].speed){
+				if(val > this.player.speed) val = this.player.speed
+			} else if(val < 0 && val >= -this.player.speed){
 				val-=2;
-				if(val < -this.engine.ethers[0].speed) val = -this.engine.ethers[0].speed
+				if(val < -this.player.speed) val = -this.player.speed
 			}
 		} else if (val != 0){
 			if(val > 0){
@@ -420,6 +398,7 @@ Ether.World.prototype.adjustVelocity = function(axis,val,time){
 	}
 	return val
 }
+
 //interaction
 Ether.World.prototype.handleKeyDown = function(e){
 	//if(!this.draggingX || !this.draggingY){
@@ -433,7 +412,7 @@ Ether.World.prototype.handleKeyDown = function(e){
 				} else if(this.yv < -5){
 					this.speedUp.y = false
 				}
-				this.engine.ethers[0].moved = true
+				this.player.moved = true
 				break;
 			case 68 :
 			case 39 :
@@ -444,7 +423,7 @@ Ether.World.prototype.handleKeyDown = function(e){
 				} else if(this.xv > 5){
 					this.speedUp.x = false
 				}
-				this.engine.ethers[0].moved = true
+				this.player.moved = true
 				break;
 			case 83 : 
 			case 40 :
@@ -455,7 +434,7 @@ Ether.World.prototype.handleKeyDown = function(e){
 				} else if(this.yv > 5){
 					this.speedUp.y = false
 				}
-				this.engine.ethers[0].moved = true
+				this.player.moved = true
 				break;
 			case 65 :
 			case 37 :
@@ -466,7 +445,7 @@ Ether.World.prototype.handleKeyDown = function(e){
 				} else if(this.xv < -5){
 					this.speedUp.x = false
 				}
-				this.engine.ethers[0].moved = true
+				this.player.moved = true
 				break;
 		}
 	//}
@@ -489,16 +468,9 @@ Ether.World.prototype.handleKeyUp = function(e){
 		}
 }
 
-Ether.World.prototype.dragMotion = function(direction,val){
-	if(time)
-	if(faster){
-
-	}
-}
-
 //Elements
 Ether.World.prototype.newElement = function(e){
-	var ether = this.engine.ethers[0]
+	var ether = this.player
 
 	//reset coordination variables (x,y,offsets,and drift)
 	e.xOffset = e.x - this.x

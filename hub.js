@@ -1,5 +1,3 @@
-Ether = Ether || {};
-
 Ether.Hub = function(engine) {
 	var self = this;
 

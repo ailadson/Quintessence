@@ -110,7 +110,7 @@ Ether.Engine.prototype.init = function(){
 
 	this.hub.init();
 
-	this.world.init();
+	this.world.init(this);
 
 	this.audio.init();
 

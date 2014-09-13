@@ -1,3 +1,6 @@
+/**
+ * @constructor
+ */
 var Ether = Ether || {};
 
 Ether.Element = function(type,size,config,bad){

@@ -36,6 +36,8 @@
 	this.transformation;
 	this.transformations = [this.rotateElement,this.createSludge]
 
+	this.sludgeTimeOffset = 500;
+	this.sludgeAlphaStep = 0.1
 	this.sludgeLastTime = 0;
 
 	this.rotateLastTime = 0;
@@ -57,6 +59,8 @@ Ether.Ether.prototype.init = function(){
 
 		case 3 :
 			this.zoomOut(2);
+			this.sludgeAlphaStep *= 2;
+			this.sludgeTimeOffset *= 4;
 			this.finalElementLength = this.elements.length;
 			break;
 	}
@@ -83,7 +87,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 		e.jitter *= -1;
 
 		//Butterfly//Snail Transformation
-		if(this.age==2)this.transformation(e,time)
+		if(this.age>=2)this.transformation(e,time)
 
 		//Draw Ether Elements
 		engine.ctx.beginPath();
@@ -283,13 +287,13 @@ Ether.Ether.prototype.createCoreElement = function(){
 Ether.Ether.prototype.increaseMass = function(e){
 	this.createCoreElement();
 	this.mass += 1//e.radius/massOffset;
-	this.range += (e.radius/3)
+	this.range += Math.round(e.radius/6)
 }
 
 Ether.Ether.prototype.decreaseMass = function(e){
 	if(this.coreElements.length > 1) this.coreElements.pop();
 	if(this.mass > 0) this.mass -= 1;
-	if(this.range > 2) this.range -= (e.radius/3);
+	if(this.range > 2) this.range -= Math.round(e.radius/6);
 }
 
 //awards
@@ -335,7 +339,7 @@ Ether.Ether.prototype.rotateElement = function(e,time){
 }
 
 Ether.Ether.prototype.createSludge = function(e,time){
-	if(time > this.sludgeLastTime + 500){
+	if(time > this.sludgeLastTime + this.sludgeTimeOffset){
 		this.sludgeLastTime = time; //lock after 1st iteration. for the sake of delay.
 		
 		var sludge = new Sludge(this.engine,this);
@@ -397,7 +401,7 @@ Sludge = function(engine,player){
 				self.destroy();
 				return
 			}
-			self.alpha -= 0.1;
+			self.alpha -= this.player.sludgeAlphaStep;
 			if(self.alpha < 0) self.alpha = 0;
 		}
 

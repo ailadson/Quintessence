@@ -1,11 +1,8 @@
+/**
+ * @constructor
+ */
 Ether.Util = function (engine) {
 	this.engine = engine;
-}
-
-//Structures
-Ether.Util.prototype.Vector2 = function(x,y){
-	this.x = x;
-	this.y = y;
 }
 
 //Conversion
