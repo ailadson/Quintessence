@@ -1,33 +1,43 @@
+/**
+ * @constructor
+ */
 Ether.Hub = function(engine) {
 	var self = this;
-
 	this.engine = engine;
 	this.unit = engine.width/50;
+
+	this.showInfo = true;
+
+	//messages
 	this.lastTime = 0;
 	this.messageExist = false;
 	this.messageAlpha = 1;
 	this.currentMessage = "";
 	this.lastMessageTime = 0;
+
+	//between stages
 	this.betweenAlpha = 0.1;
 	this.betweenLastTime = 0;
-	this.showInfo = true;
 
 	//intro
 	this.intro = true;
 	this.lastIntroTime = 0;
-	this.choice1Alpha = 0.2;
-	this.choice2Alpha = 0.2;
 	this.introAlpha = 0;
-	this.question = 0;
 	this.introText = ["","an ether is born","you are born","collect the four elements","grow into yourself","and die","as all things that are born must","seek balance"];
 	this.introIndex = 0;
 	this.timeOffset = 0
 
+	//questions
+	this.choice1Alpha = 0.2;
+	this.choice2Alpha = 0.2;
+	this.question = 0;
+	
+	//awards
 	this.awardMssg = "";
 	this.lifeStageMssg = "";
-	this.lifeStageOpts = ["spread your wings","watch your trail"]
+	this.lifeStageOpts = ["spread your wings","spread your trail"]
 
-	this.showControl = true;
+	
 
 	this.gameOverLastTime = 0;
 	this.gameOverAlpha = 0;
@@ -52,8 +62,6 @@ Ether.Hub = function(engine) {
 			return
 		}
 
-		//if(!this.intro) return
-
 		if(x <= self.engine.width/2){
 			self.choice1Alpha = 0.5;
 			self.choice2Alpha = 0.2;
@@ -72,8 +80,6 @@ Ether.Hub = function(engine) {
 			}
 			return
 		}
-
-	//	if(!this.intro) return
 
 		switch(self.question){
 			case 0 :
@@ -108,7 +114,7 @@ Ether.Hub = function(engine) {
 	}
 
 	this.handleKeyDown = function(){
-			if(self.question > 2 && self.introIndex + 1 < self.introText.length){
+			if(self.question > 3 && self.introIndex + 1 < self.introText.length){
 				self.timeOffset = self.lastIntroTime;
 				self.introIndex++;
 				if(self.introIndex != self.introText.length -1) self.introAlpha = 0;	
@@ -212,7 +218,7 @@ Ether.Hub.prototype.draw = function(time){
 	//in between ages?
 	this.drawInbetween(ctx,time);
 
-	if(this.showInfo) this.drawElementStats(stats,ctx);
+	if(this.showInfo) this.drawElementStats(stats.elementCount,ctx);
 	this.drawLifeBar(ctx, time);
 	this.drawMessage(ctx,time);
 }
@@ -252,20 +258,20 @@ Ether.Hub.prototype.getStats = function(){
 	return o;
 }
 
-Ether.Hub.prototype.drawElementStats = function(stats, ctx){
+Ether.Hub.prototype.drawElementStats = function(count, ctx){
 	ctx.font = this.unit/2 + "px Verdana";
 
 	ctx.fillStyle = "red";
-	ctx.fillText("Fire: " + stats.elementCount.f, this.unit, this.unit*3.2);
+	ctx.fillText("Fire: " + count["f"], this.unit, this.unit*3.2);
 
 	ctx.fillStyle = "blue";
-	ctx.fillText("Water: " + stats.elementCount.w, this.unit * 3.5, this.unit*3.2);
+	ctx.fillText("Water: " + count["w"], this.unit * 3.5, this.unit*3.2);
 
 	ctx.fillStyle = "white";
-	ctx.fillText("Air: " + stats.elementCount.a, this.unit, this.unit*4.1);
+	ctx.fillText("Air: " + count["a"], this.unit, this.unit*4.1);
 
 	ctx.fillStyle = "green";
-	ctx.fillText("Earth: " + stats.elementCount.e, this.unit * 3.5, this.unit*4.1);
+	ctx.fillText("Earth: " + count["e"], this.unit * 3.5, this.unit*4.1);
 }
 
 Ether.Hub.prototype.drawLifeBar = function(ctx, time){
@@ -300,43 +306,18 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 	var ether = this.engine.ethers[0];
 
-	var controlMssg = "wsad / arrow keys"
 	var borderMssg = "there is no time in the boundless void";
 	var age0Mssg = "you are no longer an infant";
-	var age2Mssg = "you are ancient";
-	var age3Mssg = "you give back what you borrowed";
-	var killerMssg = "Save the big ones for post-infancy"
-	var stableMssg = "You are becoming too unstable"
+	var age2Mssg = "give back you borrowed";
+	var age3Mssg = "so it goes";
+	var killerMssg = "Save The Big Ones For Post-Infancy"
+	var stableMssg = "You Are Becoming Too Unstable"
 
-	if(award){this.messageExist = false}
+	if(award && !this.engine.betweenAges){ this.messageExist = false; this.messageAlpha = 1 }
 
 	if(!this.messageExist){
-		if(this.showControl){
-			this.showControl = false;
-			this.messageExist = true;
-			this.currentMessage = controlMssg;
-			//award
-		} else if(this.awardMssg && !this.engine.betweenAges){
-			this.messageExist = true;
-			this.currentMessage = this.awardMssg;
-
-		//leaving game border
-		} else if(this.hasLeftBorder() && this.currentMessage != borderMssg && !this.engine.betweenAges){
-			this.messageExist = true;
-			this.currentMessage = borderMssg;
-		
-		//killer element
-		} else if(this.killerElement && !this.engine.betweenAges){
-			this.messageExist = true;
-			this.currentMessage = killerMssg;
-
-		//stability
-		} else if(this.unstable && !this.stableWarned && !this.engine.betweenAges){
-			this.messageExist = true;
-			this.stableWarned = true;
-			this.currentMessage = stableMssg;
 		//new age
-		} else if(this.engine.betweenAges){
+		if(this.engine.betweenAges){
 			this.messageExist = true;
 
 			switch(ether.age){
@@ -358,7 +339,26 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 
 			}
 
+		//award
+		} else if(this.awardMssg){
+			this.messageExist = true;
+			this.currentMessage = this.awardMssg;
 
+		//leaving game border
+		} else if(this.hasLeftBorder() && this.currentMessage != borderMssg){
+			this.messageExist = true;
+			this.currentMessage = borderMssg;
+		
+		//killer element
+		} else if(this.killerElement){
+			this.messageExist = true;
+			this.currentMessage = killerMssg;
+
+		//stability
+		} else if(this.unstable && !this.stableWarned){
+			this.messageExist = true;
+			this.stableWarned = true;
+			this.currentMessage = stableMssg;
 		}
 
 	} else {
@@ -402,12 +402,9 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 
 				if(this.engine.ethers[0].age < 4){
 					this.engine.init();
-				} else {
-					//TO DO END GAME?!?!?
 				}
 			}
 		}
-
 		this.lastMessageTime = time;
 	}
 
