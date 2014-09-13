@@ -1,37 +1,127 @@
 <html>
-<title>click play to play</title>
-<style type="text/css">
-	body{margin: 0; background-color:black; font-family: "Lucida Console", Monaco, monospace; color: white; text-align: center; font-size: 1em}
-	e{color: brown} f{color: red} w{color:blue} a{color:white}
-	#content{width: 21em; height: 5em; top:0; bottom: 0; left: 0; right: 0; margin: auto;}
-	#rules{width: 8em; margin-left: auto; margin-right: auto;}
-	#play{width:8em; height: 2.5em; margin-left: auto; margin-right: auto}
-	#title{margin-top: 1em; margin-bottom: 0; padding: 0}
-	#line{margin:0; padding-bottom: 0.35em}
-	h1{margin-top: 1.5em; font-size: 1.5em; font-weight: bolder;}
-	m{text-decoration: underline;}
-	c{text-decoration: overline;}
-	#case{line-height: 110%}
+	<head>
+		<title>click play to play</title>
+		<link href='http://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'>
+		<style type="text/css">
+			body{
+				margin: 0; 
+				padding: 0; 
+				background-color:black; 
+				font-family: 'Titillium Web', serif;, Monaco, monospace; 
+				color: #A4A197; 
+				text-align: center; 
+				font-size: 1.2em
+			}
 
-</style>
-<p id='title'>quintessence: rules</p>
-<body>
-<div id="content">
-	<h1>*Why we are here</h1>
-	<p id="line">An ether in a world of elements.</p>
-	<p id="line">Discover your self in either</p>
-	<p id="line"><m>Matter</m> or <c>Conciousness.</c></p>
-	<h1>*Instruction</h1>
-	<p>WSAD/Arrow Keys</p>
-	<p>Lifespan bar in upper-Right corner</p>
-	<p>Stats on the left</p>
-	<p id="case">First-time players should go with "Knowledge is Power" and "Peace"</p>
-	<h1>*Definition of 'Balance'</h1>
-<div id="rules">
-	<p><e>Earth</e> == <a>Air</a></p>
-	<p><w>Water</w> == <f>Fire</f></p>
-</div>
-<a href="game.html"><button id="play">Play</button></a>
-</div>
-</body>
+			h1{
+				font-size: 1.5em; 
+				font-weight: bold;
+				-webkit-margin-before: 0em;
+				-webkit-margin-after: 0em;
+				-webkit-margin-start: 0px;
+				-webkit-margin-end: 0px;
+			}
+
+			p{
+				-webkit-margin-before: 0;
+				-webkit-margin-after: 0;
+				-webkit-margin-start: 0px;
+				-webkit-margin-end: 0px;
+			}
+			
+			#content{
+				height: 90%; 
+				top:0; 
+				bottom: 0; 
+				left: 0; 
+				right: 0; 
+				margin: auto; 
+			}
+			
+			#rules{
+				width: 8em; 
+				margin-left: auto; 
+				margin-right: auto;
+			}
+			
+			#play{
+				width:8em; 
+				height: 2.5em; 
+				margin-left: auto; 
+				margin-right: auto
+			}
+			
+			#title{
+				height: 10%;  
+				padding: 0; 
+			}
+			
+			m{
+				text-decoration: underline;
+			}
+			
+			c{
+				text-decoration: overline;
+			}
+
+			e{
+				color: brown
+			} 
+
+			f{
+				color: red
+			} 
+
+			w{
+				color:blue
+			} 
+
+			a{
+				color:white
+			}
+
+			.gap {
+				line-height: 230%
+			}
+
+			#g1{
+				height: 25%
+			}
+
+			#g2{
+				height: 50%
+			}
+
+			#g3{
+				height: 25%
+			}
+
+		</style>
+	<head>
+	<body>
+	<p id='title'><u>quintessence: rules</u></p>
+	<div id="content">
+		<div id="g1">
+			<h1>*Why we are here</h1>
+			<p>Discover your self in either</p>
+			<p class="gap"><m>Matter</m> or <c>Conciousness.</c></p>
+		</div>
+		<div id="g2">
+			<h1>*Instruction</h1>
+			<p class="gap">WSAD/Arrow Keys</p>
+			<p class="gap">Lifespan bar in upper-Right corner</p>
+			<p class="gap">Stats on the left</p>
+			<p class="gap"><b>First-time players</b> should go with "Knowledge is Power" and "Peace"</p>
+			<p class="gap">Take Note: If BALANCE falls below 50, the ether will purge itself until it's stable!!</p>
+		</div>
+		<div id="g3">
+			<h1>*Definition of 'BALANCE'</h1>
+			<div id="rules">
+				<p><e>Earth</e> == <a>Air</a></p>
+				<p><w>Water</w> == <f>Fire</f></p>
+			</div>
+			<a href="game.html"><button id="play">Play</button></a>
+		</div>
+	</div>
+	</body>
 </html>

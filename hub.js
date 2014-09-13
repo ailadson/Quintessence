@@ -178,8 +178,8 @@ Ether.Hub.prototype.drawQuestionText = function(ctx,time){
 	}
 
 	//quetion
-	ctx.font = "28pt Verdana"
-	ctx.fillStyle="rgba(255,255,255,"+this.introAlpha+")";
+	ctx.font = "28pt Titillium Web"
+	ctx.fillStyle="rgba(164,161,151,"+this.introAlpha+")";
 	ctx.fillText(currentQuestion,(this.engine.width/2)-(qWidth/2),this.unit * 2);
 
 	//answers
@@ -209,8 +209,8 @@ Ether.Hub.prototype.draw = function(time){
 	var hubStab = (stats.stab > 100) ? 0 : (100 - stats.stab)
 
 	if(this.showInfo){
-		ctx.font = this.unit + "30px Verdana";
-		ctx.fillStyle = "rgba(20,70,200,1)"
+		ctx.font = this.unit + "30px Titillium Web";
+		ctx.fillStyle = "rgba(164,161,151,1)"
 		ctx.fillText("Mass: " + Math.floor(stats.mass), this.unit,this.unit*1.5)
 		ctx.fillText("Balance: " + hubStab, this.unit,this.unit*2.5)
 	}
@@ -231,7 +231,7 @@ Ether.Hub.prototype.drawInbetween = function(ctx,time){
 			//alpha
 			if(time > this.betweenLastTime + 100){
 				this.betweenLastTime = time;
-				ctx.fillStyle = "rgba(0,0,0,"+this.betweenAlpha+")";
+				ctx.fillStyle = "rgba(164,161,151,"+this.betweenAlpha+")";
 			    ctx.fillRect(0,0,this.engine.width,this.engine.height);
 			}
 		} else{
@@ -259,7 +259,7 @@ Ether.Hub.prototype.getStats = function(){
 }
 
 Ether.Hub.prototype.drawElementStats = function(count, ctx){
-	ctx.font = this.unit/2 + "px Verdana";
+	ctx.font = this.unit/2 + "px Titillium Web";
 
 	ctx.fillStyle = "red";
 	ctx.fillText("Fire: " + count["f"], this.unit, this.unit*3.2);
@@ -367,11 +367,11 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 }
 
 Ether.Hub.prototype.renderMessage = function(ctx,time){
-	ctx.font = (this.currentMessage == this.awardMssg) ? "90px Verdana" : "30px Verdana";
+	ctx.font = (this.currentMessage == this.awardMssg) ? "90px Titillium Web" : "30px Titillium Web";
 	var textWidth = ctx.measureText(this.currentMessage).width;
 
 	if(textWidth > this.engine.width - 10){ 
-		ctx.font = "70px Verdana"
+		ctx.font = "70px Titillium Web"
 		textWidth = ctx.measureText(this.currentMessage).width
 	}
 
@@ -381,7 +381,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	ctx.fillStyle = "rgba(0,0,0,"+this.messageAlpha+")";
 	ctx.fillText(this.currentMessage,x+2,y+2);
 
-	ctx.fillStyle = "rgba(255,255,255,"+this.messageAlpha+")";
+	ctx.fillStyle = "rgba(164,161,151,"+this.messageAlpha+")";
 	ctx.fillText(this.currentMessage,x,y);
 
 	if(time > this.lastMessageTime + 100){

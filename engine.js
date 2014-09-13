@@ -164,8 +164,8 @@ Ether.Engine.prototype.setAwards = function(type){
 	for (var i = 0; i < this.awards.length; i++) {
 		this.awards[i].amount = amount;
 		this.awards[i].award = Math.ceil(award/5);
-		//console.log(this.awards[i].amount)
-		amount += 4;
+		console.log(i)
+		amount += 3;
 		award = i+1;
 	};
 }

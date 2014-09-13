@@ -6,9 +6,11 @@ Ether.awards["consciousness"] = [
 	},{
 		text : "I am"
 	},{
-		text : "You"
+		text : "Me"
 	},{
 		text : "Mine"
+	},{
+		text : "You"
 	},{
 		text : "I love"
 	},{
@@ -26,17 +28,15 @@ Ether.awards["consciousness"] = [
 	},{
 		text : "I am in the world"
 	},{
-		text : "What is this?"
+		text : "I want this"
 	},{
-		text : "I want that"
+		text : "Why can't I have that?"
 	},{
-		text : "I can be hurt"
-	},{
-		text : "I fear"
+		text : "I'm afraid"
 	},{
 		text : "Why do I hurt?"
 	},{
-		text : "How do I get?"
+		text : "How do I get more?"
 	},{
 		text : "Who are my friends?"
 	},{
@@ -44,11 +44,11 @@ Ether.awards["consciousness"] = [
 	},{
 		text : "This is my stuff"
 	},{
-		text : "They are wrong"
-	},{
 		text : "I am right"
 	},{
-		text : "I can create"
+		text : "They are wrong"
+	},{
+		text : "I will create"
 	},{
 		text : "Will I die?"
 	},{
@@ -62,43 +62,43 @@ Ether.awards["consciousness"] = [
 	},{
 		text : "Where did I come from?"
 	},{
-		text : "My Truth"
+		text : "This is the truth"
 	},{
-		text : "Not your Truth"
+		text : "That is not the truth"
 	},{
 		text : "This is who I am"
 	},{
-		text : "Everything changes"
+		text : "Who I am keeps changing"
 	},{
-		text : "I think; I am"
+		text : "I am my thougts"
 	},{
 		text : "My thoughts always change"
 	},{
 		text : "Do I change?"
 	},{
-		text : "Has anything ever remained constant?"
+		text : "What is constant?"
 	},{
-		text : "Am I seperate from my perceptions?"
+		text : "I am awareness"
 	},{
-		text : "I am all"
+		text : "Was awareness always here?"
 	},{
-		text : "I am nothing"
-	},{
-		text : "Death is just another change"
-	},{
-		text : "What is born will die"
+		text : "From here did this awareness come?"
 	},{
 		text : "All comes from nothing"
 	},{
 		text : "All goes to nothing"
 	},{
-		text : "What I percieve, I cannot be"
+		text : "I am all"
 	},{
-		text : "Truth is self evident; I am self evident"
+		text : "I am nothing"
 	},{
-		text : "How can words describe silence?"
+		text : "I am self evident"
+	},{
+		text : "I am self here"
 	},{
 		text : "No word is true"
+	},{
+		text : "How can sounds describe silence?"
 	},{
 		text : "[silence]"
 	}
@@ -107,103 +107,103 @@ Ether.awards["consciousness"] = [
 
 Ether.awards["matter"] = [
 	{
-		text : "String(1 x 10^-35)"
+		text : "Strings(1 x 10^-35)"
 	},{
 		text : "Quantum Foam(1 x 10^-35)"
 	},{
-		text : "Neutrino(1 x 10^-24)"
+		text : "Neutrinos(1 x 10^-24)"
 	},{
-		text : "Top Quark(1 x 10^-22)"
+		text : "Quarks(1 x 10^-19)"
 	},{
-		text : "Bottom Quark(3 x 10^-20)"
+		text : "Protons(1 x 10^-15)"
 	},{
-		text : "Charm Quark(1 x 10^-19)"
+		text : "Neutrons(1 x 10^-15)"
 	},{
-		text : "Strange Quark(4 x 10^-19)"
+		text : "Electrons(1 x 10^-15)"
 	},{
-		text : "Up Quark(1 x 10^-18)"
+		text : "Rays(1 x 10^-12)"
 	},{
-		text : "Down Quark(1 x 10^-18)"
+		text : "Atoms(1 x 10^-10)"
 	},{
-		text : "Proton(1 x 10^-15)"
+		text : "Proteins(1 x 10^-10)"
 	},{
-		text : "Neutron(1 x 10^-15)"
+		text : "Molecules(1 x 10^-9)"
 	},{
-		text : "Electron(1 x 10^-15)"
+		text : "Clay Particles(1 x 10^-6)"
 	},{
-		text : "Ray(1 x 10^-12)"
+		text : "Mist Droplets(1 x 10^-5)"
 	},{
-		text : "Atom(1 x 10^-10)"
+		text : "Viruses(1 x 10^-8)"
 	},{
-		text : "Protein(1 x 10^-10)"
+		text : "Large Rocks(5 x 10^3)"
 	},{
-		text : "Molecule(1 x 10^-9)"
+		text : "Moons(1.5 x 10^5)"
 	},{
-		text : "Clay Particle(1 x 10^-6)"
+		text : "Bacteria(1 x 10^-3)"
 	},{
-		text : "Mist Droplet(1 x 10^-5)"
-	},{
-		text : "Virus(1 x 10^-8)"
-	},{
-		text : "Large Rock(5 x 10^3)"
-	},{
-		text : "Moon(1.5 x 10^5)"
-	},{
-		text : "Planet(1.27 x 10^7)"
-	},{
-		text : "Planet(1.27 x 10^7)"
+		text : "Planets(1.27 x 10^7)"
 	},{
 		text : "Nebula(8^10 x 16)"
 	},{
-		text : "Unicellular Organism(1 x 10^-5)"
+		text : "Protozoa(1 x 10^-5)"
 	},{
-		text : "Star(5.8 x 10^9)"
+		text : "Choanoflagellate(7 x 10^-6)"
 	},{
-		text : "Galaxy(1.2 x 10^21)"
+		text : "Stars(5.8 x 10^9)"
 	},{
-		text : "Cluster(3 x 10^23)"
+		text : "Galaxies(1.2 x 10^21)"
 	},{
-		text : "Multicellular Organism(1 x 10^-3)"
+		text : "Clusters(3 x 10^23)"
 	},{
-		text : "Seed(7 x 10^3)"
+		text : "Chromistas(1 x 10^-1)"
 	},{
-		text : "Multicellular Organism(4 x 10-2)"
+		text : "Fungi(7 x 10^3)"
 	},{
-		text : "Vertebrate(1 x 10^-1)"
+		text : "Invertebrates(4 x 10-2)"
 	},{
-		text : "Flora(1.5 x 10^1)"
+		text : "Plants(1.5 x 10^1)"
 	},{
-		text : "Fauna(3 x 10^0)"
+		text : "Vertebrates(1 x 10^-1)"
+	},{
+		text : "Land Animals(3 x 10^0)"
 	},{
 		text : "Intelligence(1.7 x 10^0)"
 	},{
-		text : "Tools(3 x 10^-1)"
+		text : "Symbolic Systems(1.7 x 10^0)"
 	},{
-		text : "Culture(1.7 x x10^0)"
+		text : "Mechanical Systems(1.5 x 10^1)"
 	},{
-		text : "Mechanical System(1.7 x x10^0)"
+		text : "Digital Systems(3.2 x 10^-8)"
 	},{
-		text : "Digital System(1.7 x x10^0)"
+		text : "Bioengineered Systems(1.7 x 10^0)"
 	},{
-		text : "Genetically Modified System(1.7 x x10^0)"
+		text : "Quantum Systems(1 x 10^-10)"
 	},{
-		text : "Quantum System(1.7 x x10^0)"
+		text : "Artifical Intelligence(3.2 x 10^-8)"
 	},{
-		text : "Artifical Intelligence"
+		text : "Planetary Societies(1.27 x 10^7)"
 	},{
-		text : "Solar Society"
+		text : "Synchronized Mind(1.7 x x10^0)"
 	},{
-		text : "Synchronized Organism"
+		text : "Solar Societies(1.2 x 10^10)"
 	},{
-		text : "Astral Computing"
+		text : "Giant Stars(8 x 10^11)"
 	},{
-		text : "Giant"
+		text : "Dwarf Stars(1.27 x 10^7)"
 	},{
-		text : "Dwarf"
+		text : "String Computing(1 x 10^-35)"
 	},{
-		text : "Supernova"
+		text : "Neutron Stars(1.3 x 10^4)"
 	},{
-		text : "Black Hole"
+		text : "Supernovas(9.5 x 10^16)"
+	},{
+		text : "Galactic Societies(1.2 x 10^21)"
+	},{
+		text : "Multi-Demensional Computing(~)"
+	},{
+		text : "Black Holes"
+	},{
+		text : "Thermal Equilibrium"
 	},{
 		text : "[silence]"
 	}
