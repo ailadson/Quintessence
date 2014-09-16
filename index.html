@@ -1,127 +1,39 @@
 <html>
+
 	<head>
 		<title>click play to play</title>
 		<link href='http://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'>
-		<style type="text/css">
-			body{
-				margin: 0; 
-				padding: 0; 
-				background-color:black; 
-				font-family: 'Titillium Web', serif;, Monaco, monospace; 
-				color: #A4A197; 
-				text-align: center; 
-				font-size: 1.2em
-			}
-
-			h1{
-				font-size: 1.5em; 
-				font-weight: bold;
-				-webkit-margin-before: 0em;
-				-webkit-margin-after: 0em;
-				-webkit-margin-start: 0px;
-				-webkit-margin-end: 0px;
-			}
-
-			p{
-				-webkit-margin-before: 0;
-				-webkit-margin-after: 0;
-				-webkit-margin-start: 0px;
-				-webkit-margin-end: 0px;
-			}
-			
-			#content{
-				height: 90%; 
-				top:0; 
-				bottom: 0; 
-				left: 0; 
-				right: 0; 
-				margin: auto; 
-			}
-			
-			#rules{
-				width: 8em; 
-				margin-left: auto; 
-				margin-right: auto;
-			}
-			
-			#play{
-				width:8em; 
-				height: 2.5em; 
-				margin-left: auto; 
-				margin-right: auto
-			}
-			
-			#title{
-				height: 10%;  
-				padding: 0; 
-			}
-			
-			m{
-				text-decoration: underline;
-			}
-			
-			c{
-				text-decoration: overline;
-			}
-
-			e{
-				color: brown
-			} 
-
-			f{
-				color: red
-			} 
-
-			w{
-				color:blue
-			} 
-
-			a{
-				color:white
-			}
-
-			.gap {
-				line-height: 230%
-			}
-
-			#g1{
-				height: 25%
-			}
-
-			#g2{
-				height: 50%
-			}
-
-			#g3{
-				height: 25%
-			}
-
-		</style>
+		<link href='reset.css' rel='stylesheet' type='text/css'>
+		<link href='index.css' rel='stylesheet' type='text/css'>
 	<head>
+
 	<body>
-	<p id='title'><u>quintessence: rules</u></p>
-	<div id="content">
-		<div id="g1">
-			<h1>*Why we are here</h1>
-			<p>Discover your self in either</p>
-			<p class="gap"><m>Matter</m> or <c>Conciousness.</c></p>
-		</div>
-		<div id="g2">
-			<h1>*Instruction</h1>
-			<p class="gap">WSAD/Arrow Keys</p>
-			<p class="gap">Lifespan bar in upper-Right corner</p>
-			<p class="gap">Stats on the left</p>
-			<p class="gap"><b>First-time players</b> should go with "Knowledge is Power" and "Peace"</p>
-			<p class="gap">Take Note: If BALANCE falls below 50, the ether will purge itself until it's stable!!</p>
-		</div>
-		<div id="g3">
-			<h1>*Definition of 'BALANCE'</h1>
-			<div id="rules">
-				<p><e>Earth</e> == <a>Air</a></p>
-				<p><w>Water</w> == <f>Fire</f></p>
-			</div>
-			<a href="game.html"><button id="play">Play</button></a>
-		</div>
-	</div>
+		<section class='header'>
+			<h4>quintessence</u></h4>
+				<h3>*~Why We Are Here~*</h3>
+				<p>Discover your self in either</p>
+				<p><u>Matter</u> or <span style="text-decoration:overline">Conciousness.</span></p>
+		</section>
+		<section class="mainContent">
+			
+			<section class="mainGroup" id="notes">
+				<h1>TAKE NOTES</h1>
+				<p><b>First-time players</b> should go with "Knowledge is Power" and "Peace".</p>
+				<p>Use WSAD/Arrow Keys to navigate.</p>
+				<p>Lifespan bar in upper-right corner.</p>
+				<p>Stats in the upper-left.</p>
+				<p>If BALANCE falls below 50, the ether will purge itself until it's stable!!</p>
+				<p>All the stats can be deduced by looking at your character.</p>
+			</section>
+			<section class="mainGroup" id="defBalance">
+				<h1>a vital definition of 'BALANCE'</h1>
+				<section id="rules">
+					<p><span style="color:brown">Earth</span> == Air</p>
+					<p><span style="color:blue">Water</span> == <span style="color:red">Fire</span></p>
+				</section>
+				<a href="game.html"><button id="play">Play</button></a>
+			</section>
+		</section>
 	</body>
+
 </html>
