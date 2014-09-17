@@ -4,26 +4,77 @@
 $numberOfSections : 2;
 $groupHeight : 100/$numberOfSections;
 $fontSize : 1em;
+$textColor : #FFF4E9;
 
 
 @mixin centered {
 	margin-left: auto;
 	margin-right: auto;
 	width: 70%;
-	border: solid 1px red;
 	text-align : center;
 }
 
-@mixin equalChildSpacing($n){
-	&:p{
-		margin-bottom: 100/$n 0 
+@mixin mobileContent {
+	height : 75%;
+	width : 90%;
+	border-bottom : 1px solid $textColor;
+	border-top : 1px solid $textColor;
+	text-transform : uppercase;
+	position: relative;
+	text-align : justify;
+
+	p {
+		width: 100%;
+		font-size : 0.6em;
+		margin-left : 0;
+		margin-right : 0;
+	}
+
+	h1{
+		padding : 0;
+		font-size : 1em;
+		text-align : center;
+	}
+
+	#defBalance {
+		position : relative;
+
+		button {
+			position : absolute;
+			bottom : 0;
+		}
+
+		#rules{
+			top : 30%;
+			text-align : center;
+		}
+
+		h1{
+			display : none;
+		}
 	}
 }
 
+@mixin mobileHeader {
+	height : 20%;
+
+	p {
+		padding : 0em;
+		margin : 0.5em
+	}
+
+	h3{
+		display : none;
+	}
+
+	h4{
+		padding : 0;
+	}
+}
 
 body {
-	background-color : #001F1F;
-	color : #FFF4E9;
+	background-color : black;
+	color : $textColor;
 	font-family : "Titillium Web";
 	font-size : $fontSize;
 }
@@ -33,24 +84,35 @@ body {
 	padding : 0;
 	margin-bottom : 2%;
 	height : 18%;
+
+	@media screen and (max-width : 575px){
+		@include mobileHeader;
+	}
+
+	@media screen and (max-height : 615px){
+		@include mobileHeader;
+	}
 }
 
 .mainContent {
 	@include centered;
 	padding : 0;
-	height : 80%
+	height : 78%;
+	background-color : #001224;
+
+	@media screen and (max-width : 575px){
+		@include mobileContent;
+	}
+
+	@media screen and (max-height : 615px){
+		@include mobileContent;
+	}
+	
 }
 
 .mainGroup {
-	#defBalance {
-		@include equalChildSpacing(3);
-	}
-
-	#notes {
-		@include equalChildSpacing(6);
-	}
-
 	margin : 0;
 	padding : 0;
 	height : $groupHeight * 1%;
+	width : 100%
 }

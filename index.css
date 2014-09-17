@@ -482,7 +482,7 @@ table {
 }
 
 body {
-  background-color: #001F1F;
+  background-color: black;
   color: #FFF4E9;
   font-family: "Titillium Web";
   font-size: 1em;
@@ -492,33 +492,129 @@ body {
   margin-left: auto;
   margin-right: auto;
   width: 70%;
-  border: solid 1px red;
   text-align: center;
   padding: 0;
   margin-bottom: 2%;
   height: 18%;
+}
+@media screen and (max-width: 575px) {
+  .header {
+    height: 20%;
+  }
+  .header p {
+    padding: 0em;
+    margin: 0.5em;
+  }
+  .header h3 {
+    display: none;
+  }
+  .header h4 {
+    padding: 0;
+  }
+}
+@media screen and (max-height: 615px) {
+  .header {
+    height: 20%;
+  }
+  .header p {
+    padding: 0em;
+    margin: 0.5em;
+  }
+  .header h3 {
+    display: none;
+  }
+  .header h4 {
+    padding: 0;
+  }
 }
 
 .mainContent {
   margin-left: auto;
   margin-right: auto;
   width: 70%;
-  border: solid 1px red;
   text-align: center;
   padding: 0;
-  height: 80%;
+  height: 78%;
+  background-color: #001224;
+}
+@media screen and (max-width: 575px) {
+  .mainContent {
+    height: 75%;
+    width: 90%;
+    border-bottom: 1px solid #FFF4E9;
+    border-top: 1px solid #FFF4E9;
+    text-transform: uppercase;
+    position: relative;
+    text-align: justify;
+  }
+  .mainContent p {
+    width: 100%;
+    font-size: 0.6em;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .mainContent h1 {
+    padding: 0;
+    font-size: 1em;
+    text-align: center;
+  }
+  .mainContent #defBalance {
+    position: relative;
+  }
+  .mainContent #defBalance button {
+    position: absolute;
+    bottom: 0;
+  }
+  .mainContent #defBalance #rules {
+    top: 30%;
+    text-align: center;
+  }
+  .mainContent #defBalance h1 {
+    display: none;
+  }
+}
+@media screen and (max-height: 615px) {
+  .mainContent {
+    height: 75%;
+    width: 90%;
+    border-bottom: 1px solid #FFF4E9;
+    border-top: 1px solid #FFF4E9;
+    text-transform: uppercase;
+    position: relative;
+    text-align: justify;
+  }
+  .mainContent p {
+    width: 100%;
+    font-size: 0.6em;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .mainContent h1 {
+    padding: 0;
+    font-size: 1em;
+    text-align: center;
+  }
+  .mainContent #defBalance {
+    position: relative;
+  }
+  .mainContent #defBalance button {
+    position: absolute;
+    bottom: 0;
+  }
+  .mainContent #defBalance #rules {
+    top: 30%;
+    text-align: center;
+  }
+  .mainContent #defBalance h1 {
+    display: none;
+  }
 }
 
 .mainGroup {
   margin: 0;
   padding: 0;
   height: 50%;
-}
-.mainGroup #defBalance:p {
-  margin-bottom: 33.33333 0;
-}
-.mainGroup #notes:p {
-  margin-bottom: 16.66667 0;
+  width: 100%;
 }
 
 /*# sourceMappingURL=index.css.map */
