@@ -24,7 +24,7 @@
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [100,95,90,70]; //in seconds
+	this.lifeSpan = [20,95,90,70]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.totalLifeSpan;
 	this.dead = false;
@@ -375,7 +375,7 @@ Ether.Ether.prototype.pushSludge = function(s,e){
 /**
  * @constructor
  */
-Sludge = function(engine,player){
+function Sludge(engine,player){
 	var self = this;
 	this.engine = engine;
 	this.world = engine.world;
@@ -433,5 +433,21 @@ Sludge = function(engine,player){
 
 	this.destroy = function(){
 		self.engine.removeEther(self);
+	}
+}
+
+
+Ether.Ether.prototype.save = function(name){
+	var obj = {}
+	obj.elements = this.elements.name 
+	obj.name =  "" + name;
+	obj.coreElements = this.coreElements;
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST","saveEther.php",true);
+	xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+	xhr.send(JSON.stringify(obj));
+	xhr.onloadend = function(){
+		console.log('Saved');
 	}
 }

@@ -1,4 +1,7 @@
-/*! Quintessence - v0.0.1 - 2014-09-16 */var Ether = Ether || {};
+/*! Quintessence - v0.0.1 - 2014-09-17 */window.mobilecheck = function() {
+var check = false;
+(function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true})(navigator.userAgent||navigator.vendor||window.opera);
+return check; };var Ether = Ether || {};
 
 Ether.Element = function(type,size,config,bad){
 	var config = config || {};
@@ -341,7 +344,7 @@ Ether.Util.prototype.drawElement = function(element,ctx,gradFunc){
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [100,95,90,70]; //in seconds
+	this.lifeSpan = [20,95,90,70]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.totalLifeSpan;
 	this.dead = false;
@@ -692,7 +695,7 @@ Ether.Ether.prototype.pushSludge = function(s,e){
 /**
  * @constructor
  */
-Sludge = function(engine,player){
+function Sludge(engine,player){
 	var self = this;
 	this.engine = engine;
 	this.world = engine.world;
@@ -752,7 +755,22 @@ Sludge = function(engine,player){
 		self.engine.removeEther(self);
 	}
 }
-;Ether.World = function (engine) {
+
+
+Ether.Ether.prototype.save = function(name){
+	var obj = {}
+	obj.elements = this.elements.name 
+	obj.name =  "" + name;
+	obj.coreElements = this.coreElements;
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST","saveEther.php",true);
+	xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
+	xhr.send(JSON.stringify(obj));
+	xhr.onloadend = function(){
+		console.log('Saved');
+	}
+};Ether.World = function (engine) {
 	this.engine = engine;
 	this.util;
 	this.player;
@@ -807,13 +825,13 @@ Ether.World.prototype.init = function(engine){
 
 		switch(engine.ethers[0].age){
 			case 0 :
-				this.initElements(type,collection,[5,300],[0,200],[300,50],[9000,100])
+				this.initElements(type,collection,[5,300],[0,250],[300,50],[9000,100])
 				this.initBadGuys(type,collection,120,true);
 				break;
 
 			case 1 :
-				this.initElements(type,collection,[70,200],[10,180],[250,50],[7000,2000])
-				//this.initBadGuys(type,collection,90);
+				this.initElements(type,collection,[70,180],[10,150],[250,50],[7000,2000])
+				this.initBadGuys(type,collection,90);
 				break;
 			case 2 :
 				this.initElements(type,collection,[],[20,80],[200,200],[5000,1000])
@@ -841,7 +859,7 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,25,100,function(e){
+			this.initElement(type,collection,15,100,function(e){
 				if(e.radius > max) e.radius = max;
 			},true)
 		}
@@ -1219,6 +1237,14 @@ Ether.World.prototype.handleKeyUp = function(e){
 		}
 }
 
+Ether.World.prototype.handleTouch = function(e){
+	console.log(e.changedTouches)
+}
+
+Ether.World.prototype.handleTouchEnd = function(e){
+	console.log(e.changedTouches)
+}
+
 //Elements
 Ether.World.prototype.newElement = function(e){
 	var ether = this.player
@@ -1445,6 +1471,7 @@ Ether.Hub.prototype.draw = function(time){
 	var hubStab = (stats.stab > 100) ? 0 : (100 - stats.stab)
 
 	if(this.showInfo){
+
 		ctx.font = this.unit + "30px Titillium Web";
 		ctx.fillStyle = "rgba(164,161,151,1)"
 		ctx.fillText("Mass: " + Math.floor(stats.mass), this.unit,this.unit*1.5)
@@ -1495,12 +1522,12 @@ Ether.Hub.prototype.getStats = function(){
 }
 
 Ether.Hub.prototype.drawElementStats = function(count, ctx){
-	ctx.font = this.unit/2 + "px Titillium Web";
+	ctx.font = this.unit * .75 + "px Titillium Web";
 
 	ctx.fillStyle = "red";
 	ctx.fillText("Fire: " + count["f"], this.unit, this.unit*3.2);
 
-	ctx.fillStyle = "blue";
+	ctx.fillStyle = "#3399FF";
 	ctx.fillText("Water: " + count["w"], this.unit * 3.5, this.unit*3.2);
 
 	ctx.fillStyle = "white";
@@ -1516,6 +1543,10 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 	var colors = ["green","yellow","orange","red"];
 	var ether = this.engine.ethers[0];
 	var ratio = (ether.age != 3) ? (ether.currentSpan/ether.lifeSpan[ether.age]) : (ether.elements.length/ether.finalElementLength)
+
+	ctx.fillStyle = "#FFF4E9";
+	ctx.font = this.unit + "px Titillium Web"
+	ctx.fillText("Lifespan " + (this.engine.ethers[0].age + 1),this.engine.width-(this.unit * 5.5), this.unit);
 
 	ctx.fillStyle = colors[ether.age];
 	ctx.fillRect(this.engine.width - (this.unit * 0.5), this.unit * 1.5, -(this.unit * 5) * ratio, this.unit * 0.5)
@@ -1634,6 +1665,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 				this.currentMessage = "";
 				this.engine.betweenAges = false;
 				this.engine.ethers[0].age++;
+				this.engine.ethers[0].save(this.engine.ethers[0].age);
 				this.engine.ethers[0].currentSpan = this.engine.ethers[0].lifeSpan[this.engine.ethers[0].age];
 
 				if(this.engine.ethers[0].age < 4){
@@ -1815,13 +1847,27 @@ Ether.Engine.prototype.init = function(){
 	this.player.init();
 	
 	//set up world
-	window.onkeydown = function(evt){
-		self.world.handleKeyDown(evt.keyCode,self)
-		self.hub.handleKeyDown();
-	}
+	if(!window.mobilecheck()){
+		window.onkeydown = function(evt){
+			self.world.handleKeyDown(evt.keyCode,self)
+			self.hub.handleKeyDown();
+		}
 
-	window.onkeyup = function(evt){
-		self.world.handleKeyUp(evt.keyCode,self)
+		window.onkeyup = function(evt){
+			self.world.handleKeyUp(evt.keyCode,self)
+		}
+	} else {
+		this.canvas.addEventListener('touchstart',function(evt){
+			evt.preventDefault();
+			self.world.handleTouch(evt,self)
+			self.hub.handleKeyDown();
+		});
+
+		this.canvas.addEventListener('touchmove',function(evt){
+			evt.preventDefault();
+			self.world.handleTouch(evt,self)
+			self.hub.handleKeyDown();
+		});
 	}
 
 	this.hub.init();
@@ -1876,7 +1922,6 @@ Ether.Engine.prototype.setAwards = function(type){
 	for (var i = 0; i < this.awards.length; i++) {
 		this.awards[i].amount = amount;
 		this.awards[i].award = Math.ceil(award/5);
-		console.log(i)
 		amount += 3;
 		award = i+1;
 	};

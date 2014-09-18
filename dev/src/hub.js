@@ -209,6 +209,7 @@ Ether.Hub.prototype.draw = function(time){
 	var hubStab = (stats.stab > 100) ? 0 : (100 - stats.stab)
 
 	if(this.showInfo){
+
 		ctx.font = this.unit + "30px Titillium Web";
 		ctx.fillStyle = "rgba(164,161,151,1)"
 		ctx.fillText("Mass: " + Math.floor(stats.mass), this.unit,this.unit*1.5)
@@ -259,12 +260,12 @@ Ether.Hub.prototype.getStats = function(){
 }
 
 Ether.Hub.prototype.drawElementStats = function(count, ctx){
-	ctx.font = this.unit/2 + "px Titillium Web";
+	ctx.font = this.unit * .75 + "px Titillium Web";
 
 	ctx.fillStyle = "red";
 	ctx.fillText("Fire: " + count["f"], this.unit, this.unit*3.2);
 
-	ctx.fillStyle = "blue";
+	ctx.fillStyle = "#3399FF";
 	ctx.fillText("Water: " + count["w"], this.unit * 3.5, this.unit*3.2);
 
 	ctx.fillStyle = "white";
@@ -280,6 +281,10 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 	var colors = ["green","yellow","orange","red"];
 	var ether = this.engine.ethers[0];
 	var ratio = (ether.age != 3) ? (ether.currentSpan/ether.lifeSpan[ether.age]) : (ether.elements.length/ether.finalElementLength)
+
+	ctx.fillStyle = "#FFF4E9";
+	ctx.font = this.unit + "px Titillium Web"
+	ctx.fillText("Lifespan " + (this.engine.ethers[0].age + 1),this.engine.width-(this.unit * 5.5), this.unit);
 
 	ctx.fillStyle = colors[ether.age];
 	ctx.fillRect(this.engine.width - (this.unit * 0.5), this.unit * 1.5, -(this.unit * 5) * ratio, this.unit * 0.5)
@@ -398,6 +403,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 				this.currentMessage = "";
 				this.engine.betweenAges = false;
 				this.engine.ethers[0].age++;
+				this.engine.ethers[0].save(this.engine.ethers[0].age);
 				this.engine.ethers[0].currentSpan = this.engine.ethers[0].lifeSpan[this.engine.ethers[0].age];
 
 				if(this.engine.ethers[0].age < 4){

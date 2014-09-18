@@ -103,13 +103,27 @@ Ether.Engine.prototype.init = function(){
 	this.player.init();
 	
 	//set up world
-	window.onkeydown = function(evt){
-		self.world.handleKeyDown(evt.keyCode,self)
-		self.hub.handleKeyDown();
-	}
+	if(!window.mobilecheck()){
+		window.onkeydown = function(evt){
+			self.world.handleKeyDown(evt.keyCode,self)
+			self.hub.handleKeyDown();
+		}
 
-	window.onkeyup = function(evt){
-		self.world.handleKeyUp(evt.keyCode,self)
+		window.onkeyup = function(evt){
+			self.world.handleKeyUp(evt.keyCode,self)
+		}
+	} else {
+		this.canvas.addEventListener('touchstart',function(evt){
+			evt.preventDefault();
+			self.world.handleTouch(evt,self)
+			self.hub.handleKeyDown();
+		});
+
+		this.canvas.addEventListener('touchmove',function(evt){
+			evt.preventDefault();
+			self.world.handleTouch(evt,self)
+			self.hub.handleKeyDown();
+		});
 	}
 
 	this.hub.init();
@@ -164,7 +178,6 @@ Ether.Engine.prototype.setAwards = function(type){
 	for (var i = 0; i < this.awards.length; i++) {
 		this.awards[i].amount = amount;
 		this.awards[i].award = Math.ceil(award/5);
-		console.log(i)
 		amount += 3;
 		award = i+1;
 	};

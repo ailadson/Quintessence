@@ -1,7 +1,7 @@
 
 module.exports = function(grunt) {
 
-	var sourceFiles = ['dev/src/element.js','dev/src/awards.js','dev/src/util.js',
+	var sourceFiles = ['dev/src/mobileCheck.js','dev/src/element.js','dev/src/awards.js','dev/src/util.js',
 						'dev/src/ether.js','dev/src/world.js','dev/src/hub.js',
 						'dev/src/audio.js','dev/src/engine.js'];
 
@@ -14,7 +14,7 @@ module.exports = function(grunt) {
 					style: 'expanded'
 				},
 				files : {
-					'index.css' : 'dev/styles/main.scss'
+					'game/index.css' : 'dev/styles/main.scss'
 				}
 			}
 		},
@@ -30,27 +30,36 @@ module.exports = function(grunt) {
 				dest : 'dev/src/script.js'
 			}
 		},
-		'closure-compiler' : {
-			frontend : {
-				closurePath : 'dev/tools/closure-compiler',
-				js : '<%= concat.dist.dest %>',
-				jsOutputFile : 'script.min.js',
-				maxBuffer : 500,
-				options : {
-					compilation_level : 'SIMPLE_OPTIMIZATIONS',
-					language_in: 'ECMASCRIPT5_STRICT'
+		uglify: {
+		    my_target: {
+				files: {
+				'game/script.min.js': '<%= concat.dist.dest %>'
 				}
-			}
+		    }
 		},
+		'ftp-deploy' : {
+			build : {
+				auth : {
+					host : 'ftp.anthonyladson.com',
+					port : 21,
+					authKey : "key1"
+				},
+				src : 'game',
+				dest : 'quintessence',
+				exclusions : ['.*']
+			}
+		}
 	});
 
 	//load task
 	grunt.loadNpmTasks('grunt-contrib-sass')
 	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-closure-compiler');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-ftp-deploy')
 
 	//register task
-	grunt.registerTask('default', ['sass','concat','closure-compiler']);
+	grunt.registerTask('default', ['sass','concat','uglify']);
 	grunt.registerTask('css',['sass']);
+	grunt.registerTask('deploy',['default','ftp-deploy']);
 
 };

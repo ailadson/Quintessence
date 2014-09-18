@@ -56,13 +56,13 @@ Ether.World.prototype.init = function(engine){
 
 		switch(engine.ethers[0].age){
 			case 0 :
-				this.initElements(type,collection,[5,300],[0,200],[300,50],[9000,100])
+				this.initElements(type,collection,[5,300],[0,250],[300,50],[9000,100])
 				this.initBadGuys(type,collection,120,true);
 				break;
 
 			case 1 :
-				this.initElements(type,collection,[70,200],[10,180],[250,50],[7000,2000])
-				//this.initBadGuys(type,collection,90);
+				this.initElements(type,collection,[70,180],[10,150],[250,50],[7000,2000])
+				this.initBadGuys(type,collection,90);
 				break;
 			case 2 :
 				this.initElements(type,collection,[],[20,80],[200,200],[5000,1000])
@@ -90,7 +90,7 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,25,100,function(e){
+			this.initElement(type,collection,15,100,function(e){
 				if(e.radius > max) e.radius = max;
 			},true)
 		}
@@ -466,6 +466,14 @@ Ether.World.prototype.handleKeyUp = function(e){
 				this.speedUp.x = false//this.dragMotion('up',this.xv);
 				break;
 		}
+}
+
+Ether.World.prototype.handleTouch = function(e){
+	console.log(e.changedTouches)
+}
+
+Ether.World.prototype.handleTouchEnd = function(e){
+	console.log(e.changedTouches)
 }
 
 //Elements
