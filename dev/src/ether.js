@@ -438,9 +438,9 @@ function Sludge(engine,player){
 
 
 Ether.Ether.prototype.save = function(name){
-	var obj = {}
-	obj.elements = this.elements.name 
+	var obj = {};
 	obj.name =  "" + name;
+	obj.elements = this.elements; 
 	obj.coreElements = this.coreElements;
 
 	var xhr = new XMLHttpRequest();
