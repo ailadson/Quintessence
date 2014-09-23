@@ -56,20 +56,20 @@ Ether.World.prototype.init = function(engine){
 
 		switch(engine.ethers[0].age){
 			case 0 :
-				this.initElements(type,collection,[5,300],[0,250],[300,50],[9000,100])
+				this.initElements(type,collection,[5,300,450],[0,250,350],[320,40,2],[4000,70,47])
 				this.initBadGuys(type,collection,120,true);
 				break;
 
 			case 1 :
-				this.initElements(type,collection,[70,180],[10,150],[250,50],[7000,2000])
+				this.initElements(type,collection,[2,100,300],[0,50,250],[325,250,10],[1,200,70])
 				this.initBadGuys(type,collection,90);
 				break;
 			case 2 :
-				this.initElements(type,collection,[],[20,80],[200,200],[5000,1000])
+				this.initElements(type,collection,[50,200],[30,150],[200,150],[400,100])
 				this.initBadGuys(type,collection,60);
 				break;
 			case 3 :
-				this.initElements(type,collection,[0],[50],[300],[6000])
+				this.initElements(type,collection,[20,90],[5,50],[200,200],[1000,220])
 				this.initBadGuys(type,collection,30);
 				break;
 		}		
@@ -79,8 +79,8 @@ Ether.World.prototype.init = function(engine){
 Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffset){
 	for (var i = 0; i < n.length; i++) {
 		this.initElement(type,collection,n[i],sizeOffset[i],function(e){
-			if(min[i] && e.radius > min[i]) e.radius = min[i];
-			if(max[i] && e.radius < max[i]) e.radius = max[i];
+			if(max[i] && e.radius > max[i]) e.radius = max[i];
+			if(min[i] && e.radius < min[i]) e.radius = min[i];
 		})
 	};
 
@@ -90,8 +90,8 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,15,100,function(e){
-				if(e.radius > max) e.radius = max;
+			this.initElement(type,collection,10,1,function(e){
+				if(e.radius > max || e.radius < min) e.radius = max;
 			},true)
 		}
 }
@@ -102,11 +102,14 @@ Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,e
 			var xOffset = ((Math.random()*(this.width*2)) - this.width)/2;
 			var yOffset = ((Math.random()*(this.height*2)) - this.height)/2;
 			var size = this.getDistanceFromCenter({x:xOffset,y:yOffset});
-			
+
 			var element = new Ether.Element(type,size/sizeOffset,{},bad);
 			eFunc(element)
 			element.xOffset = xOffset;
 			element.yOffset = yOffset;
+			var x = element.xOffset+this.x;
+			var y =element.yOffset+this.y;
+
 			collection.push(element);
 		};
 }
@@ -199,6 +202,12 @@ Ether.World.prototype.zoomOut = function(val){
 	this.hillWidthAmount *= val;
 	this.hillWidth = this.engine.width/this.hillWidthAmount;
 	this.hillHeight = this.engine.height/this.hillHeightAmount;
+}
+
+Ether.World.prototype.zoomOutElements = function(val){
+	for (var i = 0; i < this.elements.length; i++) {
+		this.elements[i].radius /= val;
+	};
 }
 
 Ether.World.prototype.drawBackground = function(xv,yv){

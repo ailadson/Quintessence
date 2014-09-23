@@ -24,7 +24,7 @@
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [20,95,90,70]; //in seconds
+	this.lifeSpan = [100,95,90,80]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.totalLifeSpan;
 	this.dead = false;
@@ -154,6 +154,18 @@ Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	}
 }
 
+Ether.Ether.prototype.isNearScreenEdge = function(e){
+	console.log(this.range+(e.radius*2))
+	console.log(this.engine.height/2)
+	if((this.range+(e.radius*1.8) >= this.engine.width/2) ||
+		(this.range+(e.radius*1.8) >= this.engine.height/2)){
+		this.zoomOut(1.2);
+		this.engine.world.zoomOut(1.1);
+		this.engine.world.zoomOutElements(1.2);
+
+	}
+}
+
 Ether.Ether.prototype.zoomOut = function(val){
 	this.range /= val;
 
@@ -185,7 +197,8 @@ Ether.Ether.prototype.ageEther = function(time){
 		this.ageLastTime = time;
 		
 		if(this.elements.length != 0){
-			this.loseElement(this.elements[this.elements.length-1],true)
+			var e =this.loseElement(this.elements[this.elements.length-1],true)
+			this.engine.audio.playSound(e);
 		}
 	}
 }
@@ -238,7 +251,8 @@ Ether.Ether.prototype.getElementCount = function(){
 
 //Elements
 Ether.Ether.prototype.newElement = function(e){
-	this.engine.audio.playSound(e)
+	this.engine.audio.playSound(e);
+	this.isNearScreenEdge(e);
 	if(this.age != 3){
 		this.increaseMass(e);
 	}
@@ -262,7 +276,7 @@ Ether.Ether.prototype.loseElement = function(e){
 		if(ele.x == e.x && ele.y == e.y){
 			var worldEle = this.elements.splice(i,1)[0];
 			this.engine.world.newElement(worldEle);
-			return true;
+			return ele;
 		}
 	};
 }
@@ -287,13 +301,13 @@ Ether.Ether.prototype.createCoreElement = function(){
 Ether.Ether.prototype.increaseMass = function(e){
 	this.createCoreElement();
 	this.mass += 1//e.radius/massOffset;
-	this.range += Math.round(e.radius/6)
+	this.range += Math.ceil(e.radius/8)
 }
 
 Ether.Ether.prototype.decreaseMass = function(e){
 	if(this.coreElements.length > 1) this.coreElements.pop();
 	if(this.mass > 0) this.mass -= 1;
-	if(this.range > 2) this.range -= Math.round(e.radius/6);
+	if(this.range > 2) this.range -= Math.ceil(e.radius/8);
 }
 
 //awards
@@ -437,7 +451,7 @@ function Sludge(engine,player){
 }
 
 
-Ether.Ether.prototype.save = function(name){
+/*Ether.Ether.prototype.save = function(name){
 	var obj = {};
 	obj.name =  "" + name;
 	obj.elements = this.elements; 
@@ -450,4 +464,4 @@ Ether.Ether.prototype.save = function(name){
 	xhr.onloadend = function(){
 		console.log('Saved');
 	}
-}
+}*/

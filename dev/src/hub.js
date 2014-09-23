@@ -1,4 +1,4 @@
-/**
+ /**
  * @constructor
  */
 Ether.Hub = function(engine) {
@@ -199,6 +199,9 @@ Ether.Hub.prototype.drawAnswerBoxes = function(ctx){
 
 	ctx.fillStyle = "rgba(75,75,100,"+this.choice2Alpha+")";
 	ctx.fillRect(width/2,0,width/2,height)
+
+	ctx.fillStyle = "black";
+	ctx.fillRect(0,0,width,this.unit*3);
 }
 
 Ether.Hub.prototype.draw = function(time){
@@ -233,7 +236,7 @@ Ether.Hub.prototype.drawInbetween = function(ctx,time){
 			if(time > this.betweenLastTime + 100){
 				this.betweenLastTime = time;
 				ctx.fillStyle = "rgba(164,161,151,"+this.betweenAlpha+")";
-			    ctx.fillRect(0,0,this.engine.width,this.engine.height);
+			    //ctx.fillRect(0,0,this.engine.width,this.engine.height);
 			}
 		} else{
 			this.gameOver(ctx,time)
@@ -403,7 +406,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 				this.currentMessage = "";
 				this.engine.betweenAges = false;
 				this.engine.ethers[0].age++;
-				this.engine.ethers[0].save(this.engine.ethers[0].age);
+//				this.engine.ethers[0].save(this.engine.ethers[0].age);
 				this.engine.ethers[0].currentSpan = this.engine.ethers[0].lifeSpan[this.engine.ethers[0].age];
 
 				if(this.engine.ethers[0].age < 4){
