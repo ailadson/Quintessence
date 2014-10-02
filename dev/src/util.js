@@ -41,3 +41,11 @@ Ether.Util.prototype.drawElement = function(element,ctx,gradFunc){
 	ctx.arc(element.x,element.y,element.radius,Math.PI*2,false);
 	ctx.fill();
 }
+
+Ether.Util.prototype.getLocalStorage = function(){
+    try {
+    	if(!! window.localStorage) return window.localStorage;
+    }catch(e){
+    	return false;
+    }
+}

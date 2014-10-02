@@ -1,4 +1,4 @@
-/*! Quintessence - v0.0.1 - 2014-09-23 */window.mobilecheck = function() {
+/*! Quintessence - v0.0.1 - 2014-10-01 */window.mobilecheck = function() {
 var check = false;
 (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true})(navigator.userAgent||navigator.vendor||window.opera);
 return check; };var Ether = Ether || {};
@@ -321,6 +321,14 @@ Ether.Util.prototype.drawElement = function(element,ctx,gradFunc){
 	ctx.fillStyle = gradient;
 	ctx.arc(element.x,element.y,element.radius,Math.PI*2,false);
 	ctx.fill();
+}
+
+Ether.Util.prototype.getLocalStorage = function(){
+    try {
+    	if(!! window.localStorage) return window.localStorage;
+    }catch(e){
+    	return false;
+    }
 };Ether.Ether = function(engine) {
 	this.engine = engine;
 	this.util = engine.util
@@ -341,10 +349,12 @@ Ether.Util.prototype.drawElement = function(element,ctx,gradFunc){
 	this.mass = 1;
 	this.age = 0;
 	this.speed = 8;
+	this.zoom = 1;
+	this.elementCount = {f:0,w:0,a:0,e:0}
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [100,95,90,80]; //in seconds
+	this.lifeSpan = [365]; //in seconds
 	this.currentSpan = this.lifeSpan[this.age];
 	this.totalLifeSpan;
 	this.dead = false;
@@ -474,20 +484,20 @@ Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	}
 }
 
-Ether.Ether.prototype.isNearScreenEdge = function(e){
-	console.log(this.range+(e.radius*2))
-	console.log(this.engine.height/2)
-	if((this.range+(e.radius*1.8) >= this.engine.width/2) ||
-		(this.range+(e.radius*1.8) >= this.engine.height/2)){
-		this.zoomOut(1.2);
-		this.engine.world.zoomOut(1.1);
-		this.engine.world.zoomOutElements(1.2);
+Ether.Ether.prototype.getMoreScreen = function(){
+	// console.log(this.range+(e.radius*2))
+	// console.log(this.engine.height/2)
+	// if((this.range+(e.radius*1.8) >= this.engine.width/2) ||
+	// 	(this.range+(e.radius*1.8) >= this.engine.height/2)){
+		this.zoomOut(1.5);
+		this.engine.world.zoomOutBackground(1.3);
+		this.engine.world.zoomOutElements(1.5);
 
-	}
 }
 
 Ether.Ether.prototype.zoomOut = function(val){
 	this.range /= val;
+	this.zoom += val;
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i]
@@ -545,37 +555,40 @@ Ether.Ether.prototype.getStability = function(){
 }
 
 Ether.Ether.prototype.getElementCount = function(){
-	var f=w=a=e = 0;
+	return this.elementCount
+}
 
-	for (var i = 0; i < this.elements.length; i++) {
-		var ele = this.elements[i];
-		switch(ele.type){
-			case 'fire': f += Math.round((ele.radius/5));
-				break;
-			case 'water': w += Math.round((ele.radius/5));
-				break;
-			case 'air': a += Math.round((ele.radius/5));
-				break;
-			case 'earth': e += Math.round((ele.radius/5));
-				break;
-		}
-	};
+Ether.Ether.prototype.addToElementCount = function(ele){
+	switch(ele.type){
+		case 'fire': this.elementCount.f += (Math.round((ele.radius/5)) * this.zoom);
+			break;
+		case 'water': this.elementCount.w += (Math.round((ele.radius/5)) * this.zoom);
+			break;
+		case 'air': this.elementCount.a += (Math.round((ele.radius/5)) * this.zoom);
+			break;
+		case 'earth': this.elementCount.e += (Math.round((ele.radius/5)) * this.zoom);
+			break;
+	}
+}
 
-	var obj = {}
-	obj["f"] = f;
-	obj["w"] = w;
-	obj["a"] = a;
-	obj["e"] = e;
-	return obj
+Ether.Ether.prototype.removeFromElementCount = function(ele){
+	switch(ele.type){
+		case 'fire': this.elementCount.f -= (Math.round((ele.radius/5)) * this.zoom);
+			break;
+		case 'water': this.elementCount.w -= (Math.round((ele.radius/5)) * this.zoom);
+			break;
+		case 'air': this.elementCount.a -= (Math.round((ele.radius/5)) * this.zoom);
+			break;
+		case 'earth': this.elementCount.e -= (Math.round((ele.radius/5)) * this.zoom);
+			break;
+	}
 }
 
 //Elements
 Ether.Ether.prototype.newElement = function(e){
 	this.engine.audio.playSound(e);
-	this.isNearScreenEdge(e);
-	if(this.age != 3){
-		this.increaseMass(e);
-	}
+	this.addToElementCount(e);
+	this.increaseMass(e);
 			
 	e.xOffset = e.x - this.x; 
 	e.yOffset = e.y - this.y;
@@ -586,7 +599,7 @@ Ether.Ether.prototype.newElement = function(e){
 }
 
 Ether.Ether.prototype.loseElement = function(e){
-
+	this.removeFromElementCount(e);
 	this.decreaseMass(e);
 	
 	//remove from elements
@@ -621,13 +634,13 @@ Ether.Ether.prototype.createCoreElement = function(){
 Ether.Ether.prototype.increaseMass = function(e){
 	this.createCoreElement();
 	this.mass += 1//e.radius/massOffset;
-	this.range += Math.ceil(e.radius/8)
+	this.range += e.radius/3
 }
 
 Ether.Ether.prototype.decreaseMass = function(e){
 	if(this.coreElements.length > 1) this.coreElements.pop();
 	if(this.mass > 0) this.mass -= 1;
-	if(this.range > 2) this.range -= Math.ceil(e.radius/8);
+	if(this.range > 2) this.range -= e.radius/3;
 }
 
 //awards
@@ -771,27 +784,70 @@ function Sludge(engine,player){
 }
 
 
-/*Ether.Ether.prototype.save = function(name){
-	var obj = {};
-	obj.name =  "" + name;
-	obj.elements = this.elements; 
-	obj.coreElements = this.coreElements;
+Ether.Ether.prototype.save = function(){
+	//this.engine.trophy.save(this);
+	console.log('save')
+};Ether.Trophy = function(){
+	this.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+	this.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+	this.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+	this.db;
+	this.newEther;
 
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST","saveEther.php",true);
-	xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
-	xhr.send(JSON.stringify(obj));
-	xhr.onloadend = function(){
-		console.log('Saved');
+	if (!this.indexedDB) {
+    	window.alert("Your browser doesn't support IndexedDB. Please update to get the most out of this game.");
 	}
-}*/;Ether.World = function (engine) {
+}
+
+Ether.Trophy.prototype.extractEtherInfo = function(ether){
+	var body = {};
+	body.elements = ether.elements;
+	body.coreElements = ether.coreElements;
+	return body;
+}
+
+Ether.Trophy.prototype.init = function(){
+	var request = this.indexedDB.open("PastEther",1);
+
+	request.onerror = function(event) {
+	  alert("Why didn't you allow my web app to use IndexedDB?!");
+	};
+
+	request.onsuccess = function(event) {
+		this.db = request.result;
+		
+		 var transaction = db.transaction()
+
+		console.log(this.db.transaction.objectStore);
+		console.log(this.db.transaction.objectStore("ether"));
+
+		if(!this.db.transaction.objectStore("ether")){
+			console.log("inside if statement");
+			console.log(this.db.createObjectStore);
+			var objectStore = this.db.createObjectStore("ether",{ autoIncrement : true });
+			console.log("object store made")
+			objectStore.createIndex("elements","elements");
+			objectStore.createIndex("coreElements","coreElements");
+			console.log("index created")
+	  	}
+	  	console.log('end on request success')
+	};
+}
+
+Ether.Trophy.prototype.save = function(ether){
+	console.log("in save")
+	var body = this.extractEtherInfo(ether);
+	var etherObjectStore = db.transaction("Ether","readwrite").objectStore("Ether");
+	etherObjectStore.add(body);
+	console.log(etherObjectStore);
+};Ether.World = function (engine) {
 	this.engine = engine;
 	this.util;
 	this.player;
 
 	//world positioning values
-	this.width = engine.width*30;
-	this.height = engine.height*30;
+	this.width = engine.width*100;
+	this.height = engine.height*100;
 	this.x = engine.width/2;
 	this.y = engine.height/2;
 	this.xv = 0;
@@ -823,27 +879,27 @@ function Sludge(engine,player){
 Ether.World.prototype.init = function(engine){
 	var eleStrings = ['earth','air','fire','water'];
 	
-	if(engine.ethers[0].age != 0){ 
-		this.zoomOut(2) 
-	} else {
+	// if(engine.ethers[0].age != 0){ 
+	// 	this.zoomOut(2) 
+	// } else {
 		this.player = engine.ethers[0]
 		this.util = engine.util;
-	}
+	// }
 
 	this.initBackground();
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var collection = this.elements[i];
-		collection.length = 0; //clear out array
+		//collection.length = 0; //clear out array
 		var type = eleStrings[i];
 
 		switch(engine.ethers[0].age){
 			case 0 :
-				this.initElements(type,collection,[5,300,450],[0,250,350],[320,40,2],[4000,70,47])
+				this.initElements(type,collection,[20,300,500],[3,150,350],[2500,300,100],[50000,700,300])
 				this.initBadGuys(type,collection,120,true);
 				break;
 
-			case 1 :
+			/*case 1 :
 				this.initElements(type,collection,[2,100,300],[0,50,250],[325,250,10],[1,200,70])
 				this.initBadGuys(type,collection,90);
 				break;
@@ -854,17 +910,19 @@ Ether.World.prototype.init = function(engine){
 			case 3 :
 				this.initElements(type,collection,[20,90],[5,50],[200,200],[1000,220])
 				this.initBadGuys(type,collection,30);
-				break;
+				break;*/
 		}		
 	};
 }
 
 Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffset){
 	for (var i = 0; i < n.length; i++) {
+
 		this.initElement(type,collection,n[i],sizeOffset[i],function(e){
 			if(max[i] && e.radius > max[i]) e.radius = max[i];
 			if(min[i] && e.radius < min[i]) e.radius = min[i];
 		})
+	
 	};
 
 	
@@ -873,8 +931,8 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,10,1,function(e){
-				if(e.radius > max || e.radius < min) e.radius = max;
+			this.initElement(type,collection,100,1,function(e){
+				if(e.radius > max || e.radius < max) e.radius = max;
 			},true)
 		}
 }
@@ -898,9 +956,9 @@ Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,e
 }
 
 Ether.World.prototype.initBackground = function(){
-	for (var i = 0; i < this.hillHeightAmount + 2; i++) {
+	for (var i = 0; i < this.hillHeightAmount + 4; i++) {
 		var hills = [];
-		for (var j = 0; j < this.hillWidthAmount+2; j++) {
+		for (var j = 0; j < this.hillWidthAmount+4; j++) {
 			hills[j] = {x: (this.hillWidth*j), y: (this.hillHeight*i)}
 		};
 		this.hills.push(hills);
@@ -980,7 +1038,7 @@ Ether.World.prototype.draw = function(engine,time){
 
 
 
-Ether.World.prototype.zoomOut = function(val){
+Ether.World.prototype.zoomOutBackground = function(val){
 	this.hillHeightAmount *= val;
 	this.hillWidthAmount *= val;
 	this.hillWidth = this.engine.width/this.hillWidthAmount;
@@ -989,7 +1047,9 @@ Ether.World.prototype.zoomOut = function(val){
 
 Ether.World.prototype.zoomOutElements = function(val){
 	for (var i = 0; i < this.elements.length; i++) {
-		this.elements[i].radius /= val;
+		for (var j = 0; j < this.elements[i].length; j++) {
+			this.elements[i][j].radius /= val;
+		};		
 	};
 }
 
@@ -1246,15 +1306,19 @@ Ether.World.prototype.handleKeyDown = function(e){
 Ether.World.prototype.handleKeyUp = function(e){
 		switch(e){
 			case 38 :
+			case 87 :
 				this.speedUp.y = false//this.dragMotion('up',this.yv);
 				break;
+			case 68 :
 			case 39 :
 				this.speedUp.x = false//this.dragMotion('up',-this.xv) * -1;
 				break;
 			case 40 :
+			case 83 :
 				this.speedUp.y = false//this.dragMotion('up',-this.yv) * -1;
 				break;
 			case 37 :
+			case 65 :
 				this.speedUp.x = false//this.dragMotion('up',this.xv);
 				break;
 		}
@@ -1308,7 +1372,7 @@ Ether.World.prototype.newElement = function(e){
 	this.intro = true;
 	this.lastIntroTime = 0;
 	this.introAlpha = 0;
-	this.introText = ["","an ether is born","you are born","collect the four elements","grow into yourself","and die","as all things that are born must","seek balance"];
+	this.introText = ["an ether is born","you are born","collect the four elements","grow into yourself","and die","as all things that are born must","seek balance"];
 	this.introIndex = 0;
 	this.timeOffset = 0
 
@@ -1366,35 +1430,32 @@ Ether.World.prototype.newElement = function(e){
 			return
 		}
 
-		switch(self.question){
-			case 0 :
-				self.showInfo = (self.choice1Alpha > self.choice2Alpha) ? true : false
-				break;
-			case 1 :
-				if(self.choice1Alpha > self.choice2Alpha)
-					self.engine.setAwards("matter") 
-				else
-					self.engine.setAwards("consciousness"); 
-				break;
-			case 2 :
-				var ether = self.engine.ethers[0];
-				ether.transformation = (self.choice1Alpha > self.choice2Alpha) ? ether.transformations[0] : ether.transformations[1];
-				self.lifeStageMssg = (self.choice1Alpha > self.choice2Alpha) ? self.lifeStageOpts[0] : self.lifeStageOpts[1];
-				break;
-			case 3 :
-				self.engine.badGuys = (self.choice1Alpha > self.choice2Alpha) ? true : false
-				if(!self.engine.badGuys){ self.engine.world.removeBadElements()}
-		}
+		// switch(self.question){
+		// 	case 0 :
+		// 		self.showInfo = (self.choice1Alpha > self.choice2Alpha) ? true : false
+		// 		break;
+		// 	case 1 :
+		// 		if(self.choice1Alpha > self.choice2Alpha)
+		// 			self.engine.setAwards("matter") 
+		// 		else
+		// 			self.engine.setAwards("consciousness"); 
+		// 		break;
+		// 	case 2 :
+		// 		var ether = self.engine.ethers[0];
+		// 		ether.transformation = (self.choice1Alpha > self.choice2Alpha) ? ether.transformations[0] : ether.transformations[1];
+		// 		self.lifeStageMssg = (self.choice1Alpha > self.choice2Alpha) ? self.lifeStageOpts[0] : self.lifeStageOpts[1];
+		// 		break;
+		// 	case 3 :
+		// 		self.engine.badGuys = (self.choice1Alpha > self.choice2Alpha) ? true : false
+		// 		if(!self.engine.badGuys){ self.engine.world.removeBadElements()}
+		// }
 
 		
-		if(self.question > 3 && self.introIndex + 1 < self.introText.length){
+		if(self.introIndex + 1 < self.introText.length){
 			self.timeOffset = self.lastIntroTime;
 			self.introIndex++;
 			if(self.introIndex != self.introText.length -1) self.introAlpha = 0;	
 
-		} else if(self.introIndex + 1 != self.introText.length){
-			self.question++;
-			self.introAlpha = 0;	
 		}
 	}
 
@@ -1414,18 +1475,21 @@ Ether.Hub.prototype.init = function(){
 	window.onclick = this.handleClick;
 }
 
-Ether.Hub.prototype.drawIntro = function(time){
-	var ctx = this.engine.ctx;
-	if(this.question <= 3){
-		this.drawAnswerBoxes(ctx,time);
-		this.drawQuestionText(ctx,time);
-	} else {
+ Ether.Hub.prototype.drawIntro = function(time){
+ 	var ctx = this.engine.ctx;
+// 	if(this.question <= 3){
+// 		this.drawAnswerBoxes(ctx,time);
+// 		this.drawQuestionText(ctx,time);
+// 	} else {
 		this.drawIntroText(ctx,time)
-	}
+// 	}
 }
 
 Ether.Hub.prototype.drawIntroText = function(ctx,time){
 	if(time > this.lastIntroTime + 50){
+		ctx.font = "28pt Titillium Web"
+		ctx.fillStyle="rgba(164,161,151,"+this.introAlpha+")";
+
 		this.introAlpha += 0.1;
 		this.lastIntroTime = time;
 		if(this.introAlpha > 1) this.introAlpha = 1;
@@ -1444,36 +1508,33 @@ Ether.Hub.prototype.drawIntroText = function(ctx,time){
 	ctx.fillText(txt,(this.engine.width/2)-(iWidth/2),this.engine.height/2)
 }
 
-Ether.Hub.prototype.drawQuestionText = function(ctx,time){
-	var questions = ["Which is more true?","To which are you destined?","Which is your body?","Which do you desire?"];
+// Ether.Hub.prototype.drawQuestionText = function(ctx,time){
+// 	var questions = [];
 
-	var answers = [["Knowledge is Power.","Reality is Unknown."],
-					["Matter","Consciousness"],
-					["A Butterfly","A Snail"],
-					["Struggle","Peace"]];
+// 	var answers = [];
 
-	var currentQuestion = questions[this.question];
-	var currentAnswers = answers[this.question];
-	var qWidth = ctx.measureText(currentQuestion).width;
+// 	var currentQuestion = questions[this.question];
+// 	var currentAnswers = answers[this.question];
+// 	var qWidth = ctx.measureText(currentQuestion).width;
 
-	if(time > this.lastIntroTime + 50){
-		this.lastIntroTime = time;
-		this.introAlpha += 0.05;
-		if(this.introAlpha > 1) this.introAlpha = 1;
-	}
+// 	if(time > this.lastIntroTime + 50){
+// 		this.lastIntroTime = time;
+// 		this.introAlpha += 0.05;
+// 		if(this.introAlpha > 1) this.introAlpha = 1;
+// 	}
 
-	//quetion
-	ctx.font = "28pt Titillium Web"
-	ctx.fillStyle="rgba(164,161,151,"+this.introAlpha+")";
-	ctx.fillText(currentQuestion,(this.engine.width/2)-(qWidth/2),this.unit * 2);
+// 	//quetion
+// 	ctx.font = "28pt Titillium Web"
+// 	ctx.fillStyle="rgba(164,161,151,"+this.introAlpha+")";
+// 	ctx.fillText(currentQuestion,(this.engine.width/2)-(qWidth/2),this.unit * 2);
 
-	//answers
-	var aWidth0 = ctx.measureText(currentAnswers[0]).width;
-	var aWidth1 = ctx.measureText(currentAnswers[1]).width;
+// 	//answers
+// 	var aWidth0 = ctx.measureText(currentAnswers[0]).width;
+// 	var aWidth1 = ctx.measureText(currentAnswers[1]).width;
 
-	ctx.fillText(currentAnswers[0],(this.engine.width/4)-(aWidth0/2),this.engine.height/2)
-	ctx.fillText(currentAnswers[1],((this.engine.width/4) * 3)-(aWidth1/2),this.engine.height/2)
-}
+// 	ctx.fillText(currentAnswers[0],(this.engine.width/4)-(aWidth0/2),this.engine.height/2)
+// 	ctx.fillText(currentAnswers[1],((this.engine.width/4) * 3)-(aWidth1/2),this.engine.height/2)
+// }
 
 Ether.Hub.prototype.drawAnswerBoxes = function(ctx){
 	var width = this.engine.width;
@@ -1572,13 +1633,13 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 
 	ctx.fillStyle = "#FFF4E9";
 	ctx.font = this.unit + "px Titillium Web"
-	ctx.fillText("Lifespan " + (this.engine.ethers[0].age + 1),this.engine.width-(this.unit * 5.5), this.unit);
+	ctx.fillText("Lifespan",(this.unit * (9+ 35/2)), this.unit);
 
 	ctx.fillStyle = colors[ether.age];
-	ctx.fillRect(this.engine.width - (this.unit * 0.5), this.unit * 1.5, -(this.unit * 5) * ratio, this.unit * 0.5)
+	ctx.fillRect((this.unit * 45), this.unit * 1.5, -(this.unit * 35) * ratio, this.unit * 0.5)
 
 	ctx.strokeStyle = "red";
-	ctx.strokeRect(this.engine.width - (this.unit * 5.5), this.unit * 1.5, this.unit * 5, this.unit * 0.5)
+	ctx.strokeRect((this.unit * 10), this.unit * 1.5, this.unit * 35, this.unit * 0.5)
 
 	//MOVE THIS TO ETHER!!???
 	if(!ether.moved){return}
@@ -1660,6 +1721,8 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 }
 
 Ether.Hub.prototype.renderMessage = function(ctx,time){
+	var ether = this.engine.ethers[0];
+
 	ctx.font = (this.currentMessage == this.awardMssg) ? "90px Titillium Web" : "30px Titillium Web";
 	var textWidth = ctx.measureText(this.currentMessage).width;
 
@@ -1687,14 +1750,14 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 			this.killerElement = false;
 			
 			//in between message?
-			if(this.engine.betweenAges && !this.engine.ethers[0].dead){
+			if(this.engine.betweenAges && !ether.dead){
 				this.currentMessage = "";
 				this.engine.betweenAges = false;
-				this.engine.ethers[0].age++;
-//				this.engine.ethers[0].save(this.engine.ethers[0].age);
-				this.engine.ethers[0].currentSpan = this.engine.ethers[0].lifeSpan[this.engine.ethers[0].age];
+				ether.age++;
+				ether.save();
+				ether.currentSpan = ether.lifeSpan[ether.age];
 
-				if(this.engine.ethers[0].age < 4){
+				if(ether.age < 4){
 					this.engine.init();
 				}
 			}
@@ -1738,15 +1801,6 @@ Ether.Hub.prototype.gameOver = function(ctx,time){
 }
 
 Ether.Audio.prototype.init = function(){
-	/*if(this.loaded) return
-	//try{
-		window.AudioContext = window.AudioContext || window.webkitAudioContext;
-		this.ctx = new window.AudioContext();
-		console.log(this.ctx)
-		this.loadSounds();
-/*	} catch(e){
-		alert('Your brower does not support Web Audio API. Please update.');
-	}*/
 	this.loadSounds();
 }
 
@@ -1788,6 +1842,7 @@ Ether.Audio.prototype.playSound = function(element){
 	this.hub = new Ether.Hub(this);
 	this.util = new Ether.Util(this);
 	this.audio = new Ether.Audio(this);
+	//this.trophy = new Ether.Trophy(this);
 
 	//Ethers
 	this.ethers = [new Ether.Ether(self)];
@@ -1862,6 +1917,7 @@ Ether.Audio.prototype.playSound = function(element){
 Ether.Engine.prototype.init = function(){
 	var self = this;
 
+
 	//set up canvas
 	this.canvas.width = this.width;
 	this.canvas.height = this.height;
@@ -1876,8 +1932,13 @@ Ether.Engine.prototype.init = function(){
 	//set up world
 	if(!window.mobilecheck()){
 		window.onkeydown = function(evt){
+			console.log(evt.keyCode)
 			self.world.handleKeyDown(evt.keyCode,self)
 			self.hub.handleKeyDown();
+
+			switch(evt.keyCode){
+				case 90: self.ethers[0].getMoreScreen();
+			}
 		}
 
 		window.onkeyup = function(evt){
@@ -1902,6 +1963,11 @@ Ether.Engine.prototype.init = function(){
 	this.world.init(this);
 
 	this.audio.init();
+	
+	this.setAwards('matter')
+
+
+	//this.trophy.init();
 
 	//start animation
 	if(this.player.age == 0)

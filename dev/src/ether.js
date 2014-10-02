@@ -19,13 +19,14 @@
 	//stats
 	this.range = 15;
 	this.mass = 1;
-	this.age = 0;
 	this.speed = 8;
+	this.zoom = 1;
+	this.elementCount = {f:0,w:0,a:0,e:0}
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [100,95,90,80]; //in seconds
-	this.currentSpan = this.lifeSpan[this.age];
+	this.lifeSpan = [365]; //in seconds
+	this.currentSpan = this.lifeSpan[0];
 	this.totalLifeSpan;
 	this.dead = false;
 	this.ageLastTime = 0;
@@ -47,23 +48,23 @@
 }
 
 Ether.Ether.prototype.init = function(){
-	switch(this.age){
-		case 0 :
+	// switch(this.age){
+	// 	case 0 :
 			this.createCoreElement();
-			break;
+	// 		break;
 
-		case 1 : 
-		case 2 : 
-			this.zoomOut(2)
-			break;
+	// 	case 1 : 
+	// 	case 2 : 
+	// 		this.zoomOut(2)
+	// 		break;
 
-		case 3 :
-			this.zoomOut(2);
-			this.sludgeAlphaStep *= 2;
-			this.sludgeTimeOffset *= 4;
-			this.finalElementLength = this.elements.length;
-			break;
-	}
+	// 	case 3 :
+	// 		this.zoomOut(2);
+	// 		this.sludgeAlphaStep *= 2;
+	// 		this.sludgeTimeOffset *= 4;
+	// 		this.finalElementLength = this.elements.length;
+	// 		break;
+	// }
 }
 
 Ether.Ether.prototype.draw = function(engine,time){
@@ -76,7 +77,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 	var self = this;
 
 	//age ether during the thried life stage
-	if(this.age == 3)this.ageEther(time)
+	//if(this.age == 3)this.ageEther(time)
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i];
@@ -87,7 +88,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 		e.jitter *= -1;
 
 		//Butterfly//Snail Transformation
-		if(this.age>=2)this.transformation(e,time)
+		//if(this.age>=2)this.transformation(e,time)
 
 		//Draw Ether Elements
 		engine.ctx.beginPath();
@@ -100,7 +101,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 	};
 
 	//time has to be updated outside of the loop
-	if(this.age == 2 && time > this.rotateLastTime + 500) this.rotateLastTime = time;
+	//if(this.age == 2 && time > this.rotateLastTime + 500) this.rotateLastTime = time;
 }
 
 Ether.Ether.prototype.drawCoreElements = function(engine){
@@ -112,17 +113,17 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 
 		engine.ctx.beginPath();
 		
-		if(this.age == 0){
-			self.util.drawElement(e, engine.ctx, function(ctx,element){
-				var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-				return self.util.createGradient(gradient,[[0.5,"white"],[1,"black"]])
-			});	
-		} else {
+		// if(this.age == 0){
 			self.util.drawElement(e, engine.ctx, function(ctx,element){
 				var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
 				return self.util.createGradient(gradient,[[0.5,"white"],[0.4,element.color],[1,"black"]])
 			});	
-		}	
+		// } else {
+		// 	self.util.drawElement(e, engine.ctx, function(ctx,element){
+		// 		var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
+		// 		return self.util.createGradient(gradient,[[0.5,"white"],,[1,"black"]])
+		// 	});	
+		// }	
 
 		//velocity
 		e.x += e.vx;
@@ -142,7 +143,7 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	var stability = this.getStability();
 
-	if(stability > 40 && this.age < 3){
+	if(stability > 40){
 		engine.hub.unstable = true 
 
 		if(stability >= 50){
@@ -154,20 +155,20 @@ Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	}
 }
 
-Ether.Ether.prototype.isNearScreenEdge = function(e){
-	console.log(this.range+(e.radius*2))
-	console.log(this.engine.height/2)
-	if((this.range+(e.radius*1.8) >= this.engine.width/2) ||
-		(this.range+(e.radius*1.8) >= this.engine.height/2)){
-		this.zoomOut(1.2);
-		this.engine.world.zoomOut(1.1);
-		this.engine.world.zoomOutElements(1.2);
+Ether.Ether.prototype.getMoreScreen = function(){
+	// console.log(this.range+(e.radius*2))
+	// console.log(this.engine.height/2)
+	// if((this.range+(e.radius*1.8) >= this.engine.width/2) ||
+	// 	(this.range+(e.radius*1.8) >= this.engine.height/2)){
+		this.zoomOut(1.5);
+		this.engine.world.zoomOutBackground(1.3);
+		this.engine.world.zoomOutElements(1.5);
 
-	}
 }
 
 Ether.Ether.prototype.zoomOut = function(val){
 	this.range /= val;
+	this.zoom += val;
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i]
@@ -225,37 +226,44 @@ Ether.Ether.prototype.getStability = function(){
 }
 
 Ether.Ether.prototype.getElementCount = function(){
-	var f=w=a=e = 0;
+	return this.elementCount
+}
 
-	for (var i = 0; i < this.elements.length; i++) {
-		var ele = this.elements[i];
-		switch(ele.type){
-			case 'fire': f += Math.round((ele.radius/5));
-				break;
-			case 'water': w += Math.round((ele.radius/5));
-				break;
-			case 'air': a += Math.round((ele.radius/5));
-				break;
-			case 'earth': e += Math.round((ele.radius/5));
-				break;
-		}
-	};
+Ether.Ether.prototype.addToElementCount = function(ele){
+	switch(ele.type){
+		case 'fire': this.elementCount.f += (Math.round((ele.radius/5)) * this.zoom);
+			break;
+		case 'water': this.elementCount.w += (Math.round((ele.radius/5)) * this.zoom);
+			break;
+		case 'air': this.elementCount.a += (Math.round((ele.radius/5)) * this.zoom);
+			break;
+		case 'earth': this.elementCount.e += (Math.round((ele.radius/5)) * this.zoom);
+			break;
+	}
+}
 
-	var obj = {}
-	obj["f"] = f;
-	obj["w"] = w;
-	obj["a"] = a;
-	obj["e"] = e;
-	return obj
+Ether.Ether.prototype.removeFromElementCount = function(ele){
+	switch(ele.type){
+		case 'fire': this.elementCount.f -= Math.round((ele.radius/5));
+			if(this.elementCount.f < 0){ this.elementCount.f = 0}
+			break;
+		case 'water': this.elementCount.w -= Math.round((ele.radius/5));
+			if(this.elementCount.w < 0){ this.elementCount.w = 0}
+			break;
+		case 'air': this.elementCount.a -= Math.round((ele.radius/5));
+			if(this.elementCount.a < 0){ this.elementCount.a = 0}
+			break;
+		case 'earth': this.elementCount.e -= Math.round((ele.radius/5));
+			if(this.elementCount.e < 0){ this.elementCount.e = 0}
+			break;
+	}
 }
 
 //Elements
 Ether.Ether.prototype.newElement = function(e){
 	this.engine.audio.playSound(e);
-	this.isNearScreenEdge(e);
-	if(this.age != 3){
-		this.increaseMass(e);
-	}
+	this.addToElementCount(e);
+	this.increaseMass(e);
 			
 	e.xOffset = e.x - this.x; 
 	e.yOffset = e.y - this.y;
@@ -266,7 +274,7 @@ Ether.Ether.prototype.newElement = function(e){
 }
 
 Ether.Ether.prototype.loseElement = function(e){
-
+	this.removeFromElementCount(e);
 	this.decreaseMass(e);
 	
 	//remove from elements
@@ -301,21 +309,21 @@ Ether.Ether.prototype.createCoreElement = function(){
 Ether.Ether.prototype.increaseMass = function(e){
 	this.createCoreElement();
 	this.mass += 1//e.radius/massOffset;
-	this.range += Math.ceil(e.radius/8)
+	this.range += e.radius/3
 }
 
 Ether.Ether.prototype.decreaseMass = function(e){
 	if(this.coreElements.length > 1) this.coreElements.pop();
 	if(this.mass > 0) this.mass -= 1;
-	if(this.range > 2) this.range -= Math.ceil(e.radius/8);
+	if(this.range > 2) this.range -= e.radius/3;
 }
 
 //awards
 Ether.Ether.prototype.receiveAward = function(a){
 	//make sure the award wont put the player past the cap
 	//givien by the engine
-	if(this.currentSpan + a > this.lifeSpan[this.age]){
-		this.currentSpan = this.lifeSpan[this.age];
+	if(this.currentSpan + a > this.lifeSpan[0]){
+		this.currentSpan = this.lifeSpan[0];
 	} else {
 		this.currentSpan += a;
 	}
@@ -329,14 +337,14 @@ Ether.Ether.prototype.rotateElement = function(e,time){
 		if(this.rotateDirection < 0){ //rDir starts at -1
 			this.degreeChange += 0.001;
 			if(this.degreeChange > 1) {this.degreeChange = 1 }
-			if(this.currentSpan < (this.lifeSpan[this.age]/3) * 2){ this.rotateDirection++; }
+			if(this.currentSpan < (this.lifeSpan[0]/3) * 2){ this.rotateDirection++; }
 
 		} else if(this.rotateDirection > 0){
 			this.degreeChange -= 0.001;
 			if(this.degreeChange < 0.001) {this.degreeChange = 0.001 }
 
 		} else {
-			if(this.currentSpan < this.lifeSpan[this.age]/3){ this.rotateDirection++; }
+			if(this.currentSpan < this.lifeSpan[0]/3){ this.rotateDirection++; }
 
 		}
 	}
@@ -451,17 +459,7 @@ function Sludge(engine,player){
 }
 
 
-/*Ether.Ether.prototype.save = function(name){
-	var obj = {};
-	obj.name =  "" + name;
-	obj.elements = this.elements; 
-	obj.coreElements = this.coreElements;
-
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST","saveEther.php",true);
-	xhr.setRequestHeader('Content-Type','application/json; charset=UTF-8');
-	xhr.send(JSON.stringify(obj));
-	xhr.onloadend = function(){
-		console.log('Saved');
-	}
-}*/
+Ether.Ether.prototype.save = function(){
+	//this.engine.trophy.save(this);
+	console.log('save')
+}

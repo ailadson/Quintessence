@@ -7,8 +7,8 @@
 	this.player;
 
 	//world positioning values
-	this.width = engine.width*30;
-	this.height = engine.height*30;
+	this.width = engine.width*100;
+	this.height = engine.height*100;
 	this.x = engine.width/2;
 	this.y = engine.height/2;
 	this.xv = 0;
@@ -40,27 +40,27 @@
 Ether.World.prototype.init = function(engine){
 	var eleStrings = ['earth','air','fire','water'];
 	
-	if(engine.ethers[0].age != 0){ 
-		this.zoomOut(2) 
-	} else {
+	// if(engine.ethers[0].age != 0){ 
+	// 	this.zoomOut(2) 
+	// } else {
 		this.player = engine.ethers[0]
 		this.util = engine.util;
-	}
+	// }
 
 	this.initBackground();
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var collection = this.elements[i];
-		collection.length = 0; //clear out array
+		//collection.length = 0; //clear out array
 		var type = eleStrings[i];
 
-		switch(engine.ethers[0].age){
-			case 0 :
-				this.initElements(type,collection,[5,300,450],[0,250,350],[320,40,2],[4000,70,47])
-				this.initBadGuys(type,collection,120,true);
-				break;
+		// switch(engine.ethers[0].age){
+		// 	case 0 :
+			this.initElements(type,collection,[20,300,500],[3,150,350],[3000,300,100],[50000,700,300])
+			this.initBadGuys(type,collection,120,true);
+				//break;
 
-			case 1 :
+			/*case 1 :
 				this.initElements(type,collection,[2,100,300],[0,50,250],[325,250,10],[1,200,70])
 				this.initBadGuys(type,collection,90);
 				break;
@@ -71,17 +71,19 @@ Ether.World.prototype.init = function(engine){
 			case 3 :
 				this.initElements(type,collection,[20,90],[5,50],[200,200],[1000,220])
 				this.initBadGuys(type,collection,30);
-				break;
-		}		
+				break;*/
+		//}		
 	};
 }
 
 Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffset){
 	for (var i = 0; i < n.length; i++) {
+
 		this.initElement(type,collection,n[i],sizeOffset[i],function(e){
 			if(max[i] && e.radius > max[i]) e.radius = max[i];
 			if(min[i] && e.radius < min[i]) e.radius = min[i];
 		})
+	
 	};
 
 	
@@ -90,8 +92,8 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,10,1,function(e){
-				if(e.radius > max || e.radius < min) e.radius = max;
+			this.initElement(type,collection,100,1,function(e){
+				if(e.radius > max || e.radius < max) e.radius = max;
 			},true)
 		}
 }
@@ -115,9 +117,9 @@ Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,e
 }
 
 Ether.World.prototype.initBackground = function(){
-	for (var i = 0; i < this.hillHeightAmount + 2; i++) {
+	for (var i = 0; i < this.hillHeightAmount + 4; i++) {
 		var hills = [];
-		for (var j = 0; j < this.hillWidthAmount+2; j++) {
+		for (var j = 0; j < this.hillWidthAmount+4; j++) {
 			hills[j] = {x: (this.hillWidth*j), y: (this.hillHeight*i)}
 		};
 		this.hills.push(hills);
@@ -197,7 +199,7 @@ Ether.World.prototype.draw = function(engine,time){
 
 
 
-Ether.World.prototype.zoomOut = function(val){
+Ether.World.prototype.zoomOutBackground = function(val){
 	this.hillHeightAmount *= val;
 	this.hillWidthAmount *= val;
 	this.hillWidth = this.engine.width/this.hillWidthAmount;
@@ -206,7 +208,9 @@ Ether.World.prototype.zoomOut = function(val){
 
 Ether.World.prototype.zoomOutElements = function(val){
 	for (var i = 0; i < this.elements.length; i++) {
-		this.elements[i].radius /= val;
+		for (var j = 0; j < this.elements[i].length; j++) {
+			this.elements[i][j].radius /= val;
+		};		
 	};
 }
 
@@ -364,7 +368,7 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 		} else {
 			this.engine.audio.playSound(e)
 			ether.loseElements(1);
-			if(ether.elements.length > 6) ether.tripleLoss();
+			if(ether.elements.length > 6) ether.loseElements(3);
 		}
 	}
 }
@@ -463,15 +467,19 @@ Ether.World.prototype.handleKeyDown = function(e){
 Ether.World.prototype.handleKeyUp = function(e){
 		switch(e){
 			case 38 :
+			case 87 :
 				this.speedUp.y = false//this.dragMotion('up',this.yv);
 				break;
+			case 68 :
 			case 39 :
 				this.speedUp.x = false//this.dragMotion('up',-this.xv) * -1;
 				break;
 			case 40 :
+			case 83 :
 				this.speedUp.y = false//this.dragMotion('up',-this.yv) * -1;
 				break;
 			case 37 :
+			case 65 :
 				this.speedUp.x = false//this.dragMotion('up',this.xv);
 				break;
 		}

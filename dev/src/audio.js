@@ -5,15 +5,6 @@ Ether.Audio = function (engine) {
 }
 
 Ether.Audio.prototype.init = function(){
-	/*if(this.loaded) return
-	//try{
-		window.AudioContext = window.AudioContext || window.webkitAudioContext;
-		this.ctx = new window.AudioContext();
-		console.log(this.ctx)
-		this.loadSounds();
-/*	} catch(e){
-		alert('Your brower does not support Web Audio API. Please update.');
-	}*/
 	this.loadSounds();
 }
 

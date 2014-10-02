@@ -4,6 +4,9 @@
  Ether.Engine = function() {	
 	var self = this;
 
+	//div
+	this.container = document.getElementById('container');
+
 	//Canvas
 	this.canvas = document.getElementById('canvas');
 	this.ctx = this.canvas.getContext('2d');
@@ -17,6 +20,7 @@
 	this.hub = new Ether.Hub(this);
 	this.util = new Ether.Util(this);
 	this.audio = new Ether.Audio(this);
+	this.upgrade = new Ether.Upgrade(this);
 
 	//Ethers
 	this.ethers = [new Ether.Ether(self)];
@@ -24,6 +28,7 @@
 
 	//level
 	this.betweenAges = false;
+	this.upgradeScreen = false;
 
 	//endgame
 	this.gameOverAlpha = 0;
@@ -36,6 +41,8 @@
 	this.animate = function(time){
 		requestAnimFrame(self.animate);
 
+		if(self.upgradeScreen) return
+			
 		//Draw Background
 		if(!self.player.dead){
 			self.ctx.fillStyle = "black";
@@ -105,8 +112,10 @@ Ether.Engine.prototype.init = function(){
 	//set up world
 	if(!window.mobilecheck()){
 		window.onkeydown = function(evt){
+			evt.preventDefault();
 			self.world.handleKeyDown(evt.keyCode,self)
 			self.hub.handleKeyDown();
+			self.handleKeyDown(evt.keyCode);
 		}
 
 		window.onkeyup = function(evt){
@@ -132,9 +141,35 @@ Ether.Engine.prototype.init = function(){
 
 	this.audio.init();
 
+	this.upgrade.init();
+	
+	this.setAwards('matter')
+
+
+	//this.trophy.init();
+
 	//start animation
-	if(this.player.age == 0)
+	//if(this.player.age == 0)
 		window.requestAnimFrame(this.animate);
+}
+
+Ether.Engine.prototype.handleKeyDown =function(key){
+	if(this.hub.intro) return
+
+	var display = this.container.style.display;
+	switch(key){
+
+		case 32 : 
+		if(display != "none"){ 
+			this.container.style.display = "none";
+			this.upgrade.container.style.display = "";
+			this.upgradeScreen = true;
+		} else {
+			this.container.style.display = "";
+			this.upgrade.container.style.display = "none";
+			this.upgradeScreen = false;
+		}
+	}
 }
 
 Ether.Engine.prototype.checkAwards = function(time){

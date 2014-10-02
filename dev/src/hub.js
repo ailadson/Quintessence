@@ -23,7 +23,7 @@ Ether.Hub = function(engine) {
 	this.intro = true;
 	this.lastIntroTime = 0;
 	this.introAlpha = 0;
-	this.introText = ["","an ether is born","you are born","collect the four elements","grow into yourself","and die","as all things that are born must","seek balance"];
+	this.introText = ["an ether is born","you are born","collect the four elements","grow into yourself","and die","as all things that are born must","seek balance"];
 	this.introIndex = 0;
 	this.timeOffset = 0
 
@@ -81,35 +81,32 @@ Ether.Hub = function(engine) {
 			return
 		}
 
-		switch(self.question){
-			case 0 :
-				self.showInfo = (self.choice1Alpha > self.choice2Alpha) ? true : false
-				break;
-			case 1 :
-				if(self.choice1Alpha > self.choice2Alpha)
-					self.engine.setAwards("matter") 
-				else
-					self.engine.setAwards("consciousness"); 
-				break;
-			case 2 :
-				var ether = self.engine.ethers[0];
-				ether.transformation = (self.choice1Alpha > self.choice2Alpha) ? ether.transformations[0] : ether.transformations[1];
-				self.lifeStageMssg = (self.choice1Alpha > self.choice2Alpha) ? self.lifeStageOpts[0] : self.lifeStageOpts[1];
-				break;
-			case 3 :
-				self.engine.badGuys = (self.choice1Alpha > self.choice2Alpha) ? true : false
-				if(!self.engine.badGuys){ self.engine.world.removeBadElements()}
-		}
+		// switch(self.question){
+		// 	case 0 :
+		// 		self.showInfo = (self.choice1Alpha > self.choice2Alpha) ? true : false
+		// 		break;
+		// 	case 1 :
+		// 		if(self.choice1Alpha > self.choice2Alpha)
+		// 			self.engine.setAwards("matter") 
+		// 		else
+		// 			self.engine.setAwards("consciousness"); 
+		// 		break;
+		// 	case 2 :
+		// 		var ether = self.engine.ethers[0];
+		// 		ether.transformation = (self.choice1Alpha > self.choice2Alpha) ? ether.transformations[0] : ether.transformations[1];
+		// 		self.lifeStageMssg = (self.choice1Alpha > self.choice2Alpha) ? self.lifeStageOpts[0] : self.lifeStageOpts[1];
+		// 		break;
+		// 	case 3 :
+		// 		self.engine.badGuys = (self.choice1Alpha > self.choice2Alpha) ? true : false
+		// 		if(!self.engine.badGuys){ self.engine.world.removeBadElements()}
+		// }
 
 		
-		if(self.question > 3 && self.introIndex + 1 < self.introText.length){
+		if(self.introIndex + 1 < self.introText.length){
 			self.timeOffset = self.lastIntroTime;
 			self.introIndex++;
 			if(self.introIndex != self.introText.length -1) self.introAlpha = 0;	
 
-		} else if(self.introIndex + 1 != self.introText.length){
-			self.question++;
-			self.introAlpha = 0;	
 		}
 	}
 
@@ -129,18 +126,21 @@ Ether.Hub.prototype.init = function(){
 	window.onclick = this.handleClick;
 }
 
-Ether.Hub.prototype.drawIntro = function(time){
-	var ctx = this.engine.ctx;
-	if(this.question <= 3){
-		this.drawAnswerBoxes(ctx,time);
-		this.drawQuestionText(ctx,time);
-	} else {
+ Ether.Hub.prototype.drawIntro = function(time){
+ 	var ctx = this.engine.ctx;
+// 	if(this.question <= 3){
+// 		this.drawAnswerBoxes(ctx,time);
+// 		this.drawQuestionText(ctx,time);
+// 	} else {
 		this.drawIntroText(ctx,time)
-	}
+// 	}
 }
 
 Ether.Hub.prototype.drawIntroText = function(ctx,time){
 	if(time > this.lastIntroTime + 50){
+		ctx.font = "28pt Titillium Web"
+		ctx.fillStyle="rgba(164,161,151,"+this.introAlpha+")";
+
 		this.introAlpha += 0.1;
 		this.lastIntroTime = time;
 		if(this.introAlpha > 1) this.introAlpha = 1;
@@ -159,36 +159,33 @@ Ether.Hub.prototype.drawIntroText = function(ctx,time){
 	ctx.fillText(txt,(this.engine.width/2)-(iWidth/2),this.engine.height/2)
 }
 
-Ether.Hub.prototype.drawQuestionText = function(ctx,time){
-	var questions = ["Which is more true?","To which are you destined?","Which is your body?","Which do you desire?"];
+// Ether.Hub.prototype.drawQuestionText = function(ctx,time){
+// 	var questions = [];
 
-	var answers = [["Knowledge is Power.","Reality is Unknown."],
-					["Matter","Consciousness"],
-					["A Butterfly","A Snail"],
-					["Struggle","Peace"]];
+// 	var answers = [];
 
-	var currentQuestion = questions[this.question];
-	var currentAnswers = answers[this.question];
-	var qWidth = ctx.measureText(currentQuestion).width;
+// 	var currentQuestion = questions[this.question];
+// 	var currentAnswers = answers[this.question];
+// 	var qWidth = ctx.measureText(currentQuestion).width;
 
-	if(time > this.lastIntroTime + 50){
-		this.lastIntroTime = time;
-		this.introAlpha += 0.05;
-		if(this.introAlpha > 1) this.introAlpha = 1;
-	}
+// 	if(time > this.lastIntroTime + 50){
+// 		this.lastIntroTime = time;
+// 		this.introAlpha += 0.05;
+// 		if(this.introAlpha > 1) this.introAlpha = 1;
+// 	}
 
-	//quetion
-	ctx.font = "28pt Titillium Web"
-	ctx.fillStyle="rgba(164,161,151,"+this.introAlpha+")";
-	ctx.fillText(currentQuestion,(this.engine.width/2)-(qWidth/2),this.unit * 2);
+// 	//quetion
+// 	ctx.font = "28pt Titillium Web"
+// 	ctx.fillStyle="rgba(164,161,151,"+this.introAlpha+")";
+// 	ctx.fillText(currentQuestion,(this.engine.width/2)-(qWidth/2),this.unit * 2);
 
-	//answers
-	var aWidth0 = ctx.measureText(currentAnswers[0]).width;
-	var aWidth1 = ctx.measureText(currentAnswers[1]).width;
+// 	//answers
+// 	var aWidth0 = ctx.measureText(currentAnswers[0]).width;
+// 	var aWidth1 = ctx.measureText(currentAnswers[1]).width;
 
-	ctx.fillText(currentAnswers[0],(this.engine.width/4)-(aWidth0/2),this.engine.height/2)
-	ctx.fillText(currentAnswers[1],((this.engine.width/4) * 3)-(aWidth1/2),this.engine.height/2)
-}
+// 	ctx.fillText(currentAnswers[0],(this.engine.width/4)-(aWidth0/2),this.engine.height/2)
+// 	ctx.fillText(currentAnswers[1],((this.engine.width/4) * 3)-(aWidth1/2),this.engine.height/2)
+// }
 
 Ether.Hub.prototype.drawAnswerBoxes = function(ctx){
 	var width = this.engine.width;
@@ -220,30 +217,30 @@ Ether.Hub.prototype.draw = function(time){
 	}
 
 	//in between ages?
-	this.drawInbetween(ctx,time);
+	//this.drawInbetween(ctx,time);
 
 	if(this.showInfo) this.drawElementStats(stats.elementCount,ctx);
 	this.drawLifeBar(ctx, time);
 	this.drawMessage(ctx,time);
 }
 
-Ether.Hub.prototype.drawInbetween = function(ctx,time){
-	var age = this.engine.ethers[0].age;
+// Ether.Hub.prototype.drawInbetween = function(ctx,time){
+// 	var age = this.engine.ethers[0].age;
 
-	if(this.engine.betweenAges){
-		if(age < 3){
-			//alpha
-			if(time > this.betweenLastTime + 100){
-				this.betweenLastTime = time;
-				ctx.fillStyle = "rgba(164,161,151,"+this.betweenAlpha+")";
-			    //ctx.fillRect(0,0,this.engine.width,this.engine.height);
-			}
-		} else{
-			this.gameOver(ctx,time)
-		}
+// 	if(this.engine.betweenAges){
+// 		if(age < 3){
+// 			//alpha
+// 			if(time > this.betweenLastTime + 100){
+// 				this.betweenLastTime = time;
+// 				ctx.fillStyle = "rgba(164,161,151,"+this.betweenAlpha+")";
+// 			    //ctx.fillRect(0,0,this.engine.width,this.engine.height);
+// 			}
+// 		} else{
+// 			this.gameOver(ctx,time)
+// 		}
 		
-	}
-}
+// 	}
+// }
 
 Ether.Hub.prototype.newAward = function(text){
 	this.awardMssg = text;
@@ -283,17 +280,17 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 
 	var colors = ["green","yellow","orange","red"];
 	var ether = this.engine.ethers[0];
-	var ratio = (ether.age != 3) ? (ether.currentSpan/ether.lifeSpan[ether.age]) : (ether.elements.length/ether.finalElementLength)
+	var ratio = ether.currentSpan/ether.lifeSpan[0]
 
 	ctx.fillStyle = "#FFF4E9";
 	ctx.font = this.unit + "px Titillium Web"
-	ctx.fillText("Lifespan " + (this.engine.ethers[0].age + 1),this.engine.width-(this.unit * 5.5), this.unit);
+	ctx.fillText("Lifespan",(this.unit * (9+ 35/2)), this.unit);
 
-	ctx.fillStyle = colors[ether.age];
-	ctx.fillRect(this.engine.width - (this.unit * 0.5), this.unit * 1.5, -(this.unit * 5) * ratio, this.unit * 0.5)
+	ctx.fillStyle = "green";
+	ctx.fillRect((this.unit * 45), this.unit * 1.5, -(this.unit * 35) * ratio, this.unit * 0.5)
 
 	ctx.strokeStyle = "red";
-	ctx.strokeRect(this.engine.width - (this.unit * 5.5), this.unit * 1.5, this.unit * 5, this.unit * 0.5)
+	ctx.strokeRect((this.unit * 10), this.unit * 1.5, this.unit * 35, this.unit * 0.5)
 
 	//MOVE THIS TO ETHER!!???
 	if(!ether.moved){return}
@@ -315,40 +312,41 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 	var ether = this.engine.ethers[0];
 
 	var borderMssg = "there is no time in the boundless void";
-	var age0Mssg = "you are no longer an infant";
-	var age2Mssg = "give back you borrowed";
-	var age3Mssg = "so it goes";
+	// var age0Mssg = "you are no longer an infant";
+	// var age2Mssg = "give back you borrowed";
+	// var age3Mssg = "so it goes";
 	var killerMssg = "Save The Big Ones For Post-Infancy"
 	var stableMssg = "You Are Becoming Too Unstable"
 
 	if(award && !this.engine.betweenAges){ this.messageExist = false; this.messageAlpha = 1 }
 
 	if(!this.messageExist){
-		//new age
-		if(this.engine.betweenAges){
-			this.messageExist = true;
+		// //new age
+		// if(this.engine.betweenAges){
+		// 	this.messageExist = true;
 
-			switch(ether.age){
-				case 0 :
-						this.currentMessage = age0Mssg;
-					break;
+		// 	switch(ether.age){
+		// 		case 0 :
+		// 				this.currentMessage = age0Mssg;
+		// 			break;
 
-				case 1 :
-					this.currentMessage = this.lifeStageMssg;
-					break;
+		// 		case 1 :
+		// 			this.currentMessage = this.lifeStageMssg;
+		// 			break;
 
-				case 2 :
-					this.currentMessage = age2Mssg;
-					break;
+		// 		case 2 :
+		// 			this.currentMessage = age2Mssg;
+		// 			break;
 
-				case 3 :
-					this.currentMessage = age3Mssg;
-					break;
+		// 		case 3 :
+		// 			this.currentMessage = age3Mssg;
+		// 			break;
 
-			}
+		// 	}
 
-		//award
-		} else if(this.awardMssg){
+		// //award
+		// } else 
+		if(this.awardMssg){
 			this.messageExist = true;
 			this.currentMessage = this.awardMssg;
 
@@ -375,6 +373,8 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 }
 
 Ether.Hub.prototype.renderMessage = function(ctx,time){
+	var ether = this.engine.ethers[0];
+
 	ctx.font = (this.currentMessage == this.awardMssg) ? "90px Titillium Web" : "30px Titillium Web";
 	var textWidth = ctx.measureText(this.currentMessage).width;
 
@@ -402,17 +402,17 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 			this.killerElement = false;
 			
 			//in between message?
-			if(this.engine.betweenAges && !this.engine.ethers[0].dead){
-				this.currentMessage = "";
-				this.engine.betweenAges = false;
-				this.engine.ethers[0].age++;
-//				this.engine.ethers[0].save(this.engine.ethers[0].age);
-				this.engine.ethers[0].currentSpan = this.engine.ethers[0].lifeSpan[this.engine.ethers[0].age];
+			// if(this.engine.betweenAges && !ether.dead){
+			// 	this.currentMessage = "";
+			// 	this.engine.betweenAges = false;
+			// 	ether.age++;
+			// 	ether.save();
+			// 	ether.currentSpan = ether.lifeSpan[ether.age];
 
-				if(this.engine.ethers[0].age < 4){
-					this.engine.init();
-				}
-			}
+			// 	if(ether.age < 4){
+			// 		this.engine.init();
+			// 	}
+			// }
 		}
 		this.lastMessageTime = time;
 	}
