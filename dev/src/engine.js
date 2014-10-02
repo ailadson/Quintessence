@@ -42,7 +42,7 @@
 		requestAnimFrame(self.animate);
 
 		if(self.upgradeScreen) return
-			
+
 		//Draw Background
 		if(!self.player.dead){
 			self.ctx.fillStyle = "black";
@@ -163,6 +163,7 @@ Ether.Engine.prototype.handleKeyDown =function(key){
 		if(display != "none"){ 
 			this.container.style.display = "none";
 			this.upgrade.container.style.display = "";
+			this.upgrade.cy.forceRender();
 			this.upgradeScreen = true;
 		} else {
 			this.container.style.display = "";

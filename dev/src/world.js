@@ -239,15 +239,15 @@ Ether.World.prototype.drawBackground = function(xv,yv){
 
 Ether.World.prototype.driftTowardsEther = function(element){
 	var ether = this.player;
-	var radius = element.radius < 40 ? element.radius * 20 : element.radius * 2
+	var radius = element.radius < 40 ? element.radius * (ether.attraction*5) : element.radius * ether.attraction
 	var speed;
 
 	 if(element.bad){
-	 	speed = ether.speed-2
+	 	speed = ether.speed-ether.resistance
 	 }else if(element.radius > 50){ 
-	 	speed = element.radius/50 
+	 	speed = element.radius/(ether.force*60) 
 	 }else{ 
-	 	speed = element.radius/5
+	 	speed = element.radius/ether.force
 	 }
 
 	if(element.bad || this.util.getDistanceFromCenter(element,ether) <= radius){
@@ -414,48 +414,49 @@ Ether.World.prototype.adjustVelocity = function(axis,val,time){
 
 //interaction
 Ether.World.prototype.handleKeyDown = function(e){
+	var ctrl = this.player.getControl();
 	//if(!this.draggingX || !this.draggingY){
 		switch(e){
 			case 87:
 			case 38 :
-				if(!this.speedUp.y && this.yv >= -5){ 
+				if(!this.speedUp.y && this.yv >= -ctrl){ 
 					this.speedUp.y = true;
 					this.yv = 1;
 
-				} else if(this.yv < -5){
+				} else if(this.yv < -ctrl){
 					this.speedUp.y = false
 				}
 				this.player.moved = true
 				break;
 			case 68 :
 			case 39 :
-				if(!this.speedUp.x && this.xv <= 5){ 
+				if(!this.speedUp.x && this.xv <= ctrl){ 
 					this.speedUp.x = true;
 					this.xv = -1;
 
-				} else if(this.xv > 5){
+				} else if(this.xv > ctrl){
 					this.speedUp.x = false
 				}
 				this.player.moved = true
 				break;
 			case 83 : 
 			case 40 :
-				if(!this.speedUp.y && this.yv <= 5){ 
+				if(!this.speedUp.y && this.yv <= ctrl){ 
 					this.speedUp.y = true;
 					this.yv = -1;
 
-				} else if(this.yv > 5){
+				} else if(this.yv > ctrl){
 					this.speedUp.y = false
 				}
 				this.player.moved = true
 				break;
 			case 65 :
 			case 37 :
-				if(!this.speedUp.x && this.xv >= -5){ 
+				if(!this.speedUp.x && this.xv >= -ctrl){ 
 					this.speedUp.x = true;
 					this.xv = 1;
 
-				} else if(this.xv < -5){
+				} else if(this.xv < -ctrl){
 					this.speedUp.x = false
 				}
 				this.player.moved = true

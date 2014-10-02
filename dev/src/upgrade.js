@@ -12,7 +12,7 @@ Ether.Upgrade = function(engine){
 	this.cy = cytoscape({
 		container : self.container,
 		elements : self.nodes.concat(self.edges),
-		style : [],
+		style : self.style,
 		layout : {
 			name : "breadthfirst",
 			roots : '#nparent'
@@ -23,13 +23,26 @@ Ether.Upgrade = function(engine){
 
 			
 
-			setTimeout(function(){
+			//setTimeout(function(){
+				
 				cy.on('click','node',function(e){
-					console.log(e.cyTarget);
 					self.handleClick(e.cyTarget.id());
 				});
+
+				cy.on('mouseover','node',function(e){
+					var ele = e.cyTarget;
+
+					//if(self.isUpgradable(ele)){
+
+						cy.elements('node[id = "'+ele.id()+'"]').flashClass("rollover",1000)
+					// } else {
+
+					// }
+				});
+
 				self.container.style.display = "none"
-			},500);
+
+			//},1000);
 		},
 		zoomingEnabled : false,
 		panningEnabled : false
@@ -49,6 +62,63 @@ Ether.Upgrade.prototype.handleClick = function(id){
 		this.tierCounter.type += tier;
 	}
 }
+
+Ether.Upgrade.prototype.style = [
+	{
+		selector : 'node[id ^= "movement"]',
+		css : {
+			'background-color':'#47BDDE',
+			'border-width' : '2',
+			'border-color' : '#243F63',
+			'shape' : "pentagon"
+		}
+	},{
+		selector : 'node[id ^= "attraction"]',
+		css : {
+			'background-color':'#E0664A',
+			'border-width' : '2',
+			'border-color' : '#6B504A',
+			'shape' : "heptagon"
+		}
+	},{
+		selector : 'node[id ^= "resistance"]',
+		css : {
+			'background-color':'#CCD9B4',
+			'border-width' : '2',
+			'border-color' : '#858063',
+			'shape' : 'rectangle'
+		}
+	},{
+		selector : 'node[id ^= "balance"]',
+		css : {
+			'background-color':'#EDEDEB',
+			'border-width' : '2',
+			'border-color' : '#9E9E99',
+			'shape' : 'triangle'
+		}
+	},{
+		selector : 'edge',
+		css : {
+			"line-color" : "#D1E6E6",
+			"width" : "3",
+			//"curve-style" : "haystack",
+			"haystack-radius" : "1",
+			"target-arrow-color" : "#D1E6E6",
+			"target-arrow-shape" : "triangle",
+		}
+	},{
+		selector : '.rollover',
+		css : {
+			"text-outline-color" : "white",
+			"text-outline-width" : "2",
+			"color" : "black",
+			"font-size" : "50",
+			"font-family" : "Titillium Web",
+			"text-halign" : "center",
+			"content" : "hey yall"
+		}
+	}
+];
 
 Ether.Upgrade.prototype.nodes = [
 		{

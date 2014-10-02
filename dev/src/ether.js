@@ -19,7 +19,13 @@
 	//stats
 	this.range = 15;
 	this.mass = 1;
-	this.speed = 8;
+	this.speed = 10;
+	this.control = 10;
+	this.getControl = function(){ return this.speed*(this.control * 0.01) };
+	this.resistance = 1;
+	this.attraction = 10;
+	this.balance = 0;
+	this.force = 5;
 	this.zoom = 1;
 	this.elementCount = {f:0,w:0,a:0,e:0}
 
@@ -222,7 +228,9 @@ Ether.Ether.prototype.getStability = function(){
 	var dif1 = o["f"] - o["w"];
 	var dif2 = o["a"] - o["e"];
 
-	return Math.floor(Math.sqrt((dif1 * dif1)+(dif2 * dif2)));
+	var val = Math.floor(Math.sqrt((dif1 * dif1)+(dif2 * dif2)));
+	var rVal = val-this.balance < 0 ? 0 : val-this.balance
+	return rVal;
 }
 
 Ether.Ether.prototype.getElementCount = function(){
