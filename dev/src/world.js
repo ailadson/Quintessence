@@ -34,6 +34,8 @@
 	this.hillWidth = engine.width/this.hillWidthAmount;
 	this.hillHeight = engine.height/this.hillHeightAmount;
 
+	this.badToggle = 0
+
 }
 
 //WORLD INIT
@@ -366,9 +368,13 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 			ether.newElement(e);
 			this.elements[collection].splice(index,1);
 		} else {
-			this.engine.audio.playSound(e)
-			ether.loseElements(1);
-			if(ether.elements.length > 6) ether.loseElements(3);
+			if(this.badToggle > this.player.resistance*2){
+				this.badToggle = 0;
+				this.engine.audio.playSound(e)
+				ether.loseElements(1);
+			} else {
+				this.badToggle += 1;
+			}
 		}
 	}
 }

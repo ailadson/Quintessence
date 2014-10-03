@@ -3,7 +3,7 @@ module.exports = function(grunt) {
 
 	var sourceFiles = ['dev/src/mobileCheck.js','dev/src/element.js','dev/src/awards.js','dev/src/util.js',
 						'dev/src/ether.js','dev/src/trophy.js','dev/src/world.js','dev/src/hub.js',
-						'dev/src/audio.js','dev/src/upgrade.js''dev/src/engine.js',];
+						'dev/src/audio.js','dev/src/upgrade.js','dev/src/engine.js'];
 
 	//config
 	grunt.initConfig({

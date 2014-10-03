@@ -191,7 +191,7 @@ Ether.Engine.prototype.checkAwards = function(time){
 				if(stats[elements[j]] >= award.amount){
 					if(j == elements.length-1){
 						award.awarded = true;
-						this.hub.newAward(award.text);
+						this.hub.newAward(award.text,award.award);
 						this.player.receiveAward(award.award);
 						this.awardDelay = time;
 					}
@@ -213,7 +213,7 @@ Ether.Engine.prototype.setAwards = function(type){
 
 	for (var i = 0; i < this.awards.length; i++) {
 		this.awards[i].amount = amount;
-		this.awards[i].award = Math.ceil(award/5);
+		this.awards[i].award = Math.ceil(award/2);
 		amount += 3;
 		award = i+1;
 	};

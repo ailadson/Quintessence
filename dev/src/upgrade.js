@@ -1,17 +1,18 @@
 Ether.Upgrade = function(engine){
 	var self = this;
-
+	this.engine = engine;
+	this.player;
 	this.container = document.getElementById('upgrade');
 	this.tierCounter = {
-		movement : 0,
-		attraction : 0,
-		resistance : 0,
-		balance : 0
+		movement : [0],
+		attraction : [0],
+		resistance : [0],
+		balance : [0]
 	}
 
 	this.cy = cytoscape({
 		container : self.container,
-		elements : self.nodes.concat(self.edges),
+		elements : self.getNodes().concat(self.edges),
 		style : self.style,
 		layout : {
 			name : "breadthfirst",
@@ -21,28 +22,52 @@ Ether.Upgrade = function(engine){
 			
 			var cy = evt.cy
 
-			
+			cy.elements("node").data("activated",false);
+			cy.elements("node[id='nparent']").data("activated",true);
+			self.addData(cy);
 
-			//setTimeout(function(){
-				
-				cy.on('click','node',function(e){
-					self.handleClick(e.cyTarget.id());
-				});
+			cy.on('click','node',function(e){
+				if(self.hasEnoughEnergy(e.cyTarget)){
 
-				cy.on('mouseover','node',function(e){
-					var ele = e.cyTarget;
+					if(self.isUpgradable(e.cyTarget)){
+						e.cyTarget.data("activated",true);
+						e.cyTarget.addClass("permActivated")
+						self.handleClick(e.cyTarget);
+					}
 
-					//if(self.isUpgradable(ele)){
+				} else if(self.isUpgradable(e.cyTarget)){
+					e.cyTarget.flashClass("noEnergy",1000)
+				}
+			});
 
-						cy.elements('node[id = "'+ele.id()+'"]').flashClass("rollover",1000)
-					// } else {
 
-					// }
-				});
+			cy.on('mouseover','node',function(e){
+				var ele = e.cyTarget;
 
-				self.container.style.display = "none"
+				if(self.isUpgradable(ele)){
+					cy.elements('node[id = "'+ele.id()+'"]').addClass("rollover")
+					cy.elements('node[id = "'+ele.id()+'"]').addClass(ele.id().split(".")[0])
+					if(ele.data("activated")) cy.elements('node[id = "'+ele.id()+'"]').addClass("activated");
+				 } else {
+				 	cy.elements('node[id = "'+ele.id()+'"]').addClass("notActive")
+				 }
+			});
 
-			//},1000);
+			cy.on('mouseout','node',function(e){
+				var ele = e.cyTarget;
+
+				if(self.isUpgradable(ele)){
+					cy.elements('node[id = "'+ele.id()+'"]').removeClass("rollover")
+					cy.elements('node[id = "'+ele.id()+'"]').removeClass(ele.id().split(".")[0])
+					cy.elements('node[id = "'+ele.id()+'"]').removeClass("activated");
+				 } else {
+				 	cy.elements('node[id = "'+ele.id()+'"]').removeClass("notActive")
+				 }
+			});
+
+			self.container.style.display = "none"
+
+		
 		},
 		zoomingEnabled : false,
 		panningEnabled : false
@@ -51,16 +76,97 @@ Ether.Upgrade = function(engine){
 
 Ether.Upgrade.prototype.init = function(){
 	this.container.style.height = window.innerHeight;
+	this.player = this.engine.ethers[0];
 }
 
-Ether.Upgrade.prototype.handleClick = function(id){
-	var a = id.split(".");
-	var type = a[0];
-	var tier = a[1];
-
-	if(tier > this.tierCounter.type){
-		this.tierCounter.type += tier;
+Ether.Upgrade.prototype.hasEnoughEnergy = function(e){
+	var count = this.player.getElementCount();
+	var cost = e.data("cost")
+	var id = e.id().split(".")[0];
+	
+	if(id == "attraction" && count.f >= cost){
+		return true
 	}
+
+	if(id == "resistance" && count.e >= cost){
+		return true
+	}
+
+	if(id == "balance" && count.a >= cost){
+		return true
+	}
+
+	if(id == "water" && count.w >= cost){
+		return true
+	}
+}
+
+Ether.Upgrade.prototype.addData = function(cy){
+	for(var i in cy.elements("node")){
+		var node = cy.elements("node")[i]
+		if(node && node.data && !node.data("activated")){
+			var level = node.id().split(".")[1]
+			var type = node.id().split(".")[0].charAt(0).toUpperCase() + node.id().split(".")[0].slice(1)
+			node.data("cost",level*5)
+			node.data("info",type+" : "+level*5)
+		}
+		
+	}
+}
+
+Ether.Upgrade.prototype.isUpgradable = function(ele){
+	var id = ele.id();
+	var edges = [];
+	var rVal = false;
+
+	for(var i in ele.connectedEdges()){
+		var edge = ele.connectedEdges()[i];
+		
+		if(edge.data){
+			var data = edge.data();
+			
+			if(data.source != id)
+				edges.push(edge);
+		}
+		
+	}
+
+	if(edges.length == 0){
+		return true
+	}
+
+	for (var i = 0; i < edges.length; i++) {
+		var edge = edges[i];
+		var parentNode = edge.source();
+
+		if(parentNode.data().activated){
+			rVal = parentNode.data().activated
+		}
+	};
+
+	return rVal
+}
+
+Ether.Upgrade.prototype.handleClick = function(e){
+	var a = e.id().split(".");
+	var type = a[0];
+
+	 switch(type){
+	 	case "movement" :
+	 		this.player.control += 10;
+	 		this.player.speed += 1;
+	 		break
+	 	case "balance" :
+	 		this.player.balance += 0.15;
+	 		break;
+	 	case "attraction" :
+	 		this.player.attraction += 2
+	 		this.player.force -= 0.1
+	 		break
+	 	case "resistance" :
+	 		this.player.resistance += 1;
+	 		break;
+	 }
 }
 
 Ether.Upgrade.prototype.style = [
@@ -111,20 +217,92 @@ Ether.Upgrade.prototype.style = [
 		css : {
 			"text-outline-color" : "white",
 			"text-outline-width" : "2",
-			"color" : "black",
 			"font-size" : "50",
 			"font-family" : "Titillium Web",
 			"text-halign" : "center",
-			"content" : "hey yall"
+		}
+	},{
+		selector : ".movement",
+		css : {
+			"color" : '#243F63',
+			"content" : "data(info)"
+		}
+	},{
+		selector : ".attraction",
+		css : {
+			"color" : '#6B504A',
+			"content" : "data(info)"
+		}
+	},{
+		selector : ".resistance",
+		css : {
+			'color':'#858063',
+			"content" : "data(info)"
+		}
+	},{
+		selector : ".balance",
+		css : {
+			'color':'#9E9E99',
+			"content" : "data(info)"
+		}
+	},{
+		selector : '.notActive',
+		css : {
+			'background-color':'#090909',
+			'border-width' : '2',
+			'border-color' : '#000000',
+			"text-outline-color" : "black",
+			"text-outline-width" : "2",
+			"color" : "white",
+			"font-size" : "40",
+			"font-family" : "Titillium Web",
+			"text-halign" : "center",
+			"content" : "Cannot Activate"
+		}
+	},{
+		selector : '.permActivated',
+		css : {
+			'border-width' : '0',
+			'background-color' : "white"
+		}
+	},{
+		selector : ".activated",
+		css : {
+			"background-color" : "white",
+			"text-outline-color" : "black",
+			"text-outline-width" : "2",
+			"color" : "white",
+			"font-size" : "40",
+			"font-family" : "Titillium Web",
+			"text-halign" : "center",
+			"content" : "Activated"
+		}
+	},{
+		selector : ".noEnergy",
+		css : {
+			"content" : "Need more elements"
 		}
 	}
 ];
 
-Ether.Upgrade.prototype.nodes = [
+Ether.Upgrade.prototype.getNodes = function(){
+	return [
+		// {
+		// 	group : "nodes",
+		// 	data : {
+		// 		id : "zoom"
+		// 	}
+		// },{
+		// 	group : "nodes",
+		// 	data : { id: "nparent" },
+		// 	grabbable : false
+		// },{
+		// 	group : "nodes",
+		// 	data : {
+		// 		id : "transformation"
+		// 	}
+		// },{
 		{
-			group : "nodes",
-			data : { id: "nparent" }
-		},{
 			group : "nodes",
 			data : {
 				id : "balance.1",
@@ -293,7 +471,8 @@ Ether.Upgrade.prototype.nodes = [
 			},
 			grabbable : false
 		}
-];
+	];
+}
 
 Ether.Upgrade.prototype.edges = [
 		{

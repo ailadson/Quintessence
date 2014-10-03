@@ -97,7 +97,7 @@ body {
 .mainContent {
 	@include centered;
 	padding : 0;
-	height : 78%;
+	height : 100%;
 	background-color : #001224;
 
 	@media screen and (max-width : 575px){

@@ -36,6 +36,7 @@ Ether.Hub = function(engine) {
 	this.awardMssg = "";
 	this.lifeStageMssg = "";
 	this.lifeStageOpts = ["spread your wings","spread your trail"]
+	this.subMessage = "";
 
 	
 
@@ -242,8 +243,8 @@ Ether.Hub.prototype.draw = function(time){
 // 	}
 // }
 
-Ether.Hub.prototype.newAward = function(text){
-	this.awardMssg = text;
+Ether.Hub.prototype.newAward = function(text,amount){
+	this.awardMssg = [text,amount];
 	this.drawMessage(0,0,true);
 }
 
@@ -348,7 +349,8 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 		// } else 
 		if(this.awardMssg){
 			this.messageExist = true;
-			this.currentMessage = this.awardMssg;
+			this.currentMessage = this.awardMssg[0];
+			this.subMessage = "+"+this.awardMssg[1]+" Lifespan";
 
 		//leaving game border
 		} else if(this.hasLeftBorder() && this.currentMessage != borderMssg){
@@ -375,7 +377,7 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 Ether.Hub.prototype.renderMessage = function(ctx,time){
 	var ether = this.engine.ethers[0];
 
-	ctx.font = (this.currentMessage == this.awardMssg) ? "90px Titillium Web" : "30px Titillium Web";
+	ctx.font = (this.currentMessage == this.awardMssg[0]) ? "90px Titillium Web" : "30px Titillium Web";
 	var textWidth = ctx.measureText(this.currentMessage).width;
 
 	if(textWidth > this.engine.width - 10){ 
@@ -392,6 +394,16 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	ctx.fillStyle = "rgba(164,161,151,"+this.messageAlpha+")";
 	ctx.fillText(this.currentMessage,x,y);
 
+	if(this.subMessage != ""){
+		ctx.font = "25px Titillium Web";
+		textWidth = ctx.measureText(this.subMessage).width;
+		x = (this.engine.width/2) - (textWidth / 2);
+		ctx.fillStyle = "rgba(0,0,0,"+this.messageAlpha+")";
+		ctx.fillText(this.subMessage,x+2,y-this.unit*3+2);
+		ctx.fillStyle = "rgba(164,161,151,"+this.messageAlpha+")";
+		ctx.fillText(this.subMessage,x,y-this.unit*3);
+	}
+
 	if(time > this.lastMessageTime + 100){
 		this.messageAlpha-=0.01;
 
@@ -400,19 +412,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 			this.messageAlpha = 1;
 			this.awardMssg = "";
 			this.killerElement = false;
-			
-			//in between message?
-			// if(this.engine.betweenAges && !ether.dead){
-			// 	this.currentMessage = "";
-			// 	this.engine.betweenAges = false;
-			// 	ether.age++;
-			// 	ether.save();
-			// 	ether.currentSpan = ether.lifeSpan[ether.age];
-
-			// 	if(ether.age < 4){
-			// 		this.engine.init();
-			// 	}
-			// }
+			this.subMessage = "";
 		}
 		this.lastMessageTime = time;
 	}

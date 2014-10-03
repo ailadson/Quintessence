@@ -19,13 +19,13 @@
 	//stats
 	this.range = 15;
 	this.mass = 1;
-	this.speed = 10;
+	this.speed = 18;
 	this.control = 10;
 	this.getControl = function(){ return this.speed*(this.control * 0.01) };
-	this.resistance = 1;
-	this.attraction = 10;
-	this.balance = 0;
-	this.force = 5;
+	this.resistance = 4;
+	this.attraction = 0;
+	this.balance = 1;
+	this.force = 1.5;
 	this.zoom = 1;
 	this.elementCount = {f:0,w:0,a:0,e:0}
 
@@ -229,7 +229,7 @@ Ether.Ether.prototype.getStability = function(){
 	var dif2 = o["a"] - o["e"];
 
 	var val = Math.floor(Math.sqrt((dif1 * dif1)+(dif2 * dif2)));
-	var rVal = val-this.balance < 0 ? 0 : val-this.balance
+	var rVal = Math.round(val/this.balance);
 	return rVal;
 }
 
@@ -239,29 +239,29 @@ Ether.Ether.prototype.getElementCount = function(){
 
 Ether.Ether.prototype.addToElementCount = function(ele){
 	switch(ele.type){
-		case 'fire': this.elementCount.f += (Math.round((ele.radius/5)) * this.zoom);
+		case 'fire': this.elementCount.f += (Math.round((ele.radius/2)) * this.zoom);
 			break;
-		case 'water': this.elementCount.w += (Math.round((ele.radius/5)) * this.zoom);
+		case 'water': this.elementCount.w += (Math.round((ele.radius/2)) * this.zoom);
 			break;
-		case 'air': this.elementCount.a += (Math.round((ele.radius/5)) * this.zoom);
+		case 'air': this.elementCount.a += (Math.round((ele.radius/2)) * this.zoom);
 			break;
-		case 'earth': this.elementCount.e += (Math.round((ele.radius/5)) * this.zoom);
+		case 'earth': this.elementCount.e += (Math.round((ele.radius/2)) * this.zoom);
 			break;
 	}
 }
 
 Ether.Ether.prototype.removeFromElementCount = function(ele){
 	switch(ele.type){
-		case 'fire': this.elementCount.f -= Math.round((ele.radius/5));
+		case 'fire': this.elementCount.f -= Math.round((ele.radius/2));
 			if(this.elementCount.f < 0){ this.elementCount.f = 0}
 			break;
-		case 'water': this.elementCount.w -= Math.round((ele.radius/5));
+		case 'water': this.elementCount.w -= Math.round((ele.radius/2));
 			if(this.elementCount.w < 0){ this.elementCount.w = 0}
 			break;
-		case 'air': this.elementCount.a -= Math.round((ele.radius/5));
+		case 'air': this.elementCount.a -= Math.round((ele.radius/2));
 			if(this.elementCount.a < 0){ this.elementCount.a = 0}
 			break;
-		case 'earth': this.elementCount.e -= Math.round((ele.radius/5));
+		case 'earth': this.elementCount.e -= Math.round((ele.radius/2));
 			if(this.elementCount.e < 0){ this.elementCount.e = 0}
 			break;
 	}

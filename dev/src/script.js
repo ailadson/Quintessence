@@ -1,4 +1,4 @@
-/*! Quintessence - v0.0.1 - 2014-10-01 */window.mobilecheck = function() {
+/*! Quintessence - v0.0.1 - 2014-10-02 */window.mobilecheck = function() {
 var check = false;
 (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true})(navigator.userAgent||navigator.vendor||window.opera);
 return check; };var Ether = Ether || {};
@@ -347,15 +347,20 @@ Ether.Util.prototype.getLocalStorage = function(){
 	//stats
 	this.range = 15;
 	this.mass = 1;
-	this.age = 0;
-	this.speed = 8;
+	this.speed = 18;
+	this.control = 10;
+	this.getControl = function(){ return this.speed*(this.control * 0.01) };
+	this.resistance = 4;
+	this.attraction = 0;
+	this.balance = 1;
+	this.force = 1.5;
 	this.zoom = 1;
 	this.elementCount = {f:0,w:0,a:0,e:0}
 
 	//life and death
 	this.health = 5000;
 	this.lifeSpan = [365]; //in seconds
-	this.currentSpan = this.lifeSpan[this.age];
+	this.currentSpan = this.lifeSpan[0];
 	this.totalLifeSpan;
 	this.dead = false;
 	this.ageLastTime = 0;
@@ -377,23 +382,23 @@ Ether.Util.prototype.getLocalStorage = function(){
 }
 
 Ether.Ether.prototype.init = function(){
-	switch(this.age){
-		case 0 :
+	// switch(this.age){
+	// 	case 0 :
 			this.createCoreElement();
-			break;
+	// 		break;
 
-		case 1 : 
-		case 2 : 
-			this.zoomOut(2)
-			break;
+	// 	case 1 : 
+	// 	case 2 : 
+	// 		this.zoomOut(2)
+	// 		break;
 
-		case 3 :
-			this.zoomOut(2);
-			this.sludgeAlphaStep *= 2;
-			this.sludgeTimeOffset *= 4;
-			this.finalElementLength = this.elements.length;
-			break;
-	}
+	// 	case 3 :
+	// 		this.zoomOut(2);
+	// 		this.sludgeAlphaStep *= 2;
+	// 		this.sludgeTimeOffset *= 4;
+	// 		this.finalElementLength = this.elements.length;
+	// 		break;
+	// }
 }
 
 Ether.Ether.prototype.draw = function(engine,time){
@@ -406,7 +411,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 	var self = this;
 
 	//age ether during the thried life stage
-	if(this.age == 3)this.ageEther(time)
+	//if(this.age == 3)this.ageEther(time)
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i];
@@ -417,7 +422,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 		e.jitter *= -1;
 
 		//Butterfly//Snail Transformation
-		if(this.age>=2)this.transformation(e,time)
+		//if(this.age>=2)this.transformation(e,time)
 
 		//Draw Ether Elements
 		engine.ctx.beginPath();
@@ -430,7 +435,7 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 	};
 
 	//time has to be updated outside of the loop
-	if(this.age == 2 && time > this.rotateLastTime + 500) this.rotateLastTime = time;
+	//if(this.age == 2 && time > this.rotateLastTime + 500) this.rotateLastTime = time;
 }
 
 Ether.Ether.prototype.drawCoreElements = function(engine){
@@ -442,17 +447,17 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 
 		engine.ctx.beginPath();
 		
-		if(this.age == 0){
-			self.util.drawElement(e, engine.ctx, function(ctx,element){
-				var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-				return self.util.createGradient(gradient,[[0.5,"white"],[1,"black"]])
-			});	
-		} else {
+		// if(this.age == 0){
 			self.util.drawElement(e, engine.ctx, function(ctx,element){
 				var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
 				return self.util.createGradient(gradient,[[0.5,"white"],[0.4,element.color],[1,"black"]])
 			});	
-		}	
+		// } else {
+		// 	self.util.drawElement(e, engine.ctx, function(ctx,element){
+		// 		var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
+		// 		return self.util.createGradient(gradient,[[0.5,"white"],,[1,"black"]])
+		// 	});	
+		// }	
 
 		//velocity
 		e.x += e.vx;
@@ -472,7 +477,7 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	var stability = this.getStability();
 
-	if(stability > 40 && this.age < 3){
+	if(stability > 40){
 		engine.hub.unstable = true 
 
 		if(stability >= 50){
@@ -551,7 +556,9 @@ Ether.Ether.prototype.getStability = function(){
 	var dif1 = o["f"] - o["w"];
 	var dif2 = o["a"] - o["e"];
 
-	return Math.floor(Math.sqrt((dif1 * dif1)+(dif2 * dif2)));
+	var val = Math.floor(Math.sqrt((dif1 * dif1)+(dif2 * dif2)));
+	var rVal = Math.round(val/this.balance);
+	return rVal;
 }
 
 Ether.Ether.prototype.getElementCount = function(){
@@ -560,26 +567,30 @@ Ether.Ether.prototype.getElementCount = function(){
 
 Ether.Ether.prototype.addToElementCount = function(ele){
 	switch(ele.type){
-		case 'fire': this.elementCount.f += (Math.round((ele.radius/5)) * this.zoom);
+		case 'fire': this.elementCount.f += (Math.round((ele.radius/2)) * this.zoom);
 			break;
-		case 'water': this.elementCount.w += (Math.round((ele.radius/5)) * this.zoom);
+		case 'water': this.elementCount.w += (Math.round((ele.radius/2)) * this.zoom);
 			break;
-		case 'air': this.elementCount.a += (Math.round((ele.radius/5)) * this.zoom);
+		case 'air': this.elementCount.a += (Math.round((ele.radius/2)) * this.zoom);
 			break;
-		case 'earth': this.elementCount.e += (Math.round((ele.radius/5)) * this.zoom);
+		case 'earth': this.elementCount.e += (Math.round((ele.radius/2)) * this.zoom);
 			break;
 	}
 }
 
 Ether.Ether.prototype.removeFromElementCount = function(ele){
 	switch(ele.type){
-		case 'fire': this.elementCount.f -= (Math.round((ele.radius/5)) * this.zoom);
+		case 'fire': this.elementCount.f -= Math.round((ele.radius/2));
+			if(this.elementCount.f < 0){ this.elementCount.f = 0}
 			break;
-		case 'water': this.elementCount.w -= (Math.round((ele.radius/5)) * this.zoom);
+		case 'water': this.elementCount.w -= Math.round((ele.radius/2));
+			if(this.elementCount.w < 0){ this.elementCount.w = 0}
 			break;
-		case 'air': this.elementCount.a -= (Math.round((ele.radius/5)) * this.zoom);
+		case 'air': this.elementCount.a -= Math.round((ele.radius/2));
+			if(this.elementCount.a < 0){ this.elementCount.a = 0}
 			break;
-		case 'earth': this.elementCount.e -= (Math.round((ele.radius/5)) * this.zoom);
+		case 'earth': this.elementCount.e -= Math.round((ele.radius/2));
+			if(this.elementCount.e < 0){ this.elementCount.e = 0}
 			break;
 	}
 }
@@ -647,8 +658,8 @@ Ether.Ether.prototype.decreaseMass = function(e){
 Ether.Ether.prototype.receiveAward = function(a){
 	//make sure the award wont put the player past the cap
 	//givien by the engine
-	if(this.currentSpan + a > this.lifeSpan[this.age]){
-		this.currentSpan = this.lifeSpan[this.age];
+	if(this.currentSpan + a > this.lifeSpan[0]){
+		this.currentSpan = this.lifeSpan[0];
 	} else {
 		this.currentSpan += a;
 	}
@@ -662,14 +673,14 @@ Ether.Ether.prototype.rotateElement = function(e,time){
 		if(this.rotateDirection < 0){ //rDir starts at -1
 			this.degreeChange += 0.001;
 			if(this.degreeChange > 1) {this.degreeChange = 1 }
-			if(this.currentSpan < (this.lifeSpan[this.age]/3) * 2){ this.rotateDirection++; }
+			if(this.currentSpan < (this.lifeSpan[0]/3) * 2){ this.rotateDirection++; }
 
 		} else if(this.rotateDirection > 0){
 			this.degreeChange -= 0.001;
 			if(this.degreeChange < 0.001) {this.degreeChange = 0.001 }
 
 		} else {
-			if(this.currentSpan < this.lifeSpan[this.age]/3){ this.rotateDirection++; }
+			if(this.currentSpan < this.lifeSpan[0]/3){ this.rotateDirection++; }
 
 		}
 	}
@@ -873,6 +884,8 @@ Ether.Trophy.prototype.save = function(ether){
 	this.hillWidth = engine.width/this.hillWidthAmount;
 	this.hillHeight = engine.height/this.hillHeightAmount;
 
+	this.badToggle = 0
+
 }
 
 //WORLD INIT
@@ -893,11 +906,11 @@ Ether.World.prototype.init = function(engine){
 		//collection.length = 0; //clear out array
 		var type = eleStrings[i];
 
-		switch(engine.ethers[0].age){
-			case 0 :
-				this.initElements(type,collection,[20,300,500],[3,150,350],[2500,300,100],[50000,700,300])
-				this.initBadGuys(type,collection,120,true);
-				break;
+		// switch(engine.ethers[0].age){
+		// 	case 0 :
+			this.initElements(type,collection,[20,300,500],[3,150,350],[3000,300,100],[50000,700,300])
+			this.initBadGuys(type,collection,120,true);
+				//break;
 
 			/*case 1 :
 				this.initElements(type,collection,[2,100,300],[0,50,250],[325,250,10],[1,200,70])
@@ -911,7 +924,7 @@ Ether.World.prototype.init = function(engine){
 				this.initElements(type,collection,[20,90],[5,50],[200,200],[1000,220])
 				this.initBadGuys(type,collection,30);
 				break;*/
-		}		
+		//}		
 	};
 }
 
@@ -1078,15 +1091,15 @@ Ether.World.prototype.drawBackground = function(xv,yv){
 
 Ether.World.prototype.driftTowardsEther = function(element){
 	var ether = this.player;
-	var radius = element.radius < 40 ? element.radius * 20 : element.radius * 2
+	var radius = element.radius < 40 ? element.radius * (ether.attraction*5) : element.radius * ether.attraction
 	var speed;
 
 	 if(element.bad){
-	 	speed = ether.speed-2
+	 	speed = ether.speed-ether.resistance
 	 }else if(element.radius > 50){ 
-	 	speed = element.radius/50 
+	 	speed = element.radius/(ether.force*60) 
 	 }else{ 
-	 	speed = element.radius/5
+	 	speed = element.radius/ether.force
 	 }
 
 	if(element.bad || this.util.getDistanceFromCenter(element,ether) <= radius){
@@ -1205,9 +1218,13 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 			ether.newElement(e);
 			this.elements[collection].splice(index,1);
 		} else {
-			this.engine.audio.playSound(e)
-			ether.loseElements(1);
-			if(ether.elements.length > 6) ether.tripleLoss();
+			if(this.badToggle > this.player.resistance*2){
+				this.badToggle = 0;
+				this.engine.audio.playSound(e)
+				ether.loseElements(1);
+			} else {
+				this.badToggle += 1;
+			}
 		}
 	}
 }
@@ -1253,48 +1270,49 @@ Ether.World.prototype.adjustVelocity = function(axis,val,time){
 
 //interaction
 Ether.World.prototype.handleKeyDown = function(e){
+	var ctrl = this.player.getControl();
 	//if(!this.draggingX || !this.draggingY){
 		switch(e){
 			case 87:
 			case 38 :
-				if(!this.speedUp.y && this.yv >= -5){ 
+				if(!this.speedUp.y && this.yv >= -ctrl){ 
 					this.speedUp.y = true;
 					this.yv = 1;
 
-				} else if(this.yv < -5){
+				} else if(this.yv < -ctrl){
 					this.speedUp.y = false
 				}
 				this.player.moved = true
 				break;
 			case 68 :
 			case 39 :
-				if(!this.speedUp.x && this.xv <= 5){ 
+				if(!this.speedUp.x && this.xv <= ctrl){ 
 					this.speedUp.x = true;
 					this.xv = -1;
 
-				} else if(this.xv > 5){
+				} else if(this.xv > ctrl){
 					this.speedUp.x = false
 				}
 				this.player.moved = true
 				break;
 			case 83 : 
 			case 40 :
-				if(!this.speedUp.y && this.yv <= 5){ 
+				if(!this.speedUp.y && this.yv <= ctrl){ 
 					this.speedUp.y = true;
 					this.yv = -1;
 
-				} else if(this.yv > 5){
+				} else if(this.yv > ctrl){
 					this.speedUp.y = false
 				}
 				this.player.moved = true
 				break;
 			case 65 :
 			case 37 :
-				if(!this.speedUp.x && this.xv >= -5){ 
+				if(!this.speedUp.x && this.xv >= -ctrl){ 
 					this.speedUp.x = true;
 					this.xv = 1;
 
-				} else if(this.xv < -5){
+				} else if(this.xv < -ctrl){
 					this.speedUp.x = false
 				}
 				this.player.moved = true
@@ -1385,6 +1403,7 @@ Ether.World.prototype.newElement = function(e){
 	this.awardMssg = "";
 	this.lifeStageMssg = "";
 	this.lifeStageOpts = ["spread your wings","spread your trail"]
+	this.subMessage = "";
 
 	
 
@@ -1566,33 +1585,33 @@ Ether.Hub.prototype.draw = function(time){
 	}
 
 	//in between ages?
-	this.drawInbetween(ctx,time);
+	//this.drawInbetween(ctx,time);
 
 	if(this.showInfo) this.drawElementStats(stats.elementCount,ctx);
 	this.drawLifeBar(ctx, time);
 	this.drawMessage(ctx,time);
 }
 
-Ether.Hub.prototype.drawInbetween = function(ctx,time){
-	var age = this.engine.ethers[0].age;
+// Ether.Hub.prototype.drawInbetween = function(ctx,time){
+// 	var age = this.engine.ethers[0].age;
 
-	if(this.engine.betweenAges){
-		if(age < 3){
-			//alpha
-			if(time > this.betweenLastTime + 100){
-				this.betweenLastTime = time;
-				ctx.fillStyle = "rgba(164,161,151,"+this.betweenAlpha+")";
-			    //ctx.fillRect(0,0,this.engine.width,this.engine.height);
-			}
-		} else{
-			this.gameOver(ctx,time)
-		}
+// 	if(this.engine.betweenAges){
+// 		if(age < 3){
+// 			//alpha
+// 			if(time > this.betweenLastTime + 100){
+// 				this.betweenLastTime = time;
+// 				ctx.fillStyle = "rgba(164,161,151,"+this.betweenAlpha+")";
+// 			    //ctx.fillRect(0,0,this.engine.width,this.engine.height);
+// 			}
+// 		} else{
+// 			this.gameOver(ctx,time)
+// 		}
 		
-	}
-}
+// 	}
+// }
 
-Ether.Hub.prototype.newAward = function(text){
-	this.awardMssg = text;
+Ether.Hub.prototype.newAward = function(text,amount){
+	this.awardMssg = [text,amount];
 	this.drawMessage(0,0,true);
 }
 
@@ -1629,13 +1648,13 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 
 	var colors = ["green","yellow","orange","red"];
 	var ether = this.engine.ethers[0];
-	var ratio = (ether.age != 3) ? (ether.currentSpan/ether.lifeSpan[ether.age]) : (ether.elements.length/ether.finalElementLength)
+	var ratio = ether.currentSpan/ether.lifeSpan[0]
 
 	ctx.fillStyle = "#FFF4E9";
 	ctx.font = this.unit + "px Titillium Web"
 	ctx.fillText("Lifespan",(this.unit * (9+ 35/2)), this.unit);
 
-	ctx.fillStyle = colors[ether.age];
+	ctx.fillStyle = "green";
 	ctx.fillRect((this.unit * 45), this.unit * 1.5, -(this.unit * 35) * ratio, this.unit * 0.5)
 
 	ctx.strokeStyle = "red";
@@ -1661,42 +1680,44 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 	var ether = this.engine.ethers[0];
 
 	var borderMssg = "there is no time in the boundless void";
-	var age0Mssg = "you are no longer an infant";
-	var age2Mssg = "give back you borrowed";
-	var age3Mssg = "so it goes";
+	// var age0Mssg = "you are no longer an infant";
+	// var age2Mssg = "give back you borrowed";
+	// var age3Mssg = "so it goes";
 	var killerMssg = "Save The Big Ones For Post-Infancy"
 	var stableMssg = "You Are Becoming Too Unstable"
 
 	if(award && !this.engine.betweenAges){ this.messageExist = false; this.messageAlpha = 1 }
 
 	if(!this.messageExist){
-		//new age
-		if(this.engine.betweenAges){
+		// //new age
+		// if(this.engine.betweenAges){
+		// 	this.messageExist = true;
+
+		// 	switch(ether.age){
+		// 		case 0 :
+		// 				this.currentMessage = age0Mssg;
+		// 			break;
+
+		// 		case 1 :
+		// 			this.currentMessage = this.lifeStageMssg;
+		// 			break;
+
+		// 		case 2 :
+		// 			this.currentMessage = age2Mssg;
+		// 			break;
+
+		// 		case 3 :
+		// 			this.currentMessage = age3Mssg;
+		// 			break;
+
+		// 	}
+
+		// //award
+		// } else 
+		if(this.awardMssg){
 			this.messageExist = true;
-
-			switch(ether.age){
-				case 0 :
-						this.currentMessage = age0Mssg;
-					break;
-
-				case 1 :
-					this.currentMessage = this.lifeStageMssg;
-					break;
-
-				case 2 :
-					this.currentMessage = age2Mssg;
-					break;
-
-				case 3 :
-					this.currentMessage = age3Mssg;
-					break;
-
-			}
-
-		//award
-		} else if(this.awardMssg){
-			this.messageExist = true;
-			this.currentMessage = this.awardMssg;
+			this.currentMessage = this.awardMssg[0];
+			this.subMessage = "+"+this.awardMssg[1]+" Lifespan";
 
 		//leaving game border
 		} else if(this.hasLeftBorder() && this.currentMessage != borderMssg){
@@ -1723,7 +1744,7 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 Ether.Hub.prototype.renderMessage = function(ctx,time){
 	var ether = this.engine.ethers[0];
 
-	ctx.font = (this.currentMessage == this.awardMssg) ? "90px Titillium Web" : "30px Titillium Web";
+	ctx.font = (this.currentMessage == this.awardMssg[0]) ? "90px Titillium Web" : "30px Titillium Web";
 	var textWidth = ctx.measureText(this.currentMessage).width;
 
 	if(textWidth > this.engine.width - 10){ 
@@ -1740,6 +1761,16 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	ctx.fillStyle = "rgba(164,161,151,"+this.messageAlpha+")";
 	ctx.fillText(this.currentMessage,x,y);
 
+	if(this.subMessage != ""){
+		ctx.font = "25px Titillium Web";
+		textWidth = ctx.measureText(this.subMessage).width;
+		x = (this.engine.width/2) - (textWidth / 2);
+		ctx.fillStyle = "rgba(0,0,0,"+this.messageAlpha+")";
+		ctx.fillText(this.subMessage,x+2,y-this.unit*3+2);
+		ctx.fillStyle = "rgba(164,161,151,"+this.messageAlpha+")";
+		ctx.fillText(this.subMessage,x,y-this.unit*3);
+	}
+
 	if(time > this.lastMessageTime + 100){
 		this.messageAlpha-=0.01;
 
@@ -1748,19 +1779,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 			this.messageAlpha = 1;
 			this.awardMssg = "";
 			this.killerElement = false;
-			
-			//in between message?
-			if(this.engine.betweenAges && !ether.dead){
-				this.currentMessage = "";
-				this.engine.betweenAges = false;
-				ether.age++;
-				ether.save();
-				ether.currentSpan = ether.lifeSpan[ether.age];
-
-				if(ether.age < 4){
-					this.engine.init();
-				}
-			}
+			this.subMessage = "";
 		}
 		this.lastMessageTime = time;
 	}
@@ -1826,8 +1845,903 @@ Ether.Audio.prototype.playSound = function(element){
 	if(volume > 1) volume = 1
 	this.audio[element.type].volume = volume;
 	this.audio[element.type].play();
-};Ether.Engine = function() {	
+};Ether.Upgrade = function(engine){
 	var self = this;
+	this.engine = engine;
+	this.player;
+	this.container = document.getElementById('upgrade');
+	this.tierCounter = {
+		movement : [0],
+		attraction : [0],
+		resistance : [0],
+		balance : [0]
+	}
+
+	this.cy = cytoscape({
+		container : self.container,
+		elements : self.getNodes().concat(self.edges),
+		style : self.style,
+		layout : {
+			name : "breadthfirst",
+			roots : '#nparent'
+		},
+		ready : function(evt){
+			
+			var cy = evt.cy
+
+			cy.elements("node").data("activated",false);
+			cy.elements("node[id='nparent']").data("activated",true);
+			self.addData(cy);
+
+			cy.on('click','node',function(e){
+				if(self.hasEnoughEnergy(e.cyTarget)){
+
+					if(self.isUpgradable(e.cyTarget)){
+						e.cyTarget.data("activated",true);
+						e.cyTarget.addClass("permActivated")
+						self.handleClick(e.cyTarget);
+					}
+
+				} else if(self.isUpgradable(e.cyTarget)){
+					e.cyTarget.flashClass("noEnergy",1000)
+				}
+			});
+
+
+			cy.on('mouseover','node',function(e){
+				var ele = e.cyTarget;
+
+				if(self.isUpgradable(ele)){
+					cy.elements('node[id = "'+ele.id()+'"]').addClass("rollover")
+					cy.elements('node[id = "'+ele.id()+'"]').addClass(ele.id().split(".")[0])
+					if(ele.data("activated")) cy.elements('node[id = "'+ele.id()+'"]').addClass("activated");
+				 } else {
+				 	cy.elements('node[id = "'+ele.id()+'"]').addClass("notActive")
+				 }
+			});
+
+			cy.on('mouseout','node',function(e){
+				var ele = e.cyTarget;
+
+				if(self.isUpgradable(ele)){
+					cy.elements('node[id = "'+ele.id()+'"]').removeClass("rollover")
+					cy.elements('node[id = "'+ele.id()+'"]').removeClass(ele.id().split(".")[0])
+					cy.elements('node[id = "'+ele.id()+'"]').removeClass("activated");
+				 } else {
+				 	cy.elements('node[id = "'+ele.id()+'"]').removeClass("notActive")
+				 }
+			});
+
+			self.container.style.display = "none"
+
+		
+		},
+		zoomingEnabled : false,
+		panningEnabled : false
+	})
+}
+
+Ether.Upgrade.prototype.init = function(){
+	this.container.style.height = window.innerHeight;
+	this.player = this.engine.ethers[0];
+}
+
+Ether.Upgrade.prototype.hasEnoughEnergy = function(e){
+	var count = this.player.getElementCount();
+	var cost = e.data("cost")
+	var id = e.id().split(".")[0];
+	
+	if(id == "attraction" && count.f >= cost){
+		return true
+	}
+
+	if(id == "resistance" && count.e >= cost){
+		return true
+	}
+
+	if(id == "balance" && count.a >= cost){
+		return true
+	}
+
+	if(id == "water" && count.w >= cost){
+		return true
+	}
+}
+
+Ether.Upgrade.prototype.addData = function(cy){
+	for(var i in cy.elements("node")){
+		var node = cy.elements("node")[i]
+		if(node && node.data && !node.data("activated")){
+			var level = node.id().split(".")[1]
+			var type = node.id().split(".")[0].charAt(0).toUpperCase() + node.id().split(".")[0].slice(1)
+			node.data("cost",level*5)
+			node.data("info",type+" : "+level*5)
+		}
+		
+	}
+}
+
+Ether.Upgrade.prototype.isUpgradable = function(ele){
+	var id = ele.id();
+	var edges = [];
+	var rVal = false;
+
+	for(var i in ele.connectedEdges()){
+		var edge = ele.connectedEdges()[i];
+		
+		if(edge.data){
+			var data = edge.data();
+			
+			if(data.source != id)
+				edges.push(edge);
+		}
+		
+	}
+
+	if(edges.length == 0){
+		return true
+	}
+
+	for (var i = 0; i < edges.length; i++) {
+		var edge = edges[i];
+		var parentNode = edge.source();
+
+		if(parentNode.data().activated){
+			rVal = parentNode.data().activated
+		}
+	};
+
+	return rVal
+}
+
+Ether.Upgrade.prototype.handleClick = function(e){
+	var a = e.id().split(".");
+	var type = a[0];
+
+	 switch(type){
+	 	case "movement" :
+	 		this.player.control += 10;
+	 		this.player.speed += 1;
+	 		break
+	 	case "balance" :
+	 		this.player.balance += 0.15;
+	 		break;
+	 	case "attraction" :
+	 		this.player.attraction += 2
+	 		this.player.force -= 0.1
+	 		break
+	 	case "resistance" :
+	 		this.player.resistance += 1;
+	 		break;
+	 }
+}
+
+Ether.Upgrade.prototype.style = [
+	{
+		selector : 'node[id ^= "movement"]',
+		css : {
+			'background-color':'#47BDDE',
+			'border-width' : '2',
+			'border-color' : '#243F63',
+			'shape' : "pentagon"
+		}
+	},{
+		selector : 'node[id ^= "attraction"]',
+		css : {
+			'background-color':'#E0664A',
+			'border-width' : '2',
+			'border-color' : '#6B504A',
+			'shape' : "heptagon"
+		}
+	},{
+		selector : 'node[id ^= "resistance"]',
+		css : {
+			'background-color':'#CCD9B4',
+			'border-width' : '2',
+			'border-color' : '#858063',
+			'shape' : 'rectangle'
+		}
+	},{
+		selector : 'node[id ^= "balance"]',
+		css : {
+			'background-color':'#EDEDEB',
+			'border-width' : '2',
+			'border-color' : '#9E9E99',
+			'shape' : 'triangle'
+		}
+	},{
+		selector : 'edge',
+		css : {
+			"line-color" : "#D1E6E6",
+			"width" : "3",
+			//"curve-style" : "haystack",
+			"haystack-radius" : "1",
+			"target-arrow-color" : "#D1E6E6",
+			"target-arrow-shape" : "triangle",
+		}
+	},{
+		selector : '.rollover',
+		css : {
+			"text-outline-color" : "white",
+			"text-outline-width" : "2",
+			"font-size" : "50",
+			"font-family" : "Titillium Web",
+			"text-halign" : "center",
+		}
+	},{
+		selector : ".movement",
+		css : {
+			"color" : '#243F63',
+			"content" : "data(info)"
+		}
+	},{
+		selector : ".attraction",
+		css : {
+			"color" : '#6B504A',
+			"content" : "data(info)"
+		}
+	},{
+		selector : ".resistance",
+		css : {
+			'color':'#858063',
+			"content" : "data(info)"
+		}
+	},{
+		selector : ".balance",
+		css : {
+			'color':'#9E9E99',
+			"content" : "data(info)"
+		}
+	},{
+		selector : '.notActive',
+		css : {
+			'background-color':'#090909',
+			'border-width' : '2',
+			'border-color' : '#000000',
+			"text-outline-color" : "black",
+			"text-outline-width" : "2",
+			"color" : "white",
+			"font-size" : "40",
+			"font-family" : "Titillium Web",
+			"text-halign" : "center",
+			"content" : "Cannot Activate"
+		}
+	},{
+		selector : '.permActivated',
+		css : {
+			'border-width' : '0',
+			'background-color' : "white"
+		}
+	},{
+		selector : ".activated",
+		css : {
+			"background-color" : "white",
+			"text-outline-color" : "black",
+			"text-outline-width" : "2",
+			"color" : "white",
+			"font-size" : "40",
+			"font-family" : "Titillium Web",
+			"text-halign" : "center",
+			"content" : "Activated"
+		}
+	},{
+		selector : ".noEnergy",
+		css : {
+			"content" : "Need more elements"
+		}
+	}
+];
+
+Ether.Upgrade.prototype.getNodes = function(){
+	return [
+		// {
+		// 	group : "nodes",
+		// 	data : {
+		// 		id : "zoom"
+		// 	}
+		// },{
+		// 	group : "nodes",
+		// 	data : { id: "nparent" },
+		// 	grabbable : false
+		// },{
+		// 	group : "nodes",
+		// 	data : {
+		// 		id : "transformation"
+		// 	}
+		// },{
+		{
+			group : "nodes",
+			data : {
+				id : "balance.1",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "movement.1",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "attraction.1",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "movement.2",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "attraction.2",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "resistance.2",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "balance.2",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "movement.3",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "attraction.3",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "resistance.3",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "balance.4",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "resistance.4",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "movement.4",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "attraction.4",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "balance.5",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "resistance.5",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "movement.5",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "attraction.6",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "movement.6",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "balance.6",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "resistance.6",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "resistance.7",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "attraction.7",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "balance.7",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "resistance.8",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "balance.8",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "attraction.8",
+			},
+			grabbable : false
+		},{
+			group : "nodes",
+			data : {
+				id : "movement.8",
+			},
+			grabbable : false
+		}
+	];
+}
+
+Ether.Upgrade.prototype.edges = [
+		{
+			group : "edges",
+			data : {
+				id : "parent.1.balance",
+				source : "nparent",
+				target : "balance.1"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "parent.1.movement",
+				source : "nparent",
+				target : "movement.1"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "parent.1.attraction",
+				source : "nparent",
+				target : "attraction.1"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "balance.2.movement",
+				source : "balance.1",
+				target : "movement.2"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "balance.2.attraction",
+				source : "balance.1",
+				target : "attraction.2"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "movement.2.attraction",
+				source : "movement.1",
+				target : "attraction.2"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "movement.2.resistance",
+				source : "movement.1",
+				target : "resistance.2"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "attraction.2.resistance",
+				source : "attraction.1",
+				target : "resistance.2"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "attraction.balance",
+				source : "attraction.1",
+				target : "balance.2"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "movement.3.movement",
+				source : "movement.2",
+				target : "movement.3"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "attraction.3.movement",
+				source : "attraction.2",
+				target : "movement.3"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "attraction.3.attraction",
+				source : "attraction.2",
+				target : "attraction.3"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "resistance.3.attraction",
+				source : "resistance.2",
+				target : "attraction.3"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "resistance.3.resistance",
+				source : "resistance.2",
+				target : "resistance.3"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "balance.3.resistance",
+				source : "balance.2",
+				target : "resistance.3"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "movement.4.balance",
+				source : "movement.3",
+				target : "balance.4"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "movement.4.resistance",
+				source : "movement.3",
+				target : "resistance.4"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "attraction.4.resistance",
+				source : "attraction.3",
+				target : "resistance.4"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "attraction.4.movement",
+				source : "attraction.3",
+				target : "movement.4"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "resistance.4.movement",
+				source : "resistance.3",
+				target : "movement.4"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "resistance.4.attraction",
+				source : "resistance.3",
+				target : "attraction.4"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "balance.5.balance",
+				source : "balance.4",
+				target : "balance.5"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "resistance.5.balance",
+				source : "resistance.4",
+				target : "balance.5"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "resistance.5.resistance",
+				source : "resistance.4",
+				target : "resistance.5"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "movement.5.resistance",
+				source : "movement.4",
+				target : "resistance.5"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "movement.5.movement",
+				source : "movement.4",
+				target : "movement.5"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "attraction.5.movement",
+				source : "attraction.4",
+				target : "movement.5"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "balance.6.attraction",
+				source : "balance.5",
+				target : "attraction.6"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "balance.6.movement",
+				source : "balance.5",
+				target : "movement.6"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "resistance.6.movement",
+				source : "resistance.5",
+				target : "movement.6"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "resistance.6.balance",
+				source : "resistance.5",
+				target : "balance.6"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "movement.6.balance",
+				source : "movement.5",
+				target : "balance.6"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "movement.6.resistance",
+				source : "movement.5",
+				target : "resistance.6"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "attraction.7.resistance",
+				source : "attraction.6",
+				target : "resistance.7"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "movement.7.resistance",
+				source : "movement.6",
+				target : "resistance.7"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "movement.7.attraction",
+				source : "movement.6",
+				target : "attraction.7"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "balance.7.attraction",
+				source : "balance.6",
+				target : "attraction.7"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "balance.7.balance",
+				source : "balance.6",
+				target : "balance.7"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "resistance.7.balance",
+				source : "resistance.6",
+				target : "balance.7"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "resistance.8.resistance",
+				source : "resistance.7",
+				target : "resistance.8"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "resistance.8.balance",
+				source : "resistance.7",
+				target : "balance.8"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "attraction.8.balance",
+				source : "attraction.7",
+				target : "balance.8"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "attraction.8.attraction",
+				source : "attraction.7",
+				target : "attraction.8"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "balance.8.attraction",
+				source : "balance.7",
+				target : "attraction.8"
+			}
+		},
+		{
+			group : "edges",
+			data : {
+				id : "balance.8.movement",
+				source : "balance.7",
+				target : "movement.8"
+			}
+		}
+];
+
+
+// Ether.Upgrade.prototype.createEdges = function(){
+// 	var currentNumber = "1";
+// 	var oldNodes = [];
+// 	var currentNodes = [];
+// 	var nodeNumb = 0;
+
+// 	for (var i = 0; i < this.elements.length; i++) {
+// 		var id = this.elements[i].data.id;
+// 		var ele = id.split(".");
+// 		var type = ele[0];
+// 		var tier = ele[1];
+
+// 		if(!tier) continue
+
+// 		if(currentNumber != tier){
+// 			oldNodes = currentNodes;
+// 			currentNodes = [];
+// 			currentNumber = tier;
+// 			nodeNumb = 0
+// 		}
+
+// 		currentNodes.push(id);
+// 		nodeNumb+=1;
+
+// 		var src = this.getSrc(oldNodes,tier,nodeNumb);
+// 		var trgt = e
+
+
+// 		var obj = {
+// 			group : "edges",
+// 			data : {
+// 				id : "e."+tier+"."+src[0]+"."+target[0],
+// 				source : src,
+// 				target : trgt
+// 			}
+// 		}
+
+// 		console.log(obj)
+// 	};	
+// }
+
+// Ether.Upgrade.prototype.getSrc = function(oldN,tier,number){
+// 	if(oldN.length < 1){ return "nparent" }
+
+// 	if(number%2 == 0){
+
+// 	}
+
+// }
+
+
+
+;Ether.Engine = function() {	
+	var self = this;
+
+	//div
+	this.container = document.getElementById('container');
 
 	//Canvas
 	this.canvas = document.getElementById('canvas');
@@ -1842,7 +2756,7 @@ Ether.Audio.prototype.playSound = function(element){
 	this.hub = new Ether.Hub(this);
 	this.util = new Ether.Util(this);
 	this.audio = new Ether.Audio(this);
-	//this.trophy = new Ether.Trophy(this);
+	this.upgrade = new Ether.Upgrade(this);
 
 	//Ethers
 	this.ethers = [new Ether.Ether(self)];
@@ -1850,6 +2764,7 @@ Ether.Audio.prototype.playSound = function(element){
 
 	//level
 	this.betweenAges = false;
+	this.upgradeScreen = false;
 
 	//endgame
 	this.gameOverAlpha = 0;
@@ -1861,6 +2776,8 @@ Ether.Audio.prototype.playSound = function(element){
 	//Animate
 	this.animate = function(time){
 		requestAnimFrame(self.animate);
+
+		if(self.upgradeScreen) return
 
 		//Draw Background
 		if(!self.player.dead){
@@ -1917,7 +2834,6 @@ Ether.Audio.prototype.playSound = function(element){
 Ether.Engine.prototype.init = function(){
 	var self = this;
 
-
 	//set up canvas
 	this.canvas.width = this.width;
 	this.canvas.height = this.height;
@@ -1932,13 +2848,10 @@ Ether.Engine.prototype.init = function(){
 	//set up world
 	if(!window.mobilecheck()){
 		window.onkeydown = function(evt){
-			console.log(evt.keyCode)
+			evt.preventDefault();
 			self.world.handleKeyDown(evt.keyCode,self)
 			self.hub.handleKeyDown();
-
-			switch(evt.keyCode){
-				case 90: self.ethers[0].getMoreScreen();
-			}
+			self.handleKeyDown(evt.keyCode);
 		}
 
 		window.onkeyup = function(evt){
@@ -1963,6 +2876,8 @@ Ether.Engine.prototype.init = function(){
 	this.world.init(this);
 
 	this.audio.init();
+
+	this.upgrade.init();
 	
 	this.setAwards('matter')
 
@@ -1970,8 +2885,28 @@ Ether.Engine.prototype.init = function(){
 	//this.trophy.init();
 
 	//start animation
-	if(this.player.age == 0)
+	//if(this.player.age == 0)
 		window.requestAnimFrame(this.animate);
+}
+
+Ether.Engine.prototype.handleKeyDown =function(key){
+	if(this.hub.intro) return
+
+	var display = this.container.style.display;
+	switch(key){
+
+		case 32 : 
+		if(display != "none"){ 
+			this.container.style.display = "none";
+			this.upgrade.container.style.display = "";
+			this.upgrade.cy.forceRender();
+			this.upgradeScreen = true;
+		} else {
+			this.container.style.display = "";
+			this.upgrade.container.style.display = "none";
+			this.upgradeScreen = false;
+		}
+	}
 }
 
 Ether.Engine.prototype.checkAwards = function(time){
@@ -1992,7 +2927,7 @@ Ether.Engine.prototype.checkAwards = function(time){
 				if(stats[elements[j]] >= award.amount){
 					if(j == elements.length-1){
 						award.awarded = true;
-						this.hub.newAward(award.text);
+						this.hub.newAward(award.text,award.award);
 						this.player.receiveAward(award.award);
 						this.awardDelay = time;
 					}
@@ -2014,7 +2949,7 @@ Ether.Engine.prototype.setAwards = function(type){
 
 	for (var i = 0; i < this.awards.length; i++) {
 		this.awards[i].amount = amount;
-		this.awards[i].award = Math.ceil(award/5);
+		this.awards[i].award = Math.ceil(award/2);
 		amount += 3;
 		award = i+1;
 	};
