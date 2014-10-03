@@ -26,12 +26,11 @@
 	this.attraction = 0;
 	this.balance = 1;
 	this.force = 1.5;
-	this.zoom = 1;
 	this.elementCount = {f:0,w:0,a:0,e:0}
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [365]; //in seconds
+	this.lifeSpan = [400]; //in seconds
 	this.currentSpan = this.lifeSpan[0];
 	this.totalLifeSpan;
 	this.dead = false;
@@ -51,29 +50,24 @@
 	this.rotateDirection = -1;
 	this.degreeChange = 0;
 
+	//zoom out
+	this.canZoom = false;
+	this.zooming = false;
+	this.zoomLastTime = 0;
+	this.zoomDelay = 500;
+	this.zoomStep = 1.07;
+	this.zoomCounter = 4;
+	this.zoomCounterMax = this.zoomCounter;
+	this.zoom = 1;
+
 }
 
 Ether.Ether.prototype.init = function(){
-	// switch(this.age){
-	// 	case 0 :
-			this.createCoreElement();
-	// 		break;
-
-	// 	case 1 : 
-	// 	case 2 : 
-	// 		this.zoomOut(2)
-	// 		break;
-
-	// 	case 3 :
-	// 		this.zoomOut(2);
-	// 		this.sludgeAlphaStep *= 2;
-	// 		this.sludgeTimeOffset *= 4;
-	// 		this.finalElementLength = this.elements.length;
-	// 		break;
-	// }
+	this.createCoreElement();
 }
 
 Ether.Ether.prototype.draw = function(engine,time){
+	if(this.zooming){ this.getMoreScreen(time) }
 	this.drawCoreElements(engine);
 	this.drawElements(engine,time);
 	this.stabilityCheck(engine,time);
@@ -81,9 +75,6 @@ Ether.Ether.prototype.draw = function(engine,time){
 
 Ether.Ether.prototype.drawElements = function(engine,time){
 	var self = this;
-
-	//age ether during the thried life stage
-	//if(this.age == 3)this.ageEther(time)
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i];
@@ -105,9 +96,6 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 		})
 
 	};
-
-	//time has to be updated outside of the loop
-	//if(this.age == 2 && time > this.rotateLastTime + 500) this.rotateLastTime = time;
 }
 
 Ether.Ether.prototype.drawCoreElements = function(engine){
@@ -124,12 +112,6 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 				var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
 				return self.util.createGradient(gradient,[[0.5,"white"],[0.4,element.color],[1,"black"]])
 			});	
-		// } else {
-		// 	self.util.drawElement(e, engine.ctx, function(ctx,element){
-		// 		var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-		// 		return self.util.createGradient(gradient,[[0.5,"white"],,[1,"black"]])
-		// 	});	
-		// }	
 
 		//velocity
 		e.x += e.vx;
@@ -161,30 +143,37 @@ Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	}
 }
 
-Ether.Ether.prototype.getMoreScreen = function(){
-	// console.log(this.range+(e.radius*2))
-	// console.log(this.engine.height/2)
-	// if((this.range+(e.radius*1.8) >= this.engine.width/2) ||
-	// 	(this.range+(e.radius*1.8) >= this.engine.height/2)){
-		this.zoomOut(1.5);
-		this.engine.world.zoomOutBackground(1.3);
-		this.engine.world.zoomOutElements(1.5);
+Ether.Ether.prototype.getMoreScreen = function(time){
+	console.log(time > this.zoomLastTime + this.zoomDelay)
+	if(this.zoomCounter != 0 && time > this.zoomLastTime + this.zoomDelay){
+		this.zoomLastTime = time;
+		this.zoomCounter -= 1
+		this.zoomOut(this.zoomStep);
+		this.engine.world.zoomOutBackground(this.zoomStep+0.3);
+		this.engine.world.zoomOutElements(this.zoomStep);
+	} else if(this.zoomCounter == 0){
+		this.canZoom = false;
+		this.zooming = false;
+		this.zoomCounter = this.zoomCounterMax
+		this.engine.hub.zoomTimeout = 100;
+	}
 
 }
 
+
 Ether.Ether.prototype.zoomOut = function(val){
-	this.range /= val;
-	this.zoom += val;
+	this.range = Math.round(this.range/val);
+	this.zoom = Math.round(this.zoom + val);
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i]
-		e.radius /= val;
-		e.xOffset /= val;
-		e.yOffset /= val;
+		e.radius = Math.round(e.radius/val);
+		e.xOffset = Math.round(e.xOffset/val);
+		e.yOffset = Math.round(e.yOffset/val);
 	};
 
 	for (var i = 0; i < this.coreElements.length; i++) {
-		this.coreElements[i].radius /= val;
+		this.coreElements[i].radius =  Math.round(this.coreElements[i].radius/val);
 	};
 }
 
@@ -205,7 +194,7 @@ Ether.Ether.prototype.ageEther = function(time){
 		
 		if(this.elements.length != 0){
 			var e =this.loseElement(this.elements[this.elements.length-1],true)
-			this.engine.audio.playSound(e);
+			this.engine.audio.playElementSound(e);
 		}
 	}
 }
@@ -269,7 +258,7 @@ Ether.Ether.prototype.removeFromElementCount = function(ele){
 
 //Elements
 Ether.Ether.prototype.newElement = function(e){
-	this.engine.audio.playSound(e);
+	this.engine.audio.playElementSound(e);
 	this.addToElementCount(e);
 	this.increaseMass(e);
 			

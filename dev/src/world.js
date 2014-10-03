@@ -370,7 +370,7 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 		} else {
 			if(this.badToggle > this.player.resistance*2){
 				this.badToggle = 0;
-				this.engine.audio.playSound(e)
+				this.engine.audio.playElementSound(e)
 				ether.loseElements(1);
 			} else {
 				this.badToggle += 1;

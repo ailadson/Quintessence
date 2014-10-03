@@ -31,7 +31,7 @@ Ether.Upgrade = function(engine){
 
 					if(self.isUpgradable(e.cyTarget)){
 						e.cyTarget.data("activated",true);
-						e.cyTarget.addClass("permActivated")
+						e.cyTarget.addClass("permActivated");
 						self.handleClick(e.cyTarget);
 					}
 
@@ -167,6 +167,11 @@ Ether.Upgrade.prototype.handleClick = function(e){
 	 		this.player.resistance += 1;
 	 		break;
 	 }
+
+	 this.engine.audio.playSound('upgrade');
+	 this.engine.container.style.display = "";
+	this.container.style.display = "none";
+	this.engine.upgradeScreen = false;
 }
 
 Ether.Upgrade.prototype.style = [
@@ -189,7 +194,7 @@ Ether.Upgrade.prototype.style = [
 	},{
 		selector : 'node[id ^= "resistance"]',
 		css : {
-			'background-color':'#CCD9B4',
+			'background-color':'#6C7F2E',
 			'border-width' : '2',
 			'border-color' : '#858063',
 			'shape' : 'rectangle'

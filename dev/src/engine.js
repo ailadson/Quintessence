@@ -78,13 +78,12 @@
 
 		//otherwise, if player is dead
 		} else if(self.player.dead){
-			if(time > self.gameOverTime + 100){//self.gameOverAlpha < 0.35){
+			if(time > self.gameOverTime + 100){
 				self.gameOverAlpha+=0.01;
 				self.gameOverTime = time;
 
 				self.ctx.fillStyle = "rgba(255,255,255,+"+self.gameOverAlpha+");";
 				self.ctx.fillRect(0,0,self.width,self.height);
-			//} else if(self.gameOverAlpha >= 0.35){
 			
 				self.ctx.font = "30px Arial"
 				self.ctx.fillStyle = "black";
@@ -156,20 +155,24 @@ Ether.Engine.prototype.init = function(){
 Ether.Engine.prototype.handleKeyDown =function(key){
 	if(this.hub.intro) return
 
-	var display = this.container.style.display;
+	//var display = this.container.style.display;
 	switch(key){
 
 		case 32 : 
-		if(display != "none"){ 
-			this.container.style.display = "none";
-			this.upgrade.container.style.display = "";
-			this.upgrade.cy.forceRender();
-			this.upgradeScreen = true;
-		} else {
-			this.container.style.display = "";
-			this.upgrade.container.style.display = "none";
-			this.upgradeScreen = false;
-		}
+			if(display != "none"){ 
+				this.container.style.display = "none";
+				this.upgrade.container.style.display = "";
+				this.upgrade.cy.forceRender();
+				this.upgradeScreen = true;
+			} else {
+				this.container.style.display = "";
+				this.upgrade.container.style.display = "none";
+				this.upgradeScreen = false;
+			}
+			break;
+		case 90 :
+			if(this.player.canZoom){ this.player.zooming = true }
+			break
 	}
 }
 
@@ -193,6 +196,7 @@ Ether.Engine.prototype.checkAwards = function(time){
 						award.awarded = true;
 						this.hub.newAward(award.text,award.award);
 						this.player.receiveAward(award.award);
+						this.audio.playSound('life');
 						this.awardDelay = time;
 					}
 				} else {

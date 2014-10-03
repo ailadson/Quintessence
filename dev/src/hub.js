@@ -27,10 +27,11 @@ Ether.Hub = function(engine) {
 	this.introIndex = 0;
 	this.timeOffset = 0
 
-	//questions
-	this.choice1Alpha = 0.2;
-	this.choice2Alpha = 0.2;
-	this.question = 0;
+	//zoom
+	this.zoomTimeout = 100
+	this.zoomLastTime = 0
+	this.zoomMessage = ""
+	this.zoomMessageShown = false
 	
 	//awards
 	this.awardMssg = "";
@@ -81,27 +82,6 @@ Ether.Hub = function(engine) {
 			}
 			return
 		}
-
-		// switch(self.question){
-		// 	case 0 :
-		// 		self.showInfo = (self.choice1Alpha > self.choice2Alpha) ? true : false
-		// 		break;
-		// 	case 1 :
-		// 		if(self.choice1Alpha > self.choice2Alpha)
-		// 			self.engine.setAwards("matter") 
-		// 		else
-		// 			self.engine.setAwards("consciousness"); 
-		// 		break;
-		// 	case 2 :
-		// 		var ether = self.engine.ethers[0];
-		// 		ether.transformation = (self.choice1Alpha > self.choice2Alpha) ? ether.transformations[0] : ether.transformations[1];
-		// 		self.lifeStageMssg = (self.choice1Alpha > self.choice2Alpha) ? self.lifeStageOpts[0] : self.lifeStageOpts[1];
-		// 		break;
-		// 	case 3 :
-		// 		self.engine.badGuys = (self.choice1Alpha > self.choice2Alpha) ? true : false
-		// 		if(!self.engine.badGuys){ self.engine.world.removeBadElements()}
-		// }
-
 		
 		if(self.introIndex + 1 < self.introText.length){
 			self.timeOffset = self.lastIntroTime;
@@ -129,12 +109,7 @@ Ether.Hub.prototype.init = function(){
 
  Ether.Hub.prototype.drawIntro = function(time){
  	var ctx = this.engine.ctx;
-// 	if(this.question <= 3){
-// 		this.drawAnswerBoxes(ctx,time);
-// 		this.drawQuestionText(ctx,time);
-// 	} else {
-		this.drawIntroText(ctx,time)
-// 	}
+	this.drawIntroText(ctx,time)
 }
 
 Ether.Hub.prototype.drawIntroText = function(ctx,time){
@@ -160,88 +135,41 @@ Ether.Hub.prototype.drawIntroText = function(ctx,time){
 	ctx.fillText(txt,(this.engine.width/2)-(iWidth/2),this.engine.height/2)
 }
 
-// Ether.Hub.prototype.drawQuestionText = function(ctx,time){
-// 	var questions = [];
-
-// 	var answers = [];
-
-// 	var currentQuestion = questions[this.question];
-// 	var currentAnswers = answers[this.question];
-// 	var qWidth = ctx.measureText(currentQuestion).width;
-
-// 	if(time > this.lastIntroTime + 50){
-// 		this.lastIntroTime = time;
-// 		this.introAlpha += 0.05;
-// 		if(this.introAlpha > 1) this.introAlpha = 1;
-// 	}
-
-// 	//quetion
-// 	ctx.font = "28pt Titillium Web"
-// 	ctx.fillStyle="rgba(164,161,151,"+this.introAlpha+")";
-// 	ctx.fillText(currentQuestion,(this.engine.width/2)-(qWidth/2),this.unit * 2);
-
-// 	//answers
-// 	var aWidth0 = ctx.measureText(currentAnswers[0]).width;
-// 	var aWidth1 = ctx.measureText(currentAnswers[1]).width;
-
-// 	ctx.fillText(currentAnswers[0],(this.engine.width/4)-(aWidth0/2),this.engine.height/2)
-// 	ctx.fillText(currentAnswers[1],((this.engine.width/4) * 3)-(aWidth1/2),this.engine.height/2)
-// }
-
-Ether.Hub.prototype.drawAnswerBoxes = function(ctx){
-	var width = this.engine.width;
-	var height = this.engine.height;
-
-	ctx.fillStyle = "rgba(75,100,75,"+this.choice1Alpha+")";
-	ctx.fillRect(0,0,width/2,height);
-
-	ctx.fillStyle = "rgba(75,75,100,"+this.choice2Alpha+")";
-	ctx.fillRect(width/2,0,width/2,height)
-
-	ctx.fillStyle = "black";
-	ctx.fillRect(0,0,width,this.unit*3);
-}
-
 Ether.Hub.prototype.draw = function(time){
-	var stats = this.getStats();
 	var ctx = this.engine.ctx;
+	var stats = this.getStats();
 
-	//convert stability
-	var hubStab = (stats.stab > 100) ? 0 : (100 - stats.stab)
-
-	if(this.showInfo){
-
-		ctx.font = this.unit + "30px Titillium Web";
-		ctx.fillStyle = "rgba(164,161,151,1)"
-		ctx.fillText("Mass: " + Math.floor(stats.mass), this.unit,this.unit*1.5)
-		ctx.fillText("Balance: " + hubStab, this.unit,this.unit*2.5)
-	}
-
-	//in between ages?
-	//this.drawInbetween(ctx,time);
-
-	if(this.showInfo) this.drawElementStats(stats.elementCount,ctx);
+	var balanceWidth = this.drawBalance(stats.stab,ctx);
+	this.drawElementStats(stats.elementCount,ctx,balanceWidth);
 	this.drawLifeBar(ctx, time);
 	this.drawMessage(ctx,time);
+	this.drawZoom(ctx,time)
 }
 
-// Ether.Hub.prototype.drawInbetween = function(ctx,time){
-// 	var age = this.engine.ethers[0].age;
+Ether.Hub.prototype.drawZoom = function(ctx,time){
+	if(!this.engine.player.moved){return}
 
-// 	if(this.engine.betweenAges){
-// 		if(age < 3){
-// 			//alpha
-// 			if(time > this.betweenLastTime + 100){
-// 				this.betweenLastTime = time;
-// 				ctx.fillStyle = "rgba(164,161,151,"+this.betweenAlpha+")";
-// 			    //ctx.fillRect(0,0,this.engine.width,this.engine.height);
-// 			}
-// 		} else{
-// 			this.gameOver(ctx,time)
-// 		}
-		
-// 	}
-// }
+	if(this.zoomTimeout != 0){
+		if(time > this.zoomLastTime + 10){
+			this.zoomLastTime = time;
+			this.zoomTimeout -= 1;
+			if(this.zoomTimeout == 0){
+				this.engine.player.canZoom = true;
+
+				if(!this.zoomMessageShown){
+					this.zoomMessage = "When it lights up in the lower right screen, you can zoom out by pressing the Z button";
+				}
+			}
+		}
+		ctx.fillStyle = "rgba(65,78,78,.2)"
+
+	} else {
+		ctx.fillStyle = "#A3C2C2"
+	}
+	ctx.font = this.unit*1.5 + "px Titillium Web";
+	ctx.fillText("Z",this.engine.width - this.unit*2,this.engine.height - this.unit)
+}
+
 
 Ether.Hub.prototype.newAward = function(text,amount){
 	this.awardMssg = [text,amount];
@@ -260,20 +188,66 @@ Ether.Hub.prototype.getStats = function(){
 	return o;
 }
 
-Ether.Hub.prototype.drawElementStats = function(count, ctx){
-	ctx.font = this.unit * .75 + "px Titillium Web";
+Ether.Hub.prototype.drawBalance = function(stab,ctx){
+	
+	var hubStab = (stab > 100) ? 0 : (100 - stab)
+	
+	ctx.font =this.unit*2+"px Titillium Web";
+	ctx.fillStyle = "#414E4E";
+	ctx.fillText("Balance: " + hubStab, this.unit*.9-2,(this.engine.height - this.unit*1.2)-2);
+	
+	ctx.fillStyle = "#A3C2C2";
+	ctx.fillText("Balance: " + hubStab, this.unit *.9,this.engine.height - this.unit*1.2);
 
-	ctx.fillStyle = "red";
-	ctx.fillText("Fire: " + count["f"], this.unit, this.unit*3.2);
+	return this.unit
+}
 
-	ctx.fillStyle = "#3399FF";
-	ctx.fillText("Water: " + count["w"], this.unit * 3.5, this.unit*3.2);
+Ether.Hub.prototype.drawElementStats = function(count, ctx, width){
+	ctx.font = this.unit + "px Titillium Web";
 
-	ctx.fillStyle = "white";
-	ctx.fillText("Air: " + count["a"], this.unit, this.unit*4.1);
+	var fWidth = ctx.measureText("Fire: " + count["f"]).width
+	var aWidth = ctx.measureText("Air: " + count["a"]).width
+	var eleWidth = (fWidth >= aWidth) ? fWidth : aWidth
 
-	ctx.fillStyle = "green";
-	ctx.fillText("Earth: " + count["e"], this.unit * 3.5, this.unit*4.1);
+	ctx.fillStyle =  "#6B504A";
+	ctx.fillText("Fire: " + count["f"], width-1, this.engine.height - this.unit*4.5 -1);
+	ctx.fillStyle = "#E0664A";
+	ctx.fillText("Fire: " + count["f"], width, this.engine.height - this.unit*4.5);
+
+	ctx.fillStyle ='#243F63',
+	ctx.fillText("Water: " + count["w"], width + eleWidth + this.unit * 2 - 1, this.engine.height - this.unit*4.5 -1);	
+	ctx.fillStyle = "#47BDDE";
+	ctx.fillText("Water: " + count["w"], width + eleWidth + this.unit * 2, this.engine.height - this.unit*4.5);
+
+	ctx.fillStyle = "#9E9E99";
+	ctx.fillText("Air: " + count["a"], width  -1, this.engine.height - this.unit*3-1);
+	ctx.fillStyle = "#EDEDEB";
+	ctx.fillText("Air: " + count["a"], width , this.engine.height - this.unit*3);
+
+	ctx.fillStyle = '#858063'
+	ctx.fillText("Earth: " + count["e"], width + eleWidth + this.unit * 2 -1, this.engine.height - this.unit*3-1)
+	ctx.fillStyle = '#6C7F2E';
+	ctx.fillText("Earth: " + count["e"], width + eleWidth + this.unit * 2, this.engine.height - this.unit*3);
+
+	var fwSign = this.getEqualitySign(count['f'],count['w']);
+	var aeSign = this.getEqualitySign(count['a'],count['e']);
+
+	ctx.fillStyle = "#414E4E";
+	ctx.fillText(fwSign, width + eleWidth + this.unit*.75-1, this.engine.height - this.unit * 4.5 - 1)
+	ctx.fillText(aeSign, width + eleWidth + this.unit*.75- 1, this.engine.height - this.unit *3- 1)
+	ctx.fillStyle = "#A3C2C2";
+	ctx.fillText(fwSign, width + eleWidth + this.unit*.75, this.engine.height - this.unit * 4.5)
+	ctx.fillText(aeSign, width + eleWidth + this.unit*.75, this.engine.height - this.unit*3)
+}
+
+Ether.Hub.prototype.getEqualitySign = function(val1,val2){
+	if(val1 > val2){
+		return ">"
+	} else if(val1 < val2){
+		return "<"
+	} else{
+		return "="
+	}
 }
 
 Ether.Hub.prototype.drawLifeBar = function(ctx, time){
@@ -285,13 +259,14 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 
 	ctx.fillStyle = "#FFF4E9";
 	ctx.font = this.unit + "px Titillium Web"
-	ctx.fillText("Lifespan",(this.unit * (9+ 35/2)), this.unit);
+	var w = ctx.measureText("Lifespan").width
+	ctx.fillText("Lifespan",(this.engine.width/2)-(w/2), this.unit);
 
 	ctx.fillStyle = "green";
-	ctx.fillRect((this.unit * 45), this.unit * 1.5, -(this.unit * 35) * ratio, this.unit * 0.5)
+	ctx.fillRect(this.engine.width -(this.unit * 2), this.unit * 1.5, -(this.unit * 46) * ratio, this.unit * 0.5)
 
 	ctx.strokeStyle = "red";
-	ctx.strokeRect((this.unit * 10), this.unit * 1.5, this.unit * 35, this.unit * 0.5)
+	ctx.strokeRect((this.unit * 2), this.unit * 1.5, this.unit * 46, this.unit * 0.5)
 
 	//MOVE THIS TO ETHER!!???
 	if(!ether.moved){return}
@@ -301,8 +276,7 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 		if(ratio > 0){
 			ether.currentSpan--;
 		} else {
-			this.engine.betweenAges = true;
-			this.messageExist = false;
+			console.log("ADD GAME DEATH!!!!")
 		}
 	}
 
@@ -313,45 +287,19 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 	var ether = this.engine.ethers[0];
 
 	var borderMssg = "there is no time in the boundless void";
-	// var age0Mssg = "you are no longer an infant";
-	// var age2Mssg = "give back you borrowed";
-	// var age3Mssg = "so it goes";
-	var killerMssg = "Save The Big Ones For Post-Infancy"
 	var stableMssg = "You Are Becoming Too Unstable"
 
 	if(award && !this.engine.betweenAges){ this.messageExist = false; this.messageAlpha = 1 }
 
 	if(!this.messageExist){
-		// //new age
-		// if(this.engine.betweenAges){
-		// 	this.messageExist = true;
-
-		// 	switch(ether.age){
-		// 		case 0 :
-		// 				this.currentMessage = age0Mssg;
-		// 			break;
-
-		// 		case 1 :
-		// 			this.currentMessage = this.lifeStageMssg;
-		// 			break;
-
-		// 		case 2 :
-		// 			this.currentMessage = age2Mssg;
-		// 			break;
-
-		// 		case 3 :
-		// 			this.currentMessage = age3Mssg;
-		// 			break;
-
-		// 	}
-
-		// //award
-		// } else 
 		if(this.awardMssg){
 			this.messageExist = true;
 			this.currentMessage = this.awardMssg[0];
 			this.subMessage = "+"+this.awardMssg[1]+" Lifespan";
-
+		}else if(!this.zoomMessageShown && this.zoomMessage != ""){
+			this.messageExist = true;
+			this.currentMessage = this.zoomMessage;
+			this.zoomMessageShown = true;
 		//leaving game border
 		} else if(this.hasLeftBorder() && this.currentMessage != borderMssg){
 			this.messageExist = true;
