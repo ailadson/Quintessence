@@ -96,7 +96,7 @@ Ether.Upgrade.prototype.hasEnoughEnergy = function(e){
 		return true
 	}
 
-	if(id == "water" && count.w >= cost){
+	if(id == "movement" && count.w >= cost){
 		return true
 	}
 }
@@ -292,11 +292,13 @@ Ether.Upgrade.prototype.getNodes = function(){
 		// 	data : {
 		// 		id : "zoom"
 		// 	}
-		// },{
-		// 	group : "nodes",
-		// 	data : { id: "nparent" },
-		// 	grabbable : false
-		// },{
+		 //},
+		 {
+			group : "nodes",
+			data : { id: "nparent" },
+			grabbable : false
+		},
+		//{
 		// 	group : "nodes",
 		// 	data : {
 		// 		id : "transformation"
