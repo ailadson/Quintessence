@@ -130,26 +130,31 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 
 Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	var stability = this.getStability();
-
-	if(stability > 40){
+	//stabilit starts at 0 and increases as it become more unstable
+	if(stability >= 20){
 		engine.hub.unstable = true 
+	} else {
+		engine.hub.unstable = false
+	}
 
-		if(stability >= 50){
-			if(time > this.stabilityLastTime + 2000 - stability){
-				this.stabilityLastTime = time;		
-				this.loseElements(3);
-			}
+	if(stability >= 50){
+		engine.hub.purging = true;
+		if(time > this.stabilityLastTime + 2000 - stability){
+			this.stabilityLastTime = time;		
+			this.loseElements(3);
+			this.engine.audio.playSound('purge',1)
 		}
+	} else {
+		engine.hub.purging = false;
 	}
 }
 
 Ether.Ether.prototype.getMoreScreen = function(time){
-	console.log(time > this.zoomLastTime + this.zoomDelay)
 	if(this.zoomCounter != 0 && time > this.zoomLastTime + this.zoomDelay){
 		this.zoomLastTime = time;
 		this.zoomCounter -= 1
 		this.zoomOut(this.zoomStep);
-		this.engine.world.zoomOutBackground(this.zoomStep+0.3);
+		this.engine.world.zoomOutBackground(this.zoomStep+0.1);
 		this.engine.world.zoomOutElements(this.zoomStep);
 	} else if(this.zoomCounter == 0){
 		this.canZoom = false;
@@ -228,13 +233,13 @@ Ether.Ether.prototype.getElementCount = function(){
 
 Ether.Ether.prototype.addToElementCount = function(ele){
 	switch(ele.type){
-		case 'fire': this.elementCount.f += (Math.round((ele.radius/2)) * this.zoom);
+		case 'fire': this.elementCount.f += (Math.round((ele.radius/2)));
 			break;
-		case 'water': this.elementCount.w += (Math.round((ele.radius/2)) * this.zoom);
+		case 'water': this.elementCount.w += (Math.round((ele.radius/2)));
 			break;
-		case 'air': this.elementCount.a += (Math.round((ele.radius/2)) * this.zoom);
+		case 'air': this.elementCount.a += (Math.round((ele.radius/2)));
 			break;
-		case 'earth': this.elementCount.e += (Math.round((ele.radius/2)) * this.zoom);
+		case 'earth': this.elementCount.e += (Math.round((ele.radius/2)));
 			break;
 	}
 }
@@ -306,13 +311,13 @@ Ether.Ether.prototype.createCoreElement = function(){
 Ether.Ether.prototype.increaseMass = function(e){
 	this.createCoreElement();
 	this.mass += 1//e.radius/massOffset;
-	this.range += e.radius/3
+	this.range += e.radius/2
 }
 
 Ether.Ether.prototype.decreaseMass = function(e){
 	if(this.coreElements.length > 1) this.coreElements.pop();
 	if(this.mass > 0) this.mass -= 1;
-	if(this.range > 2) this.range -= e.radius/3;
+	if(this.range > 2) this.range -= e.radius/2;
 }
 
 //awards

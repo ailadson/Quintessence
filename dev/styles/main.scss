@@ -6,6 +6,12 @@ $groupHeight : 100/$numberOfSections;
 $fontSize : 1em;
 $textColor : #FFF4E9;
 
+@font-face {
+  font-family: 'simple';
+  src: url('fonts/simple.woff') format('woff'), /* Modern Browsers */
+       url('fonts/simple.ttf')  format('truetype'), /* Safari, Android, iOS */
+}
+
 
 @mixin centered {
 	margin-left: auto;
@@ -75,7 +81,7 @@ $textColor : #FFF4E9;
 body {
 	background-color : black;
 	color : $textColor;
-	font-family : "Titillium Web";
+	font-family : "simple";
 	font-size : $fontSize;
 }
 

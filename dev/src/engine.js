@@ -155,7 +155,7 @@ Ether.Engine.prototype.init = function(){
 Ether.Engine.prototype.handleKeyDown =function(key){
 	if(this.hub.intro) return
 
-	//var display = this.container.style.display;
+	var display = this.container.style.display;
 	switch(key){
 
 		case 32 : 
@@ -177,6 +177,8 @@ Ether.Engine.prototype.handleKeyDown =function(key){
 }
 
 Ether.Engine.prototype.checkAwards = function(time){
+	if(this.hub.unstable){ return }
+		
 	var stats = this.player.getElementCount();
 
 	if(time > this.awardDelay + 5000){
@@ -196,7 +198,6 @@ Ether.Engine.prototype.checkAwards = function(time){
 						award.awarded = true;
 						this.hub.newAward(award.text,award.award);
 						this.player.receiveAward(award.award);
-						this.audio.playSound('life');
 						this.awardDelay = time;
 					}
 				} else {

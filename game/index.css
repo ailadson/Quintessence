@@ -481,10 +481,14 @@ table {
   border-spacing: 0;
 }
 
+@font-face {
+  font-family: 'simple';
+  src: url("fonts/simple.woff") format("woff"), url("fonts/simple.ttf") format("truetype");
+}
 body {
   background-color: black;
   color: #FFF4E9;
-  font-family: "Titillium Web";
+  font-family: "simple";
   font-size: 1em;
 }
 

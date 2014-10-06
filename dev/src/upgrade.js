@@ -3,12 +3,6 @@ Ether.Upgrade = function(engine){
 	this.engine = engine;
 	this.player;
 	this.container = document.getElementById('upgrade');
-	this.tierCounter = {
-		movement : [0],
-		attraction : [0],
-		resistance : [0],
-		balance : [0]
-	}
 
 	this.cy = cytoscape({
 		container : self.container,
@@ -107,8 +101,8 @@ Ether.Upgrade.prototype.addData = function(cy){
 		if(node && node.data && !node.data("activated")){
 			var level = node.id().split(".")[1]
 			var type = node.id().split(".")[0].charAt(0).toUpperCase() + node.id().split(".")[0].slice(1)
-			node.data("cost",level*5)
-			node.data("info",type+" : "+level*5)
+			node.data("cost",level*(12 + level));
+			node.data("info",type+" : "+ (level*(12 + level)))
 		}
 		
 	}
@@ -302,14 +296,17 @@ Ether.Upgrade.prototype.getNodes = function(){
 			group : "nodes",
 			data : { id: "nparent" },
 			grabbable : false
-		},
-		//{
-		// 	group : "nodes",
-		// 	data : {
-		// 		id : "transformation"
-		// 	}
-		// },{
-		{
+		},{
+			group : "nodes",
+			data : {
+				id : "butterfly.9"
+			}
+		},{
+			group : "nodes",
+			data : {
+				id : "snail.9"
+			}
+		},{
 			group : "nodes",
 			data : {
 				id : "balance.1",
@@ -483,6 +480,34 @@ Ether.Upgrade.prototype.getNodes = function(){
 
 Ether.Upgrade.prototype.edges = [
 		{
+			group : "edges",
+			data : {
+				id : "movement.t.snail",
+				source : "movement.8",
+				target : "snail.9"
+			}
+		},{
+			group : "edges",
+			data : {
+				id : "attraction.t.snail",
+				source : "attraction.8",
+				target : "snail.9"
+			}
+		},{
+			group : "edges",
+			data : {
+				id : "balance.t.butterfly",
+				source : "balance.8",
+				target : "butterfly.9"
+			}
+		},{
+			group : "edges",
+			data : {
+				id : "resistance.t.butterfly",
+				source : "resistance.8",
+				target : "butterfly.9"
+			}
+		},{
 			group : "edges",
 			data : {
 				id : "parent.1.balance",

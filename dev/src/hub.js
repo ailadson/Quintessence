@@ -11,13 +11,10 @@ Ether.Hub = function(engine) {
 	//messages
 	this.lastTime = 0;
 	this.messageExist = false;
-	this.messageAlpha = 1;
+	//this.messageAlpha = 1;
 	this.currentMessage = "";
 	this.lastMessageTime = 0;
-
-	//between stages
-	this.betweenAlpha = 0.1;
-	this.betweenLastTime = 0;
+	this.msgQue = new Ether.MsgQue();
 
 	//intro
 	this.intro = true;
@@ -32,6 +29,7 @@ Ether.Hub = function(engine) {
 	this.zoomLastTime = 0
 	this.zoomMessage = ""
 	this.zoomMessageShown = false
+	this.zoomSubMessage = "Press Z to zoom out"
 	
 	//awards
 	this.awardMssg = "";
@@ -39,7 +37,11 @@ Ether.Hub = function(engine) {
 	this.lifeStageOpts = ["spread your wings","spread your trail"]
 	this.subMessage = "";
 
-	
+	this.stableWarned = false
+	this.stableMssg = "The vibration is a sign of your imbalance"
+	this.purgeMssg = "PURGING"
+	this.purgeNotified = false;
+	this.unstable = false;
 
 	this.gameOverLastTime = 0;
 	this.gameOverAlpha = 0;
@@ -114,7 +116,7 @@ Ether.Hub.prototype.init = function(){
 
 Ether.Hub.prototype.drawIntroText = function(ctx,time){
 	if(time > this.lastIntroTime + 50){
-		ctx.font = "28pt Titillium Web"
+		ctx.font = "28pt simple"
 		ctx.fillStyle="rgba(164,161,151,"+this.introAlpha+")";
 
 		this.introAlpha += 0.1;
@@ -142,6 +144,7 @@ Ether.Hub.prototype.draw = function(time){
 	var balanceWidth = this.drawBalance(stats.stab,ctx);
 	this.drawElementStats(stats.elementCount,ctx,balanceWidth);
 	this.drawLifeBar(ctx, time);
+	this.updateMsgQue();
 	this.drawMessage(ctx,time);
 	this.drawZoom(ctx,time)
 }
@@ -150,14 +153,14 @@ Ether.Hub.prototype.drawZoom = function(ctx,time){
 	if(!this.engine.player.moved){return}
 
 	if(this.zoomTimeout != 0){
-		if(time > this.zoomLastTime + 10){
+		if(time > this.zoomLastTime + 1000){
 			this.zoomLastTime = time;
 			this.zoomTimeout -= 1;
 			if(this.zoomTimeout == 0){
 				this.engine.player.canZoom = true;
 
 				if(!this.zoomMessageShown){
-					this.zoomMessage = "When it lights up in the lower right screen, you can zoom out by pressing the Z button";
+					this.zoomMessage = "See yourself on a different scale";
 				}
 			}
 		}
@@ -166,14 +169,13 @@ Ether.Hub.prototype.drawZoom = function(ctx,time){
 	} else {
 		ctx.fillStyle = "#A3C2C2"
 	}
-	ctx.font = this.unit*1.5 + "px Titillium Web";
+	ctx.font = this.unit*1.5 + "px simple";
 	ctx.fillText("Z",this.engine.width - this.unit*2,this.engine.height - this.unit)
 }
 
 
 Ether.Hub.prototype.newAward = function(text,amount){
 	this.awardMssg = [text,amount];
-	this.drawMessage(0,0,true);
 }
 
 Ether.Hub.prototype.getStats = function(){
@@ -189,10 +191,10 @@ Ether.Hub.prototype.getStats = function(){
 }
 
 Ether.Hub.prototype.drawBalance = function(stab,ctx){
-	
+	//console.log("hub balance: "+stab)
 	var hubStab = (stab > 100) ? 0 : (100 - stab)
 	
-	ctx.font =this.unit*2+"px Titillium Web";
+	ctx.font =this.unit*2+"px simple";
 	ctx.fillStyle = "#414E4E";
 	ctx.fillText("Balance: " + hubStab, this.unit*.9-2,(this.engine.height - this.unit*1.2)-2);
 	
@@ -203,7 +205,7 @@ Ether.Hub.prototype.drawBalance = function(stab,ctx){
 }
 
 Ether.Hub.prototype.drawElementStats = function(count, ctx, width){
-	ctx.font = this.unit + "px Titillium Web";
+	ctx.font = this.unit + "px simple";
 
 	var fWidth = ctx.measureText("Fire: " + count["f"]).width
 	var aWidth = ctx.measureText("Air: " + count["a"]).width
@@ -258,7 +260,7 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 	var ratio = ether.currentSpan/ether.lifeSpan[0]
 
 	ctx.fillStyle = "#FFF4E9";
-	ctx.font = this.unit + "px Titillium Web"
+	ctx.font = this.unit + "px simple"
 	var w = ctx.measureText("Lifespan").width
 	ctx.fillText("Lifespan",(this.engine.width/2)-(w/2), this.unit);
 
@@ -284,84 +286,155 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 
 //messages
 Ether.Hub.prototype.drawMessage = function(ctx,time,award){
-	var ether = this.engine.ethers[0];
+	var player = this.engine.ethers[0];
 
-	var borderMssg = "there is no time in the boundless void";
-	var stableMssg = "You Are Becoming Too Unstable"
+	if(!this.messageExist || (this.messageExist && !this.msgQue.hasMsg())){
+		if(this.msgQue.hasMsg()){
+			var msg = this.msgQue.getMsg()
 
-	if(award && !this.engine.betweenAges){ this.messageExist = false; this.messageAlpha = 1 }
+			this.messageExist = true
+			this.currentMessage = msg
 
-	if(!this.messageExist){
-		if(this.awardMssg){
-			this.messageExist = true;
-			this.currentMessage = this.awardMssg[0];
-			this.subMessage = "+"+this.awardMssg[1]+" Lifespan";
-		}else if(!this.zoomMessageShown && this.zoomMessage != ""){
-			this.messageExist = true;
-			this.currentMessage = this.zoomMessage;
-			this.zoomMessageShown = true;
-		//leaving game border
-		} else if(this.hasLeftBorder() && this.currentMessage != borderMssg){
-			this.messageExist = true;
-			this.currentMessage = borderMssg;
+			switch(msg.type){
+				case "award" : 
+					this.subMessage = msg.sub
+					this.engine.audio.playSound('life');
+					break;
+				case "zoom" :
+					this.zoomMessageShown = true
+					break;
+				case "stablility" :
+					
+					break;
+				case "purge" :
+					
+			}
+		} else {
+			this.renderMessage(ctx,time);
+		}
+	} else {
+		this.renderMessage(ctx,time);
+	}
+
+	// var borderMssg = "there is no time in the boundless void";
+	// var stableMssg = "You Are Becoming Too Unstable"
+
+	// if(award){ this.messageExist = false; this.messageAlpha = 1 }
+
+	// if(!this.messageExist){
+	// 	if(this.awardMssg){
+	// 		this.messageExist = true;
+	// 		this.currentMessage = this.awardMssg[0];
+	// 		this.subMessage = "+"+this.awardMssg[1]+" Lifespan";
+	// 	}else if(!this.zoomMessageShown && this.zoomMessage != ""){
+	// 		this.messageExist = true;
+	// 		this.currentMessage = this.zoomMessage;
+	// 		this.zoomMessageShown = true;
+	// 	//leaving game border
+	// 	} else if(this.hasLeftBorder() && this.currentMessage != borderMssg){
+	// 		this.messageExist = true;
+	// 		this.currentMessage = borderMssg;
 		
-		//killer element
-		} else if(this.killerElement){
-			this.messageExist = true;
-			this.currentMessage = killerMssg;
+	// 	//killer element
+	// 	} else if(this.killerElement){
+	// 		this.messageExist = true;
+	// 		this.currentMessage = killerMssg;
 
-		//stability
-		} else if(this.unstable && !this.stableWarned){
-			this.messageExist = true;
+	// 	//stability
+	// 	} else if(this.unstable && !this.stableWarned){
+	// 		this.messageExist = true;
+	// 		this.stableWarned = true;
+	// 		this.currentMessage = stableMssg;
+	// 	}
+
+	// } else {
+	// 	if(!award) this.renderMessage(ctx,time);
+	// }
+}
+
+Ether.Hub.prototype.updateMsgQue = function(){
+	
+	if(!this.zoomMessageShown && this.zoomMessage != ""){
+		this.msgQue.addMsg(this.zoomMessage,"zoom",this.zoomSubMessage)
+		this.zoomMessage = "";
+	}
+
+	if(this.awardMssg){
+		this.msgQue.addMsg(this.awardMssg[0],"award","+"+this.awardMssg[1]+" Lifespan")
+		this.awardMssg = "";
+	}
+
+	if(this.lifeStageMssg != ""){
+		this.msgQue.addMsg(this.lifeStageMssg,"transform")
+		this.lifeStageMssg = ""
+	}
+
+	if(this.unstable){
+		
+		if(this.purging && !this.purgeNotified){
+			this.purgeNotified = true;
+			this.msgQue.addMsg(this.purgeMssg,"purge")
+			this.purging = false;
+		} else if(!this.stableWarned){
 			this.stableWarned = true;
-			this.currentMessage = stableMssg;
+			this.msgQue.addMsg(this.stableMssg,"stability")
 		}
 
-	} else {
-		if(!award) this.renderMessage(ctx,time);
+		
 	}
 }
 
 Ether.Hub.prototype.renderMessage = function(ctx,time){
+	if(this.currentMessage == ""){ return}
 	var ether = this.engine.ethers[0];
+	var message = this.currentMessage.str
+	var sub = this.currentMessage.sub
 
-	ctx.font = (this.currentMessage == this.awardMssg[0]) ? "90px Titillium Web" : "30px Titillium Web";
-	var textWidth = ctx.measureText(this.currentMessage).width;
 
-	if(textWidth > this.engine.width - 10){ 
-		ctx.font = "70px Titillium Web"
-		textWidth = ctx.measureText(this.currentMessage).width
+	ctx.font = (this.currentMessage.type == "award") ? "90px simple" : "30px simple";
+
+	if(typeof ctx.measureText != 'function'){ 
+		console.log(ctx) ;
+		return 
+	}
+
+	var textWidth = ctx.measureText(message).width;
+
+	if(textWidth > this.engine.width - 10 && this.currentMessage.type == "award"){ 
+		ctx.font = "70px simple"
+		textWidth = ctx.measureText(message).width
 	}
 
 	var x = (this.engine.width/2) - (textWidth / 2);
 	var y = (this.engine.height/2)-this.unit;
 
-	ctx.fillStyle = "rgba(0,0,0,"+this.messageAlpha+")";
-	ctx.fillText(this.currentMessage,x+2,y+2);
+	ctx.fillStyle = "rgba(0,0,0,"+this.currentMessage.alpha+")";
+	ctx.fillText(message,x+2,y+2);
 
-	ctx.fillStyle = "rgba(164,161,151,"+this.messageAlpha+")";
-	ctx.fillText(this.currentMessage,x,y);
+	ctx.fillStyle = "rgba(164,161,151,"+this.currentMessage.alpha+")";
+	ctx.fillText(message,x,y);
 
-	if(this.subMessage != ""){
-		ctx.font = "25px Titillium Web";
-		textWidth = ctx.measureText(this.subMessage).width;
+	if(sub != ""){
+		ctx.font = "25px simple";
+		textWidth = ctx.measureText(sub).width;
 		x = (this.engine.width/2) - (textWidth / 2);
-		ctx.fillStyle = "rgba(0,0,0,"+this.messageAlpha+")";
-		ctx.fillText(this.subMessage,x+2,y-this.unit*3+2);
-		ctx.fillStyle = "rgba(164,161,151,"+this.messageAlpha+")";
-		ctx.fillText(this.subMessage,x,y-this.unit*3);
+		ctx.fillStyle = "rgba(0,0,0,"+this.currentMessage.alpha+")";
+		ctx.fillText(sub,x+2,y-this.unit*3+2);
+		ctx.fillStyle = "rgba(164,161,151,"+this.currentMessage.alpha+")";
+		ctx.fillText(sub,x,y-this.unit*3);
 	}
 
 	if(time > this.lastMessageTime + 100){
-		this.messageAlpha-=0.01;
 
-		if(this.messageAlpha <= 0.01){
+		if(this.currentMessage.lowerAlpha() < 0.3){
 			this.messageExist = false;
-			this.messageAlpha = 1;
-			this.awardMssg = "";
-			this.killerElement = false;
-			this.subMessage = "";
+			if(this.currentMessage.type == "purge"){
+				this.purgeNotified = false
+			}
+			
+			if(this.currentMessage.alpha <= 0)this.currentMessage = ""
 		}
+
 		this.lastMessageTime = time;
 	}
 

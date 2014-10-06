@@ -4,20 +4,15 @@ GOD.God
 Play Test Notes
 -Redo Hub
 	*Add update alert (u button)
-	*Add zoom alert (z button)
 	*Make Game Longer
 	*Color changes at quater marks
 
 -UnBalance
-	*prevents awards
 	*prevents upgrades
-	*message says purge
-	*first warning < 80 & > 50
-	*under 30 ether flash red
-	*message about large ethers. for 1st
 -Look
 	*Ether elements not within radius sway
-
+-Ether
+	*Fix attraction
 -Death
 	*Attach death to transformation type
 -Init

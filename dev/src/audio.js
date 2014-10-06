@@ -9,7 +9,7 @@ Ether.Audio.prototype.init = function(){
 }
 
 Ether.Audio.prototype.loadSounds = function(index){
-	var urls = ["fire","water","air","earth","life","upgrade"];
+	var urls = ["fire","water","air","earth","life","upgrade","purge"];
 	var index = index || 0;
 	var self = this;
 	var url = urls[index];

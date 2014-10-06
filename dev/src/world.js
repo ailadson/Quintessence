@@ -58,7 +58,7 @@ Ether.World.prototype.init = function(engine){
 
 		// switch(engine.ethers[0].age){
 		// 	case 0 :
-			this.initElements(type,collection,[20,300,500],[3,150,350],[3000,300,100],[50000,700,300])
+			this.initElements(type,collection,[20,300,500],[3,150,350],[3500,300,100],[50000,700,300])
 			this.initBadGuys(type,collection,120,true);
 				//break;
 
@@ -94,7 +94,7 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,100,1,function(e){
+			this.initElement(type,collection,0,1,function(e){
 				if(e.radius > max || e.radius < max) e.radius = max;
 			},true)
 		}
@@ -119,9 +119,9 @@ Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,e
 }
 
 Ether.World.prototype.initBackground = function(){
-	for (var i = 0; i < this.hillHeightAmount + 4; i++) {
+	for (var i = 0; i < this.hillHeightAmount + 10; i++) {
 		var hills = [];
-		for (var j = 0; j < this.hillWidthAmount+4; j++) {
+		for (var j = 0; j < this.hillWidthAmount+10; j++) {
 			hills[j] = {x: (this.hillWidth*j), y: (this.hillHeight*i)}
 		};
 		this.hills.push(hills);
