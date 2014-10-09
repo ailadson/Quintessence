@@ -18,21 +18,21 @@ Ether.Upgrade = function(engine){
 
 			cy.elements("node").data("activated",false);
 			cy.elements("node[id='nparent']").data("activated",true);
+			cy.elements("node[id='nparent']").addClass("activated");
 			self.addData(cy);
 
 			cy.elements("node").addClass("unactive")
 
 			cy.on('click','node',function(e){
-				if(self.hasEnoughEnergy(e.cyTarget)){
-
-					if(self.isUpgradable(e.cyTarget)){
+				if(self.isUpgradable(e.cyTarget)){
+					if(self.hasEnoughEnergy(e.cyTarget)){
 						e.cyTarget.data("activated",true);
+						cy.elements('node[id = "'+e.cyTarget.id()+'"]').removeClass("showingInfo");
 						e.cyTarget.addClass("activated");
 						self.handleClick(e.cyTarget);
+					} else {
+						//MAKE NOISE
 					}
-
-				} else if(self.isUpgradable(e.cyTarget)){
-					e.cyTarget.flashClass("lackingEnergy",1000)
 				}
 			});
 
@@ -41,12 +41,9 @@ Ether.Upgrade = function(engine){
 				var ele = e.cyTarget;
 
 				if(self.isUpgradable(ele)){
-					console.log(ele.id())
-					cy.elements('node[id = "'+ele.id()+'"]').addClass("showingInfo")
-					//cy.elements('node[id = "'+ele.id()+'"]').addClass(ele.id().split(".")[0])
-					//if(ele.data("activated")) cy.elements('node[id = "'+ele.id()+'"]').addClass("activated");
-				 } else {
-				 //	cy.elements('node[id = "'+ele.id()+'"]').addClass("notActive")
+					cy.elements('node[id = "'+ele.id()+'"]').addClass("showingInfo");					
+				 } else if(!ele.data().activated){
+					cy.elements('node[id = "'+ele.id()+'"]').addClass("notActive");									 	
 				 }
 			});
 
@@ -54,11 +51,9 @@ Ether.Upgrade = function(engine){
 				var ele = e.cyTarget;
 
 				if(self.isUpgradable(ele)){
-					cy.elements('node[id = "'+ele.id()+'"]').removeClass("showingInfo")
-					//cy.elements('node[id = "'+ele.id()+'"]').removeClass(ele.id().split(".")[0])
-					//cy.elements('node[id = "'+ele.id()+'"]').removeClass("activated");
-				 } else {
-				 //	cy.elements('node[id = "'+ele.id()+'"]').removeClass("notActive")
+					cy.elements('node[id = "'+ele.id()+'"]').removeClass("showingInfo");
+				 } else if(!ele.data("activated")){
+					cy.elements('node[id = "'+ele.id()+'"]').removeClass("notActive");									 					 	
 				 }
 			});
 
@@ -102,23 +97,22 @@ Ether.Upgrade.prototype.addData = function(cy){
 	for(var i in cy.elements("node")){
 		var node = cy.elements("node")[i]
 		if(node && node.data && !node.data("activated")){
-			var level = node.id().split(".")[1]
+			var level = parseInt(node.id().split(".")[1]);
 			var type = node.id().split(".")[0].charAt(0).toUpperCase() + node.id().split(".")[0].slice(1)
 			node.data("cost",level*(12 + level));
-			
 
-			switch(type){
+			switch(type.toLowerCase()){
 				case "movement" :
-					node.data("info",type+" : "+ (level*(12 + level)) + "water");
+					node.data("info",type+" : "+ (level*(12 + level)) + " : Water");
 					break;
 				case "resistance" :
-					node.data("info",type+" : "+ (level*(12 + level)) + "earth");
+					node.data("info",type+" : "+ (level*(12 + level)) + " : Earth");
 					break;
 				case "attraction" :
-					node.data("info",type+" : "+ (level*(12 + level)) + "fire");
+					node.data("info",type+" : "+ (level*(12 + level)) + " : Fire");
 					break;
 				case "balance" :
-					node.data("info",type+" : "+ (level*(12 + level)) + "air");
+					node.data("info",type+" : "+ (level*(12 + level)) + " : Air");
 					break;
 			}
 		}
@@ -195,7 +189,8 @@ Ether.Upgrade.prototype.style = [
 			'background-color':'#47BDDE',
 			'border-width' : '2',
 			'border-color' : '#243F63',
-			'shape' : "pentagon"
+			'shape' : "pentagon",
+			"color" : '#243F63'
 		}
 	},{
 		selector : 'node[id ^= "attraction"]',
@@ -203,7 +198,8 @@ Ether.Upgrade.prototype.style = [
 			'background-color':'#E0664A',
 			'border-width' : '2',
 			'border-color' : '#6B504A',
-			'shape' : "heptagon"
+			'shape' : "heptagon",
+			"color" : '#6B504A'
 		}
 	},{
 		selector : 'node[id ^= "resistance"]',
@@ -211,6 +207,7 @@ Ether.Upgrade.prototype.style = [
 			'background-color':'#6C7F2E',
 			'border-width' : '2',
 			'border-color' : '#858063',
+			'color' : '#858063',
 			'shape' : 'rectangle'
 		}
 	},{
@@ -219,6 +216,7 @@ Ether.Upgrade.prototype.style = [
 			'background-color':'#EDEDEB',
 			'border-width' : '2',
 			'border-color' : '#9E9E99',
+			"color" : "#9E9E99",
 			'shape' : 'triangle'
 		}
 	},{
@@ -227,6 +225,7 @@ Ether.Upgrade.prototype.style = [
 			'background-color':'#FFD700',
 			'border-width' : '2',
 			'border-color' : '#8F8F00',
+			"color" : "#8F8F00",
 			'shape' : 'star'
 		}
 	},{
@@ -239,76 +238,25 @@ Ether.Upgrade.prototype.style = [
 			"target-arrow-shape" : "triangle",
 		}
 	},{
-		selector : '.showingInfo',
+		selector : ".showingInfo",
 		css : {
-			"text-outline-color" : "white",
-			"text-outline-width" : "2",
-			"font-size" : "50",
 			"font-family" : "simple",
-			"text-align" : "center",
+			"font-size" : "25",
 			"content" : "data(info)"
 		}
 	},{
-		selector : ".movement",
+		selector : ".notActive",
 		css : {
-			"color" : '#243F63',
-			"content" : "data(info)"
+			"shape" : "ellipse",
+			"background-color" : "black",
+			"border-width" : "0"
 		}
 	},{
-		selector : ".attraction",
+		selector : ".activated",
 		css : {
-			"color" : '#6B504A',
-			"content" : "data(info)"
-		}
-	},{
-		selector : ".resistance",
-		css : {
-			'color':'#858063',
-			"content" : "data(info)"
-		}
-	},{
-		selector : ".balance",
-		css : {
-			'color':'#9E9E99',
-			"content" : "data(info)"
-		}
-	},{
-		selector : '.notActive',
-		css : {
-			'background-color':'#090909',
-			'border-width' : '2',
-			'border-color' : '#000000',
-			"text-outline-color" : "black",
-			"text-outline-width" : "2",
-			"color" : "white",
-			"font-size" : "40",
-			"font-family" : "Titillium Web",
-			"text-halign" : "center",
-			"content" : "Cannot Activate"
-		}
-	},{
-		selector : '.activated',
-		css : {
-			'border-width' : '0',
-			'background-color' : "white",
-			'shape' : 'circle'
-		}
-	},{
-		selector : ".Pactivated",
-		css : {
+			"shape" : "ellipse",
 			"background-color" : "white",
-			"text-outline-color" : "black",
-			"text-outline-width" : "2",
-			"color" : "white",
-			"font-size" : "40",
-			"font-family" : "Titillium Web",
-			"text-halign" : "center",
-			"content" : "Activated"
-		}
-	},{
-		selector : ".lackingEnergy",
-		css : {
-			"content" : "Need more elements"
+			"border-width" : "0"
 		}
 	}
 ];
