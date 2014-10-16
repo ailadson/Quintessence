@@ -31,6 +31,7 @@
 	this.upgradeScreen = false;
 
 	//endgame
+	this.gameOver = false;
 	this.gameOverAlpha = 0;
 	this.gameOverTime = 0;
 
@@ -44,7 +45,7 @@
 		if(self.upgradeScreen) return
 
 		//Draw Background
-		if(!self.player.dead){
+		if(!self.gameOver){
 			self.ctx.fillStyle = "black";
 			self.ctx.fillRect(0,0,self.width,self.height);
 		}
@@ -54,17 +55,13 @@
 			self.hub.drawIntro(time);
 
 		//otherwise, if between ages...
-		} else if(self.betweenAges){
-			self.hub.draw(time);
-
-		//otherwise, if player is not dead...
-		} else if(!self.player.dead){
+		} else if(!self.gameOver){
 
 			//Draw World
 			self.world.draw(self,time);
 
 			//check awards
-			if(!self.player.dying){ self.checkAwards(time) };
+			//if(!self.player.dying){ self.checkAwards(time) };
 			//Draw Ethers
 			for (var i = 0; i < self.ethers.length; i++) {
 				self.ethers[i].draw(self,time);
@@ -77,7 +74,7 @@
 			//
 
 		//otherwise, if player is dead
-		} else if(self.player.dead){
+		} else if(self.gameOver){
 			if(time > self.gameOverTime + 100){
 				self.gameOverAlpha+=0.01;
 				self.gameOverTime = time;
@@ -85,10 +82,12 @@
 				self.ctx.fillStyle = "rgba(255,255,255,+"+self.gameOverAlpha+");";
 				self.ctx.fillRect(0,0,self.width,self.height);
 			
-				self.ctx.font = "30px Arial"
+				self.ctx.font = "30px simple"
+				var width = ctx.measureText("so it goes").width;
 				self.ctx.fillStyle = "black";
-				self.ctx.fillText("Dead",self.width/2,self.height/2);
+				self.ctx.fillText("so it goes",self.width/2 - width/2,self.height/2);
 			}
+			self.hub.gameOver(self.ctx,time);
 		}
 	}
 
@@ -158,7 +157,7 @@ Ether.Engine.prototype.handleKeyDown =function(key){
 	var display = this.container.style.display;
 	switch(key){
 
-		case 32 : 
+		case 85 : 
 			if(display != "none"){ 
 				this.container.style.display = "none";
 				this.upgrade.container.style.display = "";

@@ -2,6 +2,7 @@ Ether.Upgrade = function(engine){
 	var self = this;
 	this.engine = engine;
 	this.player;
+	this.upgradeCheck = {w:[13],f:[13],a:[13],e:[]}
 	this.container = document.getElementById('upgrade');
 
 	this.cy = cytoscape({
@@ -31,8 +32,10 @@ Ether.Upgrade = function(engine){
 						e.cyTarget.addClass("activated");
 						self.handleClick(e.cyTarget);
 					} else {
-						//MAKE NOISE
+						self.engine.audio.playSound('nope');
 					}
+				} else {
+					self.engine.audio.playSound('nope');
 				}
 			});
 
@@ -77,19 +80,33 @@ Ether.Upgrade.prototype.hasEnoughEnergy = function(e){
 	var id = e.id().split(".")[0];
 	
 	if(id == "attraction" && count.f >= cost){
+		count.f -= cost
 		return true
 	}
 
 	if(id == "resistance" && count.e >= cost){
+		count.e -= cost
 		return true
 	}
 
 	if(id == "balance" && count.a >= cost){
+		count.a -= cost
 		return true
 	}
 
 	if(id == "movement" && count.w >= cost){
+		count.w -= cost
 		return true
+	}
+
+	if(id.indexOf("T") == 0){
+		if(count.f >= cost && count.w >= cost && count.e >= cost && count.a >= cost){
+			count.f -= cost;
+			count.e -= cost;
+			count.a -= cost;
+			count.w -= cost;
+			return true
+		}
 	}
 }
 
@@ -114,6 +131,12 @@ Ether.Upgrade.prototype.addData = function(cy){
 				case "balance" :
 					node.data("info",type+" : "+ (level*(12 + level)) + " : Air");
 					break;
+				case "tsnail" :
+				case "tbutterfly":
+					var len = type.length;
+					var lStr = type.slice(1,len);
+					var str = lStr.charAt(0).toUpperCase() + lStr.slice(1)
+					node.data("info",str+" : "+ Math.round(level*(12 + level)/1.3));
 			}
 		}
 		
@@ -163,23 +186,78 @@ Ether.Upgrade.prototype.handleClick = function(e){
 	 	case "movement" :
 	 		this.player.control += 10;
 	 		this.player.speed += 1;
+	 		this.upgradeCheck.w.shift();
 	 		break
 	 	case "balance" :
-	 		this.player.balance += 0.15;
+	 		this.player.balance += 0.5;
+	 		this.upgradeCheck.a.shift();
 	 		break;
 	 	case "attraction" :
 	 		this.player.attraction += 2
 	 		this.player.force -= 0.1
+	 		this.upgradeCheck.f.shift();
 	 		break
 	 	case "resistance" :
 	 		this.player.resistance += 1;
+	 		this.upgradeCheck.e.shift();
+	 		break;
+	 	case "Tsnail" :
+	 		this.player.transformation = this.player.transformations.snail;
+	 		break;
+	 	case "Tbutterfly" :
+	 		this.player.transformation = this.player.transformations.butterfly;
 	 		break;
 	 }
 
-	 this.engine.audio.playSound('upgrade');
-	 this.engine.container.style.display = "";
+
+	//update upgrade check
+	var edges = e.connectedEdges();
+	for(i in edges){
+		var edge = edges[i];
+
+		if(edge.target){
+			var target = edge.target();
+			var type = target.id().split(".")[0]
+			var cost = target.data().cost
+
+			switch(type){
+				case "movement" :
+			 		this.upgradeCheck.w.push(cost);
+			 		break
+			 	case "balance" :
+			 		this.upgradeCheck.a.push(cost);
+			 		break;
+			 	case "attraction" :
+			 		this.upgradeCheck.f.push(cost);
+			 		break
+			 	case "resistance" :
+			 		this.upgradeCheck.e.push(cost);
+			 		break;
+			}
+
+		}
+	}
+
+	this.engine.audio.playSound('upgrade');
+	this.engine.container.style.display = "";
 	this.container.style.display = "none";
 	this.engine.upgradeScreen = false;
+}
+
+Ether.Upgrade.prototype.canUpgrade = function(){
+	var count = this.player.getElementCount();
+
+	if(count.w >= this.upgradeCheck.w[0]){
+		return true
+	} else if(count.f >= this.upgradeCheck.f[0]){
+		return true
+	} else if(count.a >= this.upgradeCheck.a[0]){
+		return true
+	} else if(count.e >= this.upgradeCheck.e[0]){
+		return true
+	} else {
+		return false
+	}
 }
 
 Ether.Upgrade.prototype.style = [
@@ -190,7 +268,8 @@ Ether.Upgrade.prototype.style = [
 			'border-width' : '2',
 			'border-color' : '#243F63',
 			'shape' : "pentagon",
-			"color" : '#243F63'
+			"color" : '#47BDDE',
+			"text-outline-color" : '#243F63'
 		}
 	},{
 		selector : 'node[id ^= "attraction"]',
@@ -199,7 +278,8 @@ Ether.Upgrade.prototype.style = [
 			'border-width' : '2',
 			'border-color' : '#6B504A',
 			'shape' : "heptagon",
-			"color" : '#6B504A'
+			"color" : '#E0664A',
+			"text-outline-color" : '#6B504A'
 		}
 	},{
 		selector : 'node[id ^= "resistance"]',
@@ -207,8 +287,9 @@ Ether.Upgrade.prototype.style = [
 			'background-color':'#6C7F2E',
 			'border-width' : '2',
 			'border-color' : '#858063',
-			'color' : '#858063',
-			'shape' : 'rectangle'
+			'color' : '#6C7F2E',
+			'shape' : 'rectangle',
+			"text-outline-color" : '#858063'
 		}
 	},{
 		selector : 'node[id ^= "balance"]',
@@ -216,8 +297,9 @@ Ether.Upgrade.prototype.style = [
 			'background-color':'#EDEDEB',
 			'border-width' : '2',
 			'border-color' : '#9E9E99',
-			"color" : "#9E9E99",
-			'shape' : 'triangle'
+			"color" : "#EDEDEB",
+			'shape' : 'triangle',
+			"text-outline-color" : '#9F9FA0'
 		}
 	},{
 		selector : 'node[id ^= "T"]',
@@ -225,14 +307,15 @@ Ether.Upgrade.prototype.style = [
 			'background-color':'#FFD700',
 			'border-width' : '2',
 			'border-color' : '#8F8F00',
-			"color" : "#8F8F00",
-			'shape' : 'star'
+			"color" : "#FFD700",
+			'shape' : 'star',
+			"text-outline-color" : "#8F8F00"
 		}
 	},{
 		selector : 'edge',
 		css : {
 			"line-color" : "#D1E6E6",
-			"width" : "3",
+			"width" : "4",
 			"haystack-radius" : "1",
 			"target-arrow-color" : "#D1E6E6",
 			"target-arrow-shape" : "triangle",
@@ -242,6 +325,7 @@ Ether.Upgrade.prototype.style = [
 		css : {
 			"font-family" : "simple",
 			"font-size" : "25",
+			"text-outline-width" : "1",
 			"content" : "data(info)"
 		}
 	},{

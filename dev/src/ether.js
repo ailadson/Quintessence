@@ -33,14 +33,19 @@
 	this.lifeSpan = [400]; //in seconds
 	this.currentSpan = this.lifeSpan[0];
 	this.totalLifeSpan;
-	this.dead = false;
 	this.ageLastTime = 0;
 	this.finalElementLength = 1;
 	this.stabilityLastTime = 0;
+
+	this.dying = false;
+	this.dead = false;
 	
 	
 	this.transformation;
-	this.transformations = [this.rotateElement,this.createSludge]
+	this.transformations = {
+		butterfly : this.rotateElement,
+		snail : this.createSludge
+	}
 
 	this.sludgeTimeOffset = 500;
 	this.sludgeAlphaStep = 0.1
@@ -49,6 +54,8 @@
 	this.rotateLastTime = 0;
 	this.rotateDirection = -1;
 	this.degreeChange = 0;
+	this.blownUpElements = [];
+	this.blowUpTime = 0;
 
 	//zoom out
 	this.canZoom = false;
@@ -84,18 +91,30 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 		e.y = this.y + e.yOffset;
 		e.jitter *= -1;
 
-		//Butterfly//Snail Transformation
-		//if(this.age>=2)this.transformation(e,time)
+		if(this.transformation){ 
+			this.transformation(e,time) 
+		} else if (this.dead){
+			this.loseElements(2);
+			this.isGameOver();
+		}
 
 		//Draw Ether Elements
 		engine.ctx.beginPath();
 
 		self.util.drawElement(e, engine.ctx, function(ctx, element){
 			var gradient = engine.ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-			return self.util.createGradient(gradient,[[0.1,"white"],[0.1,"white"],[0.8,element.color],[0.1,"black"]])
+			if(element.rgb.a !=0.5){
+				return self.util.createGradient(gradient,[[0.1,"white"],[0.1,"white"],[0.8,element.color],[0.1,"black"]])
+			 } else {
+			 	return self.util.createGradient(gradient,[[0.1,"rgba(255,255,255,"+element.rgb.a+")"],[0.1,"rgba(255,255,255,"+element.rgb.a+")"],[0.8,element.color],[0.1,"rgba(0,0,0,"+element.rgb.a+")"]])				
+			 }
 		})
 
 	};
+
+	if(this.transformation && time > this.rotateLastTime + 500){
+		this.rotateLastTime = time;
+	}
 }
 
 Ether.Ether.prototype.drawCoreElements = function(engine){
@@ -131,13 +150,13 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	var stability = this.getStability();
 	//stabilit starts at 0 and increases as it become more unstable
-	if(stability >= 20){
+	if(stability >= 20 && !this.dead){
 		engine.hub.unstable = true 
 	} else {
 		engine.hub.unstable = false
 	}
 
-	if(stability >= 50){
+	if(stability >= 50 && !this.dead){
 		engine.hub.purging = true;
 		if(time > this.stabilityLastTime + 2000 - stability){
 			this.stabilityLastTime = time;		
@@ -293,7 +312,7 @@ Ether.Ether.prototype.loseElement = function(e){
 
 Ether.Ether.prototype.loseElements = function(val){
 	for(var i = 0; i < val; i++){
-		random = Math.floor(Math.random() * this.elements.length)
+		var random = Math.floor(Math.random() * this.elements.length)
 
 		if(this.elements.length != 0){
 			this.loseElement(this.elements[random],true)
@@ -332,21 +351,31 @@ Ether.Ether.prototype.receiveAward = function(a){
 }
 
 
+Ether.Ether.prototype.isGameOver = function(){
+	if(this.elements.length == 0){
+		this.engine.gameOver = true;
+	}
+}
+
+
 //lifestages
 Ether.Ether.prototype.rotateElement = function(e,time){
-	if(time > this.rotateLastTime + 500){
+	if(time > this.rotateLastTime + 100){
 
 		if(this.rotateDirection < 0){ //rDir starts at -1
 			this.degreeChange += 0.001;
-			if(this.degreeChange > 1) {this.degreeChange = 1 }
-			if(this.currentSpan < (this.lifeSpan[0]/3) * 2){ this.rotateDirection++; }
+			
+			if(this.degreeChange > 1) {
+				this.degreeChange = 1;
+				this.rotateDirection++; 
+			}
 
 		} else if(this.rotateDirection > 0){
 			this.degreeChange -= 0.001;
 			if(this.degreeChange < 0.001) {this.degreeChange = 0.001 }
 
 		} else {
-			if(this.currentSpan < this.lifeSpan[0]/3){ this.rotateDirection++; }
+			if(this.dying){ this.rotateDirection++; }
 
 		}
 	}
@@ -359,11 +388,15 @@ Ether.Ether.prototype.rotateElement = function(e,time){
 
 	e.xOffset = (e.range * Math.cos(this.util.degToRad(e.degree)));
 	e.yOffset = (e.xOffset * Math.tan(this.util.degToRad(e.degree)));
+
+	if(this.dead){this.loseElements(1); this.isGameOver()}
 	
 }
 
 Ether.Ether.prototype.createSludge = function(e,time){
-	if(time > this.sludgeLastTime + this.sludgeTimeOffset){
+	if(this.dead){
+		this.blowUpElements(time);
+	} else if(time > this.sludgeLastTime + this.sludgeTimeOffset){
 		this.sludgeLastTime = time; //lock after 1st iteration. for the sake of delay.
 		
 		var sludge = new Sludge(this.engine,this);
@@ -394,6 +427,56 @@ Ether.Ether.prototype.createSludge = function(e,time){
 Ether.Ether.prototype.pushSludge = function(s,e){
 	var ele = new Ether.Element(0,0,e);
 	s.elements.push(ele);
+}
+
+Ether.Ether.prototype.blowUpElements = function (time) {
+
+	if(time > this.blowUpTime + 100){
+		this.blowUpTime = time;
+
+		var c = 5 - this.blownUpElements.length;
+
+		if(this.elements.length != 0 && c > 0){
+			var random = Math.floor(Math.random() * this.elements.length)
+			this.igniteElement(this.elements[random]);
+		}
+
+		for (var i = 0; i < this.blownUpElements.length; i++) {
+			var e = this.blownUpElements[i]
+			if(this.blowUpElement(e)){ //if blown up element is removed
+				i--;
+			}
+		};
+
+		this.isGameOver();
+	}
+}
+
+Ether.Ether.prototype.blowUpElement = function (e) {
+	if(e.rgb.a > 0){
+		e.rgb.a -= 0.01;
+		if(e.rgb.a < 0){ e.rgb.a = 0; }
+		e.radius += 2;
+		e.color = "rgba("+e.rgb.r+","+e.rgb.g+","+e.rgb.b+","+e.rgb.a+")"
+	} else if(e.rgb.a == 0){
+		this.removeFromElementCount(e);
+		this.decreaseMass(e);
+		
+		//remove from elements
+		for (var i = 0; i < this.elements.length; i++) {
+			var ele = this.elements[i];
+
+			if(ele.x == e.x && ele.y == e.y){
+				this.blownUpElements.splice(0,1)
+				this.elements.splice(i,1);
+				return true
+			}
+		};
+	}
+}
+
+Ether.Ether.prototype.igniteElement = function (e) {
+	this.blownUpElements.push(e);
 }
 
 /**

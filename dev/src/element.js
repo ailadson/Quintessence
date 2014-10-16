@@ -44,7 +44,7 @@ Ether.Element = function(type,size,config,bad){
 	}
 	
 	this.color = "rgba("+r+","+g+","+b+",0.5)";
-	this.rgb = {r : r, g : g, b : b}
+	this.rgb = {r : r, g : g, b : b, a : 0.5}
 
 	//size
 	var _size = size || 0.5;

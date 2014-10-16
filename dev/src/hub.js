@@ -46,7 +46,7 @@ Ether.Hub = function(engine) {
 	this.gameOverLastTime = 0;
 	this.gameOverAlpha = 0;
 	this.gameOverWidth;
-	this.gameOverColor = "rgba(255,255,255,"
+	this.gameOverColor = "rgba(0,0,0,"
 
 
 	//mousemove
@@ -146,7 +146,8 @@ Ether.Hub.prototype.draw = function(time){
 	this.drawLifeBar(ctx, time);
 	this.updateMsgQue();
 	this.drawMessage(ctx,time);
-	this.drawZoom(ctx,time)
+	this.drawZoom(ctx,time);
+	this.drawUpgrade(ctx,time);
 }
 
 Ether.Hub.prototype.drawZoom = function(ctx,time){
@@ -171,6 +172,19 @@ Ether.Hub.prototype.drawZoom = function(ctx,time){
 	}
 	ctx.font = this.unit*1.5 + "px simple";
 	ctx.fillText("Z",this.engine.width - this.unit*2,this.engine.height - this.unit)
+}
+
+Ether.Hub.prototype.drawUpgrade = function(ctx,time){
+	if(!this.engine.player.moved){return}
+
+	if(!this.engine.upgrade.canUpgrade()){		
+		ctx.fillStyle = "rgba(65,78,78,.2)"
+	} else {
+		ctx.fillStyle = "#A3C2C2"
+	}
+
+	ctx.font = this.unit*1.5 + "px simple";
+	ctx.fillText("U",this.engine.width - this.unit*4,this.engine.height - this.unit)
 }
 
 
@@ -255,16 +269,16 @@ Ether.Hub.prototype.getEqualitySign = function(val1,val2){
 Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 	if(this.engine.betweenAges) { return }
 
-	var colors = ["green","yellow","orange","red"];
 	var ether = this.engine.ethers[0];
 	var ratio = ether.currentSpan/ether.lifeSpan[0]
+	var color = this.getLifeBarColor(ratio);
 
 	ctx.fillStyle = "#FFF4E9";
 	ctx.font = this.unit + "px simple"
 	var w = ctx.measureText("Lifespan").width
 	ctx.fillText("Lifespan",(this.engine.width/2)-(w/2), this.unit);
 
-	ctx.fillStyle = "green";
+	ctx.fillStyle = color;
 	ctx.fillRect(this.engine.width -(this.unit * 2), this.unit * 1.5, -(this.unit * 46) * ratio, this.unit * 0.5)
 
 	ctx.strokeStyle = "red";
@@ -278,10 +292,22 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 		if(ratio > 0){
 			ether.currentSpan--;
 		} else {
-			console.log("ADD GAME DEATH!!!!")
+			ether.dead = true;
 		}
 	}
 
+}
+
+Ether.Hub.prototype.getLifeBarColor = function(ratio){
+	if(ratio <= .25){
+		return "red"
+	} else if(ratio <= .5){
+		return "orange"
+	} else if(ratio <= .75){
+		return "yellow"
+	}else{
+		return "green"
+	}
 }
 
 //messages
@@ -315,41 +341,6 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 	} else {
 		this.renderMessage(ctx,time);
 	}
-
-	// var borderMssg = "there is no time in the boundless void";
-	// var stableMssg = "You Are Becoming Too Unstable"
-
-	// if(award){ this.messageExist = false; this.messageAlpha = 1 }
-
-	// if(!this.messageExist){
-	// 	if(this.awardMssg){
-	// 		this.messageExist = true;
-	// 		this.currentMessage = this.awardMssg[0];
-	// 		this.subMessage = "+"+this.awardMssg[1]+" Lifespan";
-	// 	}else if(!this.zoomMessageShown && this.zoomMessage != ""){
-	// 		this.messageExist = true;
-	// 		this.currentMessage = this.zoomMessage;
-	// 		this.zoomMessageShown = true;
-	// 	//leaving game border
-	// 	} else if(this.hasLeftBorder() && this.currentMessage != borderMssg){
-	// 		this.messageExist = true;
-	// 		this.currentMessage = borderMssg;
-		
-	// 	//killer element
-	// 	} else if(this.killerElement){
-	// 		this.messageExist = true;
-	// 		this.currentMessage = killerMssg;
-
-	// 	//stability
-	// 	} else if(this.unstable && !this.stableWarned){
-	// 		this.messageExist = true;
-	// 		this.stableWarned = true;
-	// 		this.currentMessage = stableMssg;
-	// 	}
-
-	// } else {
-	// 	if(!award) this.renderMessage(ctx,time);
-	// }
 }
 
 Ether.Hub.prototype.updateMsgQue = function(){

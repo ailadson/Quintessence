@@ -1,4 +1,4 @@
-/*! Quintessence - v0.0.1 - 2014-10-02 */window.mobilecheck = function() {
+/*! Quintessence - v0.0.1 - 2014-10-10 */window.mobilecheck = function() {
 var check = false;
 (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true})(navigator.userAgent||navigator.vendor||window.opera);
 return check; };var Ether = Ether || {};
@@ -44,7 +44,7 @@ Ether.Element = function(type,size,config,bad){
 	}
 	
 	this.color = "rgba("+r+","+g+","+b+",0.5)";
-	this.rgb = {r : r, g : g, b : b}
+	this.rgb = {r : r, g : g, b : b, a : 0.5}
 
 	//size
 	var _size = size || 0.5;
@@ -73,126 +73,53 @@ Ether.Element = function(type,size,config,bad){
 	//jitter
 	this.jitter = bad ? -5: -1;
 
+};Ether.MsgQue = function(){
+	this.que = [];
+}
+
+Ether.MsgQue.prototype.addMsg = function(string,type,sub){
+	this.que.push(new Ether.Msg(string,type,sub));
+}
+
+Ether.MsgQue.prototype.getMsg = function(){
+	return this.que.shift();
+}
+
+Ether.MsgQue.prototype.hasMsg = function(){
+	return this.que.length > 0
+}
+
+Ether.Msg = function(s,t,sb){
+	this.str = s
+	this.sub = sb || ""
+	this.alpha = 1
+	this.alphaStep = 0.01
+	this.type = t
+}
+
+Ether.Msg.prototype.lowerAlpha = function(){
+	this.alpha -= this.alphaStep
+	if(this.alpha < 0) this.alpha = 0
+	return this.alpha
+}
+
+Ether.Msg.prototype.isFadedEnuf = function(){
+	return this.alpha < 0.3
 };Ether.awards = {};
-
-Ether.awards["consciousness"] = [
-	{
-		text : "I"
-	},{
-		text : "I am"
-	},{
-		text : "Me"
-	},{
-		text : "Mine"
-	},{
-		text : "You"
-	},{
-		text : "I love"
-	},{
-		text : "I am sleepy"
-	},{
-		text : "I am hot"
-	},{
-		text : "I am cold"
-	},{
-		text : "I am thirsty"
-	},{
-		text : "I am hungry"
-	},{
-		text : "I am horny"
-	},{
-		text : "I am in the world"
-	},{
-		text : "I want this"
-	},{
-		text : "Why can't I have that?"
-	},{
-		text : "I'm afraid"
-	},{
-		text : "Why do I hurt?"
-	},{
-		text : "How do I get more?"
-	},{
-		text : "Who are my friends?"
-	},{
-		text : "How can I thrive?"
-	},{
-		text : "This is my stuff"
-	},{
-		text : "I am right"
-	},{
-		text : "They are wrong"
-	},{
-		text : "I will create"
-	},{
-		text : "Will I die?"
-	},{
-		text : "Everything dies"
-	},{
-		text : "Why am I here?"
-	},{
-		text : "I will die"
-	},{
-		text : "Who am I?"
-	},{
-		text : "Where did I come from?"
-	},{
-		text : "This is the truth"
-	},{
-		text : "That is not the truth"
-	},{
-		text : "This is who I am"
-	},{
-		text : "Who I am keeps changing"
-	},{
-		text : "I am my thougts"
-	},{
-		text : "My thoughts always change"
-	},{
-		text : "Do I change?"
-	},{
-		text : "What is constant?"
-	},{
-		text : "I am awareness"
-	},{
-		text : "Was awareness always here?"
-	},{
-		text : "From here did this awareness come?"
-	},{
-		text : "All comes from nothing"
-	},{
-		text : "All goes to nothing"
-	},{
-		text : "I am all"
-	},{
-		text : "I am nothing"
-	},{
-		text : "I am self evident"
-	},{
-		text : "I am self here"
-	},{
-		text : "No word is true"
-	},{
-		text : "How can sounds describe silence?"
-	},{
-		text : "[silence]"
-	}
-];
-
 
 Ether.awards["matter"] = [
 	{
-		text : "Strings(1 x 10^-35)"
+		text : "String(1 x 10^-35)"
 	},{
 		text : "Quantum Foam(1 x 10^-35)"
 	},{
-		text : "Neutrinos(1 x 10^-24)"
+		text : "Neutrino(1 x 10^-24)"
 	},{
-		text : "Quarks(1 x 10^-19)"
+		text : "Quark(1 x 10^-19)"
 	},{
-		text : "Protons(1 x 10^-15)"
+		text : "Proton(1 x 10^-15)"
 	},{
-		text : "Neutrons(1 x 10^-15)"
+		text : "Neutron(1 x 10^-15)"
 	},{
 		text : "Electrons(1 x 10^-15)"
 	},{
@@ -354,22 +281,26 @@ Ether.Util.prototype.getLocalStorage = function(){
 	this.attraction = 0;
 	this.balance = 1;
 	this.force = 1.5;
-	this.zoom = 1;
 	this.elementCount = {f:0,w:0,a:0,e:0}
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [365]; //in seconds
+	this.lifeSpan = [400]; //in seconds
 	this.currentSpan = this.lifeSpan[0];
 	this.totalLifeSpan;
-	this.dead = false;
 	this.ageLastTime = 0;
 	this.finalElementLength = 1;
 	this.stabilityLastTime = 0;
+
+	this.dying = false;
+	this.dead = false;
 	
 	
 	this.transformation;
-	this.transformations = [this.rotateElement,this.createSludge]
+	this.transformations = {
+		butterfly : this.rotateElement,
+		snail : this.createSludge
+	}
 
 	this.sludgeTimeOffset = 500;
 	this.sludgeAlphaStep = 0.1
@@ -378,30 +309,27 @@ Ether.Util.prototype.getLocalStorage = function(){
 	this.rotateLastTime = 0;
 	this.rotateDirection = -1;
 	this.degreeChange = 0;
+	this.blownUpElements = [];
+	this.blowUpTime = 0;
+
+	//zoom out
+	this.canZoom = false;
+	this.zooming = false;
+	this.zoomLastTime = 0;
+	this.zoomDelay = 500;
+	this.zoomStep = 1.07;
+	this.zoomCounter = 4;
+	this.zoomCounterMax = this.zoomCounter;
+	this.zoom = 1;
 
 }
 
 Ether.Ether.prototype.init = function(){
-	// switch(this.age){
-	// 	case 0 :
-			this.createCoreElement();
-	// 		break;
-
-	// 	case 1 : 
-	// 	case 2 : 
-	// 		this.zoomOut(2)
-	// 		break;
-
-	// 	case 3 :
-	// 		this.zoomOut(2);
-	// 		this.sludgeAlphaStep *= 2;
-	// 		this.sludgeTimeOffset *= 4;
-	// 		this.finalElementLength = this.elements.length;
-	// 		break;
-	// }
+	this.createCoreElement();
 }
 
 Ether.Ether.prototype.draw = function(engine,time){
+	if(this.zooming){ this.getMoreScreen(time) }
 	this.drawCoreElements(engine);
 	this.drawElements(engine,time);
 	this.stabilityCheck(engine,time);
@@ -409,9 +337,6 @@ Ether.Ether.prototype.draw = function(engine,time){
 
 Ether.Ether.prototype.drawElements = function(engine,time){
 	var self = this;
-
-	//age ether during the thried life stage
-	//if(this.age == 3)this.ageEther(time)
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i];
@@ -421,21 +346,30 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 		e.y = this.y + e.yOffset;
 		e.jitter *= -1;
 
-		//Butterfly//Snail Transformation
-		//if(this.age>=2)this.transformation(e,time)
+		if(this.transformation){ 
+			this.transformation(e,time) 
+		} else if (this.dead){
+			this.loseElements(2);
+			this.isGameOver();
+		}
 
 		//Draw Ether Elements
 		engine.ctx.beginPath();
 
 		self.util.drawElement(e, engine.ctx, function(ctx, element){
 			var gradient = engine.ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-			return self.util.createGradient(gradient,[[0.1,"white"],[0.1,"white"],[0.8,element.color],[0.1,"black"]])
+			if(element.rgb.a !=0.5){
+				return self.util.createGradient(gradient,[[0.1,"white"],[0.1,"white"],[0.8,element.color],[0.1,"black"]])
+			 } else {
+			 	return self.util.createGradient(gradient,[[0.1,"rgba(255,255,255,"+element.rgb.a+")"],[0.1,"rgba(255,255,255,"+element.rgb.a+")"],[0.8,element.color],[0.1,"rgba(0,0,0,"+element.rgb.a+")"]])				
+			 }
 		})
 
 	};
 
-	//time has to be updated outside of the loop
-	//if(this.age == 2 && time > this.rotateLastTime + 500) this.rotateLastTime = time;
+	if(this.transformation && time > this.rotateLastTime + 500){
+		this.rotateLastTime = time;
+	}
 }
 
 Ether.Ether.prototype.drawCoreElements = function(engine){
@@ -452,12 +386,6 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 				var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
 				return self.util.createGradient(gradient,[[0.5,"white"],[0.4,element.color],[1,"black"]])
 			});	
-		// } else {
-		// 	self.util.drawElement(e, engine.ctx, function(ctx,element){
-		// 		var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-		// 		return self.util.createGradient(gradient,[[0.5,"white"],,[1,"black"]])
-		// 	});	
-		// }	
 
 		//velocity
 		e.x += e.vx;
@@ -476,43 +404,55 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 
 Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	var stability = this.getStability();
-
-	if(stability > 40){
+	//stabilit starts at 0 and increases as it become more unstable
+	if(stability >= 20 && !this.dead){
 		engine.hub.unstable = true 
+	} else {
+		engine.hub.unstable = false
+	}
 
-		if(stability >= 50){
-			if(time > this.stabilityLastTime + 2000 - stability){
-				this.stabilityLastTime = time;		
-				this.loseElements(3);
-			}
+	if(stability >= 50 && !this.dead){
+		engine.hub.purging = true;
+		if(time > this.stabilityLastTime + 2000 - stability){
+			this.stabilityLastTime = time;		
+			this.loseElements(3);
+			this.engine.audio.playSound('purge',1)
 		}
+	} else {
+		engine.hub.purging = false;
 	}
 }
 
-Ether.Ether.prototype.getMoreScreen = function(){
-	// console.log(this.range+(e.radius*2))
-	// console.log(this.engine.height/2)
-	// if((this.range+(e.radius*1.8) >= this.engine.width/2) ||
-	// 	(this.range+(e.radius*1.8) >= this.engine.height/2)){
-		this.zoomOut(1.5);
-		this.engine.world.zoomOutBackground(1.3);
-		this.engine.world.zoomOutElements(1.5);
+Ether.Ether.prototype.getMoreScreen = function(time){
+	if(this.zoomCounter != 0 && time > this.zoomLastTime + this.zoomDelay){
+		this.zoomLastTime = time;
+		this.zoomCounter -= 1
+		this.zoomOut(this.zoomStep);
+		this.engine.world.zoomOutBackground(this.zoomStep+0.1);
+		this.engine.world.zoomOutElements(this.zoomStep);
+	} else if(this.zoomCounter == 0){
+		this.canZoom = false;
+		this.zooming = false;
+		this.zoomCounter = this.zoomCounterMax
+		this.engine.hub.zoomTimeout = 100;
+	}
 
 }
 
+
 Ether.Ether.prototype.zoomOut = function(val){
-	this.range /= val;
-	this.zoom += val;
+	this.range = Math.round(this.range/val);
+	this.zoom = Math.round(this.zoom + val);
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i]
-		e.radius /= val;
-		e.xOffset /= val;
-		e.yOffset /= val;
+		e.radius = Math.round(e.radius/val);
+		e.xOffset = Math.round(e.xOffset/val);
+		e.yOffset = Math.round(e.yOffset/val);
 	};
 
 	for (var i = 0; i < this.coreElements.length; i++) {
-		this.coreElements[i].radius /= val;
+		this.coreElements[i].radius =  Math.round(this.coreElements[i].radius/val);
 	};
 }
 
@@ -533,7 +473,7 @@ Ether.Ether.prototype.ageEther = function(time){
 		
 		if(this.elements.length != 0){
 			var e =this.loseElement(this.elements[this.elements.length-1],true)
-			this.engine.audio.playSound(e);
+			this.engine.audio.playElementSound(e);
 		}
 	}
 }
@@ -567,13 +507,13 @@ Ether.Ether.prototype.getElementCount = function(){
 
 Ether.Ether.prototype.addToElementCount = function(ele){
 	switch(ele.type){
-		case 'fire': this.elementCount.f += (Math.round((ele.radius/2)) * this.zoom);
+		case 'fire': this.elementCount.f += (Math.round((ele.radius/2)));
 			break;
-		case 'water': this.elementCount.w += (Math.round((ele.radius/2)) * this.zoom);
+		case 'water': this.elementCount.w += (Math.round((ele.radius/2)));
 			break;
-		case 'air': this.elementCount.a += (Math.round((ele.radius/2)) * this.zoom);
+		case 'air': this.elementCount.a += (Math.round((ele.radius/2)));
 			break;
-		case 'earth': this.elementCount.e += (Math.round((ele.radius/2)) * this.zoom);
+		case 'earth': this.elementCount.e += (Math.round((ele.radius/2)));
 			break;
 	}
 }
@@ -597,7 +537,7 @@ Ether.Ether.prototype.removeFromElementCount = function(ele){
 
 //Elements
 Ether.Ether.prototype.newElement = function(e){
-	this.engine.audio.playSound(e);
+	this.engine.audio.playElementSound(e);
 	this.addToElementCount(e);
 	this.increaseMass(e);
 			
@@ -627,7 +567,7 @@ Ether.Ether.prototype.loseElement = function(e){
 
 Ether.Ether.prototype.loseElements = function(val){
 	for(var i = 0; i < val; i++){
-		random = Math.floor(Math.random() * this.elements.length)
+		var random = Math.floor(Math.random() * this.elements.length)
 
 		if(this.elements.length != 0){
 			this.loseElement(this.elements[random],true)
@@ -645,13 +585,13 @@ Ether.Ether.prototype.createCoreElement = function(){
 Ether.Ether.prototype.increaseMass = function(e){
 	this.createCoreElement();
 	this.mass += 1//e.radius/massOffset;
-	this.range += e.radius/3
+	this.range += e.radius/2
 }
 
 Ether.Ether.prototype.decreaseMass = function(e){
 	if(this.coreElements.length > 1) this.coreElements.pop();
 	if(this.mass > 0) this.mass -= 1;
-	if(this.range > 2) this.range -= e.radius/3;
+	if(this.range > 2) this.range -= e.radius/2;
 }
 
 //awards
@@ -666,21 +606,31 @@ Ether.Ether.prototype.receiveAward = function(a){
 }
 
 
+Ether.Ether.prototype.isGameOver = function(){
+	if(this.elements.length == 0){
+		this.engine.gameOver = true;
+	}
+}
+
+
 //lifestages
 Ether.Ether.prototype.rotateElement = function(e,time){
-	if(time > this.rotateLastTime + 500){
+	if(time > this.rotateLastTime + 100){
 
 		if(this.rotateDirection < 0){ //rDir starts at -1
 			this.degreeChange += 0.001;
-			if(this.degreeChange > 1) {this.degreeChange = 1 }
-			if(this.currentSpan < (this.lifeSpan[0]/3) * 2){ this.rotateDirection++; }
+			
+			if(this.degreeChange > 1) {
+				this.degreeChange = 1;
+				this.rotateDirection++; 
+			}
 
 		} else if(this.rotateDirection > 0){
 			this.degreeChange -= 0.001;
 			if(this.degreeChange < 0.001) {this.degreeChange = 0.001 }
 
 		} else {
-			if(this.currentSpan < this.lifeSpan[0]/3){ this.rotateDirection++; }
+			if(this.dying){ this.rotateDirection++; }
 
 		}
 	}
@@ -693,11 +643,15 @@ Ether.Ether.prototype.rotateElement = function(e,time){
 
 	e.xOffset = (e.range * Math.cos(this.util.degToRad(e.degree)));
 	e.yOffset = (e.xOffset * Math.tan(this.util.degToRad(e.degree)));
+
+	if(this.dead){this.loseElements(1); this.isGameOver()}
 	
 }
 
 Ether.Ether.prototype.createSludge = function(e,time){
-	if(time > this.sludgeLastTime + this.sludgeTimeOffset){
+	if(this.dead){
+		this.blowUpElements(time);
+	} else if(time > this.sludgeLastTime + this.sludgeTimeOffset){
 		this.sludgeLastTime = time; //lock after 1st iteration. for the sake of delay.
 		
 		var sludge = new Sludge(this.engine,this);
@@ -728,6 +682,56 @@ Ether.Ether.prototype.createSludge = function(e,time){
 Ether.Ether.prototype.pushSludge = function(s,e){
 	var ele = new Ether.Element(0,0,e);
 	s.elements.push(ele);
+}
+
+Ether.Ether.prototype.blowUpElements = function (time) {
+
+	if(time > this.blowUpTime + 100){
+		this.blowUpTime = time;
+
+		var c = 5 - this.blownUpElements.length;
+
+		if(this.elements.length != 0 && c > 0){
+			var random = Math.floor(Math.random() * this.elements.length)
+			this.igniteElement(this.elements[random]);
+		}
+
+		for (var i = 0; i < this.blownUpElements.length; i++) {
+			var e = this.blownUpElements[i]
+			if(this.blowUpElement(e)){ //if blown up element is removed
+				i--;
+			}
+		};
+
+		this.isGameOver();
+	}
+}
+
+Ether.Ether.prototype.blowUpElement = function (e) {
+	if(e.rgb.a > 0){
+		e.rgb.a -= 0.01;
+		if(e.rgb.a < 0){ e.rgb.a = 0; }
+		e.radius += 2;
+		e.color = "rgba("+e.rgb.r+","+e.rgb.g+","+e.rgb.b+","+e.rgb.a+")"
+	} else if(e.rgb.a == 0){
+		this.removeFromElementCount(e);
+		this.decreaseMass(e);
+		
+		//remove from elements
+		for (var i = 0; i < this.elements.length; i++) {
+			var ele = this.elements[i];
+
+			if(ele.x == e.x && ele.y == e.y){
+				this.blownUpElements.splice(0,1)
+				this.elements.splice(i,1);
+				return true
+			}
+		};
+	}
+}
+
+Ether.Ether.prototype.igniteElement = function (e) {
+	this.blownUpElements.push(e);
 }
 
 /**
@@ -908,7 +912,7 @@ Ether.World.prototype.init = function(engine){
 
 		// switch(engine.ethers[0].age){
 		// 	case 0 :
-			this.initElements(type,collection,[20,300,500],[3,150,350],[3000,300,100],[50000,700,300])
+			this.initElements(type,collection,[20,300,500],[3,150,350],[3500,300,100],[50000,700,300])
 			this.initBadGuys(type,collection,120,true);
 				//break;
 
@@ -944,7 +948,7 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,100,1,function(e){
+			this.initElement(type,collection,0,1,function(e){
 				if(e.radius > max || e.radius < max) e.radius = max;
 			},true)
 		}
@@ -969,9 +973,9 @@ Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,e
 }
 
 Ether.World.prototype.initBackground = function(){
-	for (var i = 0; i < this.hillHeightAmount + 4; i++) {
+	for (var i = 0; i < this.hillHeightAmount + 10; i++) {
 		var hills = [];
-		for (var j = 0; j < this.hillWidthAmount+4; j++) {
+		for (var j = 0; j < this.hillWidthAmount+10; j++) {
 			hills[j] = {x: (this.hillWidth*j), y: (this.hillHeight*i)}
 		};
 		this.hills.push(hills);
@@ -1220,7 +1224,7 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 		} else {
 			if(this.badToggle > this.player.resistance*2){
 				this.badToggle = 0;
-				this.engine.audio.playSound(e)
+				this.engine.audio.playElementSound(e)
 				ether.loseElements(1);
 			} else {
 				this.badToggle += 1;
@@ -1378,13 +1382,10 @@ Ether.World.prototype.newElement = function(e){
 	//messages
 	this.lastTime = 0;
 	this.messageExist = false;
-	this.messageAlpha = 1;
+	//this.messageAlpha = 1;
 	this.currentMessage = "";
 	this.lastMessageTime = 0;
-
-	//between stages
-	this.betweenAlpha = 0.1;
-	this.betweenLastTime = 0;
+	this.msgQue = new Ether.MsgQue();
 
 	//intro
 	this.intro = true;
@@ -1394,10 +1395,12 @@ Ether.World.prototype.newElement = function(e){
 	this.introIndex = 0;
 	this.timeOffset = 0
 
-	//questions
-	this.choice1Alpha = 0.2;
-	this.choice2Alpha = 0.2;
-	this.question = 0;
+	//zoom
+	this.zoomTimeout = 100
+	this.zoomLastTime = 0
+	this.zoomMessage = ""
+	this.zoomMessageShown = false
+	this.zoomSubMessage = "Press Z to zoom out"
 	
 	//awards
 	this.awardMssg = "";
@@ -1405,12 +1408,16 @@ Ether.World.prototype.newElement = function(e){
 	this.lifeStageOpts = ["spread your wings","spread your trail"]
 	this.subMessage = "";
 
-	
+	this.stableWarned = false
+	this.stableMssg = "The vibration is a sign of your imbalance"
+	this.purgeMssg = "PURGING"
+	this.purgeNotified = false;
+	this.unstable = false;
 
 	this.gameOverLastTime = 0;
 	this.gameOverAlpha = 0;
 	this.gameOverWidth;
-	this.gameOverColor = "rgba(255,255,255,"
+	this.gameOverColor = "rgba(0,0,0,"
 
 
 	//mousemove
@@ -1448,27 +1455,6 @@ Ether.World.prototype.newElement = function(e){
 			}
 			return
 		}
-
-		// switch(self.question){
-		// 	case 0 :
-		// 		self.showInfo = (self.choice1Alpha > self.choice2Alpha) ? true : false
-		// 		break;
-		// 	case 1 :
-		// 		if(self.choice1Alpha > self.choice2Alpha)
-		// 			self.engine.setAwards("matter") 
-		// 		else
-		// 			self.engine.setAwards("consciousness"); 
-		// 		break;
-		// 	case 2 :
-		// 		var ether = self.engine.ethers[0];
-		// 		ether.transformation = (self.choice1Alpha > self.choice2Alpha) ? ether.transformations[0] : ether.transformations[1];
-		// 		self.lifeStageMssg = (self.choice1Alpha > self.choice2Alpha) ? self.lifeStageOpts[0] : self.lifeStageOpts[1];
-		// 		break;
-		// 	case 3 :
-		// 		self.engine.badGuys = (self.choice1Alpha > self.choice2Alpha) ? true : false
-		// 		if(!self.engine.badGuys){ self.engine.world.removeBadElements()}
-		// }
-
 		
 		if(self.introIndex + 1 < self.introText.length){
 			self.timeOffset = self.lastIntroTime;
@@ -1496,17 +1482,12 @@ Ether.Hub.prototype.init = function(){
 
  Ether.Hub.prototype.drawIntro = function(time){
  	var ctx = this.engine.ctx;
-// 	if(this.question <= 3){
-// 		this.drawAnswerBoxes(ctx,time);
-// 		this.drawQuestionText(ctx,time);
-// 	} else {
-		this.drawIntroText(ctx,time)
-// 	}
+	this.drawIntroText(ctx,time)
 }
 
 Ether.Hub.prototype.drawIntroText = function(ctx,time){
 	if(time > this.lastIntroTime + 50){
-		ctx.font = "28pt Titillium Web"
+		ctx.font = "28pt simple"
 		ctx.fillStyle="rgba(164,161,151,"+this.introAlpha+")";
 
 		this.introAlpha += 0.1;
@@ -1527,92 +1508,59 @@ Ether.Hub.prototype.drawIntroText = function(ctx,time){
 	ctx.fillText(txt,(this.engine.width/2)-(iWidth/2),this.engine.height/2)
 }
 
-// Ether.Hub.prototype.drawQuestionText = function(ctx,time){
-// 	var questions = [];
+Ether.Hub.prototype.draw = function(time){
+	var ctx = this.engine.ctx;
+	var stats = this.getStats();
 
-// 	var answers = [];
-
-// 	var currentQuestion = questions[this.question];
-// 	var currentAnswers = answers[this.question];
-// 	var qWidth = ctx.measureText(currentQuestion).width;
-
-// 	if(time > this.lastIntroTime + 50){
-// 		this.lastIntroTime = time;
-// 		this.introAlpha += 0.05;
-// 		if(this.introAlpha > 1) this.introAlpha = 1;
-// 	}
-
-// 	//quetion
-// 	ctx.font = "28pt Titillium Web"
-// 	ctx.fillStyle="rgba(164,161,151,"+this.introAlpha+")";
-// 	ctx.fillText(currentQuestion,(this.engine.width/2)-(qWidth/2),this.unit * 2);
-
-// 	//answers
-// 	var aWidth0 = ctx.measureText(currentAnswers[0]).width;
-// 	var aWidth1 = ctx.measureText(currentAnswers[1]).width;
-
-// 	ctx.fillText(currentAnswers[0],(this.engine.width/4)-(aWidth0/2),this.engine.height/2)
-// 	ctx.fillText(currentAnswers[1],((this.engine.width/4) * 3)-(aWidth1/2),this.engine.height/2)
-// }
-
-Ether.Hub.prototype.drawAnswerBoxes = function(ctx){
-	var width = this.engine.width;
-	var height = this.engine.height;
-
-	ctx.fillStyle = "rgba(75,100,75,"+this.choice1Alpha+")";
-	ctx.fillRect(0,0,width/2,height);
-
-	ctx.fillStyle = "rgba(75,75,100,"+this.choice2Alpha+")";
-	ctx.fillRect(width/2,0,width/2,height)
-
-	ctx.fillStyle = "black";
-	ctx.fillRect(0,0,width,this.unit*3);
+	var balanceWidth = this.drawBalance(stats.stab,ctx);
+	this.drawElementStats(stats.elementCount,ctx,balanceWidth);
+	this.drawLifeBar(ctx, time);
+	this.updateMsgQue();
+	this.drawMessage(ctx,time);
+	this.drawZoom(ctx,time);
+	this.drawUpgrade(ctx,time);
 }
 
-Ether.Hub.prototype.draw = function(time){
-	var stats = this.getStats();
-	var ctx = this.engine.ctx;
+Ether.Hub.prototype.drawZoom = function(ctx,time){
+	if(!this.engine.player.moved){return}
 
-	//convert stability
-	var hubStab = (stats.stab > 100) ? 0 : (100 - stats.stab)
+	if(this.zoomTimeout != 0){
+		if(time > this.zoomLastTime + 1000){
+			this.zoomLastTime = time;
+			this.zoomTimeout -= 1;
+			if(this.zoomTimeout == 0){
+				this.engine.player.canZoom = true;
 
-	if(this.showInfo){
+				if(!this.zoomMessageShown){
+					this.zoomMessage = "See yourself on a different scale";
+				}
+			}
+		}
+		ctx.fillStyle = "rgba(65,78,78,.2)"
 
-		ctx.font = this.unit + "30px Titillium Web";
-		ctx.fillStyle = "rgba(164,161,151,1)"
-		ctx.fillText("Mass: " + Math.floor(stats.mass), this.unit,this.unit*1.5)
-		ctx.fillText("Balance: " + hubStab, this.unit,this.unit*2.5)
+	} else {
+		ctx.fillStyle = "#A3C2C2"
+	}
+	ctx.font = this.unit*1.5 + "px simple";
+	ctx.fillText("Z",this.engine.width - this.unit*2,this.engine.height - this.unit)
+}
+
+Ether.Hub.prototype.drawUpgrade = function(ctx,time){
+	if(!this.engine.player.moved){return}
+
+	if(!this.engine.upgrade.canUpgrade()){		
+		ctx.fillStyle = "rgba(65,78,78,.2)"
+	} else {
+		ctx.fillStyle = "#A3C2C2"
 	}
 
-	//in between ages?
-	//this.drawInbetween(ctx,time);
-
-	if(this.showInfo) this.drawElementStats(stats.elementCount,ctx);
-	this.drawLifeBar(ctx, time);
-	this.drawMessage(ctx,time);
+	ctx.font = this.unit*1.5 + "px simple";
+	ctx.fillText("U",this.engine.width - this.unit*4,this.engine.height - this.unit)
 }
 
-// Ether.Hub.prototype.drawInbetween = function(ctx,time){
-// 	var age = this.engine.ethers[0].age;
-
-// 	if(this.engine.betweenAges){
-// 		if(age < 3){
-// 			//alpha
-// 			if(time > this.betweenLastTime + 100){
-// 				this.betweenLastTime = time;
-// 				ctx.fillStyle = "rgba(164,161,151,"+this.betweenAlpha+")";
-// 			    //ctx.fillRect(0,0,this.engine.width,this.engine.height);
-// 			}
-// 		} else{
-// 			this.gameOver(ctx,time)
-// 		}
-		
-// 	}
-// }
 
 Ether.Hub.prototype.newAward = function(text,amount){
 	this.awardMssg = [text,amount];
-	this.drawMessage(0,0,true);
 }
 
 Ether.Hub.prototype.getStats = function(){
@@ -1627,38 +1575,85 @@ Ether.Hub.prototype.getStats = function(){
 	return o;
 }
 
-Ether.Hub.prototype.drawElementStats = function(count, ctx){
-	ctx.font = this.unit * .75 + "px Titillium Web";
+Ether.Hub.prototype.drawBalance = function(stab,ctx){
+	//console.log("hub balance: "+stab)
+	var hubStab = (stab > 100) ? 0 : (100 - stab)
+	
+	ctx.font =this.unit*2+"px simple";
+	ctx.fillStyle = "#414E4E";
+	ctx.fillText("Balance: " + hubStab, this.unit*.9-2,(this.engine.height - this.unit*1.2)-2);
+	
+	ctx.fillStyle = "#A3C2C2";
+	ctx.fillText("Balance: " + hubStab, this.unit *.9,this.engine.height - this.unit*1.2);
 
-	ctx.fillStyle = "red";
-	ctx.fillText("Fire: " + count["f"], this.unit, this.unit*3.2);
+	return this.unit
+}
 
-	ctx.fillStyle = "#3399FF";
-	ctx.fillText("Water: " + count["w"], this.unit * 3.5, this.unit*3.2);
+Ether.Hub.prototype.drawElementStats = function(count, ctx, width){
+	ctx.font = this.unit + "px simple";
 
-	ctx.fillStyle = "white";
-	ctx.fillText("Air: " + count["a"], this.unit, this.unit*4.1);
+	var fWidth = ctx.measureText("Fire: " + count["f"]).width
+	var aWidth = ctx.measureText("Air: " + count["a"]).width
+	var eleWidth = (fWidth >= aWidth) ? fWidth : aWidth
 
-	ctx.fillStyle = "green";
-	ctx.fillText("Earth: " + count["e"], this.unit * 3.5, this.unit*4.1);
+	ctx.fillStyle =  "#6B504A";
+	ctx.fillText("Fire: " + count["f"], width-1, this.engine.height - this.unit*4.5 -1);
+	ctx.fillStyle = "#E0664A";
+	ctx.fillText("Fire: " + count["f"], width, this.engine.height - this.unit*4.5);
+
+	ctx.fillStyle ='#243F63',
+	ctx.fillText("Water: " + count["w"], width + eleWidth + this.unit * 2 - 1, this.engine.height - this.unit*4.5 -1);	
+	ctx.fillStyle = "#47BDDE";
+	ctx.fillText("Water: " + count["w"], width + eleWidth + this.unit * 2, this.engine.height - this.unit*4.5);
+
+	ctx.fillStyle = "#9E9E99";
+	ctx.fillText("Air: " + count["a"], width  -1, this.engine.height - this.unit*3-1);
+	ctx.fillStyle = "#EDEDEB";
+	ctx.fillText("Air: " + count["a"], width , this.engine.height - this.unit*3);
+
+	ctx.fillStyle = '#858063'
+	ctx.fillText("Earth: " + count["e"], width + eleWidth + this.unit * 2 -1, this.engine.height - this.unit*3-1)
+	ctx.fillStyle = '#6C7F2E';
+	ctx.fillText("Earth: " + count["e"], width + eleWidth + this.unit * 2, this.engine.height - this.unit*3);
+
+	var fwSign = this.getEqualitySign(count['f'],count['w']);
+	var aeSign = this.getEqualitySign(count['a'],count['e']);
+
+	ctx.fillStyle = "#414E4E";
+	ctx.fillText(fwSign, width + eleWidth + this.unit*.75-1, this.engine.height - this.unit * 4.5 - 1)
+	ctx.fillText(aeSign, width + eleWidth + this.unit*.75- 1, this.engine.height - this.unit *3- 1)
+	ctx.fillStyle = "#A3C2C2";
+	ctx.fillText(fwSign, width + eleWidth + this.unit*.75, this.engine.height - this.unit * 4.5)
+	ctx.fillText(aeSign, width + eleWidth + this.unit*.75, this.engine.height - this.unit*3)
+}
+
+Ether.Hub.prototype.getEqualitySign = function(val1,val2){
+	if(val1 > val2){
+		return ">"
+	} else if(val1 < val2){
+		return "<"
+	} else{
+		return "="
+	}
 }
 
 Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 	if(this.engine.betweenAges) { return }
 
-	var colors = ["green","yellow","orange","red"];
 	var ether = this.engine.ethers[0];
 	var ratio = ether.currentSpan/ether.lifeSpan[0]
+	var color = this.getLifeBarColor(ratio);
 
 	ctx.fillStyle = "#FFF4E9";
-	ctx.font = this.unit + "px Titillium Web"
-	ctx.fillText("Lifespan",(this.unit * (9+ 35/2)), this.unit);
+	ctx.font = this.unit + "px simple"
+	var w = ctx.measureText("Lifespan").width
+	ctx.fillText("Lifespan",(this.engine.width/2)-(w/2), this.unit);
 
-	ctx.fillStyle = "green";
-	ctx.fillRect((this.unit * 45), this.unit * 1.5, -(this.unit * 35) * ratio, this.unit * 0.5)
+	ctx.fillStyle = color;
+	ctx.fillRect(this.engine.width -(this.unit * 2), this.unit * 1.5, -(this.unit * 46) * ratio, this.unit * 0.5)
 
 	ctx.strokeStyle = "red";
-	ctx.strokeRect((this.unit * 10), this.unit * 1.5, this.unit * 35, this.unit * 0.5)
+	ctx.strokeRect((this.unit * 2), this.unit * 1.5, this.unit * 46, this.unit * 0.5)
 
 	//MOVE THIS TO ETHER!!???
 	if(!ether.moved){return}
@@ -1668,119 +1663,140 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 		if(ratio > 0){
 			ether.currentSpan--;
 		} else {
-			this.engine.betweenAges = true;
-			this.messageExist = false;
+			ether.dead = true;
 		}
 	}
 
+}
+
+Ether.Hub.prototype.getLifeBarColor = function(ratio){
+	if(ratio <= .25){
+		return "red"
+	} else if(ratio <= .5){
+		return "orange"
+	} else if(ratio <= .75){
+		return "yellow"
+	}else{
+		return "green"
+	}
 }
 
 //messages
 Ether.Hub.prototype.drawMessage = function(ctx,time,award){
-	var ether = this.engine.ethers[0];
+	var player = this.engine.ethers[0];
 
-	var borderMssg = "there is no time in the boundless void";
-	// var age0Mssg = "you are no longer an infant";
-	// var age2Mssg = "give back you borrowed";
-	// var age3Mssg = "so it goes";
-	var killerMssg = "Save The Big Ones For Post-Infancy"
-	var stableMssg = "You Are Becoming Too Unstable"
+	if(!this.messageExist || (this.messageExist && !this.msgQue.hasMsg())){
+		if(this.msgQue.hasMsg()){
+			var msg = this.msgQue.getMsg()
 
-	if(award && !this.engine.betweenAges){ this.messageExist = false; this.messageAlpha = 1 }
+			this.messageExist = true
+			this.currentMessage = msg
 
-	if(!this.messageExist){
-		// //new age
-		// if(this.engine.betweenAges){
-		// 	this.messageExist = true;
+			switch(msg.type){
+				case "award" : 
+					this.subMessage = msg.sub
+					this.engine.audio.playSound('life');
+					break;
+				case "zoom" :
+					this.zoomMessageShown = true
+					break;
+				case "stablility" :
+					
+					break;
+				case "purge" :
+					
+			}
+		} else {
+			this.renderMessage(ctx,time);
+		}
+	} else {
+		this.renderMessage(ctx,time);
+	}
+}
 
-		// 	switch(ether.age){
-		// 		case 0 :
-		// 				this.currentMessage = age0Mssg;
-		// 			break;
+Ether.Hub.prototype.updateMsgQue = function(){
+	
+	if(!this.zoomMessageShown && this.zoomMessage != ""){
+		this.msgQue.addMsg(this.zoomMessage,"zoom",this.zoomSubMessage)
+		this.zoomMessage = "";
+	}
 
-		// 		case 1 :
-		// 			this.currentMessage = this.lifeStageMssg;
-		// 			break;
+	if(this.awardMssg){
+		this.msgQue.addMsg(this.awardMssg[0],"award","+"+this.awardMssg[1]+" Lifespan")
+		this.awardMssg = "";
+	}
 
-		// 		case 2 :
-		// 			this.currentMessage = age2Mssg;
-		// 			break;
+	if(this.lifeStageMssg != ""){
+		this.msgQue.addMsg(this.lifeStageMssg,"transform")
+		this.lifeStageMssg = ""
+	}
 
-		// 		case 3 :
-		// 			this.currentMessage = age3Mssg;
-		// 			break;
-
-		// 	}
-
-		// //award
-		// } else 
-		if(this.awardMssg){
-			this.messageExist = true;
-			this.currentMessage = this.awardMssg[0];
-			this.subMessage = "+"+this.awardMssg[1]+" Lifespan";
-
-		//leaving game border
-		} else if(this.hasLeftBorder() && this.currentMessage != borderMssg){
-			this.messageExist = true;
-			this.currentMessage = borderMssg;
+	if(this.unstable){
 		
-		//killer element
-		} else if(this.killerElement){
-			this.messageExist = true;
-			this.currentMessage = killerMssg;
-
-		//stability
-		} else if(this.unstable && !this.stableWarned){
-			this.messageExist = true;
+		if(this.purging && !this.purgeNotified){
+			this.purgeNotified = true;
+			this.msgQue.addMsg(this.purgeMssg,"purge")
+			this.purging = false;
+		} else if(!this.stableWarned){
 			this.stableWarned = true;
-			this.currentMessage = stableMssg;
+			this.msgQue.addMsg(this.stableMssg,"stability")
 		}
 
-	} else {
-		if(!award) this.renderMessage(ctx,time);
+		
 	}
 }
 
 Ether.Hub.prototype.renderMessage = function(ctx,time){
+	if(this.currentMessage == ""){ return}
 	var ether = this.engine.ethers[0];
+	var message = this.currentMessage.str
+	var sub = this.currentMessage.sub
 
-	ctx.font = (this.currentMessage == this.awardMssg[0]) ? "90px Titillium Web" : "30px Titillium Web";
-	var textWidth = ctx.measureText(this.currentMessage).width;
 
-	if(textWidth > this.engine.width - 10){ 
-		ctx.font = "70px Titillium Web"
-		textWidth = ctx.measureText(this.currentMessage).width
+	ctx.font = (this.currentMessage.type == "award") ? "90px simple" : "30px simple";
+
+	if(typeof ctx.measureText != 'function'){ 
+		console.log(ctx) ;
+		return 
+	}
+
+	var textWidth = ctx.measureText(message).width;
+
+	if(textWidth > this.engine.width - 10 && this.currentMessage.type == "award"){ 
+		ctx.font = "70px simple"
+		textWidth = ctx.measureText(message).width
 	}
 
 	var x = (this.engine.width/2) - (textWidth / 2);
 	var y = (this.engine.height/2)-this.unit;
 
-	ctx.fillStyle = "rgba(0,0,0,"+this.messageAlpha+")";
-	ctx.fillText(this.currentMessage,x+2,y+2);
+	ctx.fillStyle = "rgba(0,0,0,"+this.currentMessage.alpha+")";
+	ctx.fillText(message,x+2,y+2);
 
-	ctx.fillStyle = "rgba(164,161,151,"+this.messageAlpha+")";
-	ctx.fillText(this.currentMessage,x,y);
+	ctx.fillStyle = "rgba(164,161,151,"+this.currentMessage.alpha+")";
+	ctx.fillText(message,x,y);
 
-	if(this.subMessage != ""){
-		ctx.font = "25px Titillium Web";
-		textWidth = ctx.measureText(this.subMessage).width;
+	if(sub != ""){
+		ctx.font = "25px simple";
+		textWidth = ctx.measureText(sub).width;
 		x = (this.engine.width/2) - (textWidth / 2);
-		ctx.fillStyle = "rgba(0,0,0,"+this.messageAlpha+")";
-		ctx.fillText(this.subMessage,x+2,y-this.unit*3+2);
-		ctx.fillStyle = "rgba(164,161,151,"+this.messageAlpha+")";
-		ctx.fillText(this.subMessage,x,y-this.unit*3);
+		ctx.fillStyle = "rgba(0,0,0,"+this.currentMessage.alpha+")";
+		ctx.fillText(sub,x+2,y-this.unit*3+2);
+		ctx.fillStyle = "rgba(164,161,151,"+this.currentMessage.alpha+")";
+		ctx.fillText(sub,x,y-this.unit*3);
 	}
 
 	if(time > this.lastMessageTime + 100){
-		this.messageAlpha-=0.01;
 
-		if(this.messageAlpha <= 0.01){
+		if(this.currentMessage.lowerAlpha() < 0.3){
 			this.messageExist = false;
-			this.messageAlpha = 1;
-			this.awardMssg = "";
-			this.killerElement = false;
-			this.subMessage = "";
+			if(this.currentMessage.type == "purge"){
+				this.purgeNotified = false
+			}
+			
+			if(this.currentMessage.alpha <= 0)this.currentMessage = ""
 		}
+
 		this.lastMessageTime = time;
 	}
 
@@ -1824,7 +1840,7 @@ Ether.Audio.prototype.init = function(){
 }
 
 Ether.Audio.prototype.loadSounds = function(index){
-	var urls = ["fire","water","air","earth"];
+	var urls = ["fire","water","air","earth","life","upgrade","purge","nope"];
 	var index = index || 0;
 	var self = this;
 	var url = urls[index];
@@ -1840,22 +1856,31 @@ Ether.Audio.prototype.loadSounds = function(index){
 }
 
 
-Ether.Audio.prototype.playSound = function(element){
+Ether.Audio.prototype.playElementSound = function(element){
 	var volume = element.bad ? 1 : element.radius/125;
 	if(volume > 1) volume = 1
 	this.audio[element.type].volume = volume;
 	this.audio[element.type].play();
+}
+
+Ether.Audio.prototype.playSound = function(type,volume){
+	this.muteOtherSound();
+	var v = volume || .8
+	this.audio[type].volume = v;
+	this.audio[type].play();
+}
+
+Ether.Audio.prototype.muteOtherSound = function(){
+	for(var s in this.audio){
+		if(!this.audio[s].ended)
+			this.audio[s].pause()
+	}
 };Ether.Upgrade = function(engine){
 	var self = this;
 	this.engine = engine;
 	this.player;
+	this.upgradeCheck = {w:[13],f:[13],a:[13],e:[]}
 	this.container = document.getElementById('upgrade');
-	this.tierCounter = {
-		movement : [0],
-		attraction : [0],
-		resistance : [0],
-		balance : [0]
-	}
 
 	this.cy = cytoscape({
 		container : self.container,
@@ -1871,19 +1896,23 @@ Ether.Audio.prototype.playSound = function(element){
 
 			cy.elements("node").data("activated",false);
 			cy.elements("node[id='nparent']").data("activated",true);
+			cy.elements("node[id='nparent']").addClass("activated");
 			self.addData(cy);
 
+			cy.elements("node").addClass("unactive")
+
 			cy.on('click','node',function(e){
-				if(self.hasEnoughEnergy(e.cyTarget)){
-
-					if(self.isUpgradable(e.cyTarget)){
+				if(self.isUpgradable(e.cyTarget)){
+					if(self.hasEnoughEnergy(e.cyTarget)){
 						e.cyTarget.data("activated",true);
-						e.cyTarget.addClass("permActivated")
+						cy.elements('node[id = "'+e.cyTarget.id()+'"]').removeClass("showingInfo");
+						e.cyTarget.addClass("activated");
 						self.handleClick(e.cyTarget);
+					} else {
+						self.engine.audio.playSound('nope');
 					}
-
-				} else if(self.isUpgradable(e.cyTarget)){
-					e.cyTarget.flashClass("noEnergy",1000)
+				} else {
+					self.engine.audio.playSound('nope');
 				}
 			});
 
@@ -1892,11 +1921,9 @@ Ether.Audio.prototype.playSound = function(element){
 				var ele = e.cyTarget;
 
 				if(self.isUpgradable(ele)){
-					cy.elements('node[id = "'+ele.id()+'"]').addClass("rollover")
-					cy.elements('node[id = "'+ele.id()+'"]').addClass(ele.id().split(".")[0])
-					if(ele.data("activated")) cy.elements('node[id = "'+ele.id()+'"]').addClass("activated");
-				 } else {
-				 	cy.elements('node[id = "'+ele.id()+'"]').addClass("notActive")
+					cy.elements('node[id = "'+ele.id()+'"]').addClass("showingInfo");					
+				 } else if(!ele.data().activated){
+					cy.elements('node[id = "'+ele.id()+'"]').addClass("notActive");									 	
 				 }
 			});
 
@@ -1904,11 +1931,9 @@ Ether.Audio.prototype.playSound = function(element){
 				var ele = e.cyTarget;
 
 				if(self.isUpgradable(ele)){
-					cy.elements('node[id = "'+ele.id()+'"]').removeClass("rollover")
-					cy.elements('node[id = "'+ele.id()+'"]').removeClass(ele.id().split(".")[0])
-					cy.elements('node[id = "'+ele.id()+'"]').removeClass("activated");
-				 } else {
-				 	cy.elements('node[id = "'+ele.id()+'"]').removeClass("notActive")
+					cy.elements('node[id = "'+ele.id()+'"]').removeClass("showingInfo");
+				 } else if(!ele.data("activated")){
+					cy.elements('node[id = "'+ele.id()+'"]').removeClass("notActive");									 					 	
 				 }
 			});
 
@@ -1932,19 +1957,33 @@ Ether.Upgrade.prototype.hasEnoughEnergy = function(e){
 	var id = e.id().split(".")[0];
 	
 	if(id == "attraction" && count.f >= cost){
+		count.f -= cost
 		return true
 	}
 
 	if(id == "resistance" && count.e >= cost){
+		count.e -= cost
 		return true
 	}
 
 	if(id == "balance" && count.a >= cost){
+		count.a -= cost
 		return true
 	}
 
 	if(id == "movement" && count.w >= cost){
+		count.w -= cost
 		return true
+	}
+
+	if(id.indexOf("T") == 0){
+		if(count.f >= cost && count.w >= cost && count.e >= cost && count.a >= cost){
+			count.f -= cost;
+			count.e -= cost;
+			count.a -= cost;
+			count.w -= cost;
+			return true
+		}
 	}
 }
 
@@ -1952,16 +1991,38 @@ Ether.Upgrade.prototype.addData = function(cy){
 	for(var i in cy.elements("node")){
 		var node = cy.elements("node")[i]
 		if(node && node.data && !node.data("activated")){
-			var level = node.id().split(".")[1]
+			var level = parseInt(node.id().split(".")[1]);
 			var type = node.id().split(".")[0].charAt(0).toUpperCase() + node.id().split(".")[0].slice(1)
-			node.data("cost",level*5)
-			node.data("info",type+" : "+level*5)
+			node.data("cost",level*(12 + level));
+
+			switch(type.toLowerCase()){
+				case "movement" :
+					node.data("info",type+" : "+ (level*(12 + level)) + " : Water");
+					break;
+				case "resistance" :
+					node.data("info",type+" : "+ (level*(12 + level)) + " : Earth");
+					break;
+				case "attraction" :
+					node.data("info",type+" : "+ (level*(12 + level)) + " : Fire");
+					break;
+				case "balance" :
+					node.data("info",type+" : "+ (level*(12 + level)) + " : Air");
+					break;
+				case "tsnail" :
+				case "tbutterfly":
+					var len = type.length;
+					var lStr = type.slice(1,len);
+					var str = lStr.charAt(0).toUpperCase() + lStr.slice(1)
+					node.data("info",str+" : "+ Math.round(level*(12 + level)/1.3));
+			}
 		}
 		
 	}
 }
 
 Ether.Upgrade.prototype.isUpgradable = function(ele){
+	if(ele.data().activated == true) {  return false }
+
 	var id = ele.id();
 	var edges = [];
 	var rVal = false;
@@ -2002,18 +2063,78 @@ Ether.Upgrade.prototype.handleClick = function(e){
 	 	case "movement" :
 	 		this.player.control += 10;
 	 		this.player.speed += 1;
+	 		this.upgradeCheck.w.shift();
 	 		break
 	 	case "balance" :
-	 		this.player.balance += 0.15;
+	 		this.player.balance += 0.5;
+	 		this.upgradeCheck.b.shift();
 	 		break;
 	 	case "attraction" :
 	 		this.player.attraction += 2
 	 		this.player.force -= 0.1
+	 		this.upgradeCheck.f.shift();
 	 		break
 	 	case "resistance" :
 	 		this.player.resistance += 1;
+	 		this.upgradeCheck.e.shift();
+	 		break;
+	 	case "Tsnail" :
+	 		this.player.transformation = this.player.transformations.snail;
+	 		break;
+	 	case "Tbutterfly" :
+	 		this.player.transformation = this.player.transformations.butterfly;
 	 		break;
 	 }
+
+
+	//update upgrade check
+	var edges = e.connectedEdges();
+	for(i in edges){
+		var edge = edges[i];
+
+		if(edge.target){
+			var target = edge.target();
+			var type = target.id().split(".")[0]
+			var cost = target.data().cost
+
+			switch(type){
+				case "movement" :
+			 		this.upgradeCheck.w.push(cost);
+			 		break
+			 	case "balance" :
+			 		this.upgradeCheck.a.push(cost);
+			 		break;
+			 	case "attraction" :
+			 		this.upgradeCheck.f.push(cost);
+			 		break
+			 	case "resistance" :
+			 		this.upgradeCheck.r.push(cost);
+			 		break;
+			}
+
+		}
+	}
+
+	this.engine.audio.playSound('upgrade');
+	this.engine.container.style.display = "";
+	this.container.style.display = "none";
+	this.engine.upgradeScreen = false;
+}
+
+Ether.Upgrade.prototype.canUpgrade = function(){
+	var count = this.player.getElementCount();
+
+	if(count.w >= this.upgradeCheck.w[0]){
+		return true
+	} else if(count.f >= this.upgradeCheck.f[0]){
+		return true
+	} else if(count.a >= this.upgradeCheck.a[0]){
+		return true
+	} else if(count.e >= this.upgradeCheck.e[0]){
+		return true
+	} else {
+		return false
+	}
 }
 
 Ether.Upgrade.prototype.style = [
@@ -2023,7 +2144,9 @@ Ether.Upgrade.prototype.style = [
 			'background-color':'#47BDDE',
 			'border-width' : '2',
 			'border-color' : '#243F63',
-			'shape' : "pentagon"
+			'shape' : "pentagon",
+			"color" : '#47BDDE',
+			"text-outline-color" : '#243F63'
 		}
 	},{
 		selector : 'node[id ^= "attraction"]',
@@ -2031,15 +2154,19 @@ Ether.Upgrade.prototype.style = [
 			'background-color':'#E0664A',
 			'border-width' : '2',
 			'border-color' : '#6B504A',
-			'shape' : "heptagon"
+			'shape' : "heptagon",
+			"color" : '#E0664A',
+			"text-outline-color" : '#6B504A'
 		}
 	},{
 		selector : 'node[id ^= "resistance"]',
 		css : {
-			'background-color':'#CCD9B4',
+			'background-color':'#6C7F2E',
 			'border-width' : '2',
 			'border-color' : '#858063',
-			'shape' : 'rectangle'
+			'color' : '#6C7F2E',
+			'shape' : 'rectangle',
+			"text-outline-color" : '#858063'
 		}
 	},{
 		selector : 'node[id ^= "balance"]',
@@ -2047,87 +2174,50 @@ Ether.Upgrade.prototype.style = [
 			'background-color':'#EDEDEB',
 			'border-width' : '2',
 			'border-color' : '#9E9E99',
-			'shape' : 'triangle'
+			"color" : "#EDEDEB",
+			'shape' : 'triangle',
+			"text-outline-color" : '#9F9FA0'
+		}
+	},{
+		selector : 'node[id ^= "T"]',
+		css : {
+			'background-color':'#FFD700',
+			'border-width' : '2',
+			'border-color' : '#8F8F00',
+			"color" : "#FFD700",
+			'shape' : 'star',
+			"text-outline-color" : "#8F8F00"
 		}
 	},{
 		selector : 'edge',
 		css : {
 			"line-color" : "#D1E6E6",
-			"width" : "3",
-			//"curve-style" : "haystack",
+			"width" : "4",
 			"haystack-radius" : "1",
 			"target-arrow-color" : "#D1E6E6",
 			"target-arrow-shape" : "triangle",
 		}
 	},{
-		selector : '.rollover',
+		selector : ".showingInfo",
 		css : {
-			"text-outline-color" : "white",
-			"text-outline-width" : "2",
-			"font-size" : "50",
-			"font-family" : "Titillium Web",
-			"text-halign" : "center",
-		}
-	},{
-		selector : ".movement",
-		css : {
-			"color" : '#243F63',
+			"font-family" : "simple",
+			"font-size" : "25",
+			"text-outline-width" : "1",
 			"content" : "data(info)"
 		}
 	},{
-		selector : ".attraction",
+		selector : ".notActive",
 		css : {
-			"color" : '#6B504A',
-			"content" : "data(info)"
-		}
-	},{
-		selector : ".resistance",
-		css : {
-			'color':'#858063',
-			"content" : "data(info)"
-		}
-	},{
-		selector : ".balance",
-		css : {
-			'color':'#9E9E99',
-			"content" : "data(info)"
-		}
-	},{
-		selector : '.notActive',
-		css : {
-			'background-color':'#090909',
-			'border-width' : '2',
-			'border-color' : '#000000',
-			"text-outline-color" : "black",
-			"text-outline-width" : "2",
-			"color" : "white",
-			"font-size" : "40",
-			"font-family" : "Titillium Web",
-			"text-halign" : "center",
-			"content" : "Cannot Activate"
-		}
-	},{
-		selector : '.permActivated',
-		css : {
-			'border-width' : '0',
-			'background-color' : "white"
+			"shape" : "ellipse",
+			"background-color" : "black",
+			"border-width" : "0"
 		}
 	},{
 		selector : ".activated",
 		css : {
+			"shape" : "ellipse",
 			"background-color" : "white",
-			"text-outline-color" : "black",
-			"text-outline-width" : "2",
-			"color" : "white",
-			"font-size" : "40",
-			"font-family" : "Titillium Web",
-			"text-halign" : "center",
-			"content" : "Activated"
-		}
-	},{
-		selector : ".noEnergy",
-		css : {
-			"content" : "Need more elements"
+			"border-width" : "0"
 		}
 	}
 ];
@@ -2144,14 +2234,17 @@ Ether.Upgrade.prototype.getNodes = function(){
 			group : "nodes",
 			data : { id: "nparent" },
 			grabbable : false
-		},
-		//{
-		// 	group : "nodes",
-		// 	data : {
-		// 		id : "transformation"
-		// 	}
-		// },{
-		{
+		},{
+			group : "nodes",
+			data : {
+				id : "Tbutterfly.9"
+			}
+		},{
+			group : "nodes",
+			data : {
+				id : "Tsnail.9"
+			}
+		},{
 			group : "nodes",
 			data : {
 				id : "balance.1",
@@ -2325,6 +2418,34 @@ Ether.Upgrade.prototype.getNodes = function(){
 
 Ether.Upgrade.prototype.edges = [
 		{
+			group : "edges",
+			data : {
+				id : "movement.t.snail",
+				source : "movement.8",
+				target : "Tsnail.9"
+			}
+		},{
+			group : "edges",
+			data : {
+				id : "attraction.t.snail",
+				source : "attraction.8",
+				target : "Tsnail.9"
+			}
+		},{
+			group : "edges",
+			data : {
+				id : "balance.t.butterfly",
+				source : "balance.8",
+				target : "Tbutterfly.9"
+			}
+		},{
+			group : "edges",
+			data : {
+				id : "resistance.t.butterfly",
+				source : "resistance.8",
+				target : "Tbutterfly.9"
+			}
+		},{
 			group : "edges",
 			data : {
 				id : "parent.1.balance",
@@ -2769,6 +2890,7 @@ Ether.Upgrade.prototype.edges = [
 	this.upgradeScreen = false;
 
 	//endgame
+	this.gameOver = false;
 	this.gameOverAlpha = 0;
 	this.gameOverTime = 0;
 
@@ -2782,7 +2904,7 @@ Ether.Upgrade.prototype.edges = [
 		if(self.upgradeScreen) return
 
 		//Draw Background
-		if(!self.player.dead){
+		if(!self.gameOver){
 			self.ctx.fillStyle = "black";
 			self.ctx.fillRect(0,0,self.width,self.height);
 		}
@@ -2792,17 +2914,13 @@ Ether.Upgrade.prototype.edges = [
 			self.hub.drawIntro(time);
 
 		//otherwise, if between ages...
-		} else if(self.betweenAges){
-			self.hub.draw(time);
-
-		//otherwise, if player is not dead...
-		} else if(!self.player.dead){
+		} else if(!self.gameOver){
 
 			//Draw World
 			self.world.draw(self,time);
 
 			//check awards
-			if(!self.player.dying){ self.checkAwards(time) };
+			//if(!self.player.dying){ self.checkAwards(time) };
 			//Draw Ethers
 			for (var i = 0; i < self.ethers.length; i++) {
 				self.ethers[i].draw(self,time);
@@ -2815,19 +2933,20 @@ Ether.Upgrade.prototype.edges = [
 			//
 
 		//otherwise, if player is dead
-		} else if(self.player.dead){
-			if(time > self.gameOverTime + 100){//self.gameOverAlpha < 0.35){
+		} else if(self.gameOver){
+			if(time > self.gameOverTime + 100){
 				self.gameOverAlpha+=0.01;
 				self.gameOverTime = time;
 
 				self.ctx.fillStyle = "rgba(255,255,255,+"+self.gameOverAlpha+");";
 				self.ctx.fillRect(0,0,self.width,self.height);
-			//} else if(self.gameOverAlpha >= 0.35){
 			
-				self.ctx.font = "30px Arial"
+				self.ctx.font = "30px simple"
+				var width = ctx.measureText("so it goes").width;
 				self.ctx.fillStyle = "black";
-				self.ctx.fillText("Dead",self.width/2,self.height/2);
+				self.ctx.fillText("so it goes",self.width/2 - width/2,self.height/2);
 			}
+			self.hub.gameOver(self.ctx,time);
 		}
 	}
 
@@ -2897,21 +3016,27 @@ Ether.Engine.prototype.handleKeyDown =function(key){
 	var display = this.container.style.display;
 	switch(key){
 
-		case 32 : 
-		if(display != "none"){ 
-			this.container.style.display = "none";
-			this.upgrade.container.style.display = "";
-			this.upgrade.cy.forceRender();
-			this.upgradeScreen = true;
-		} else {
-			this.container.style.display = "";
-			this.upgrade.container.style.display = "none";
-			this.upgradeScreen = false;
-		}
+		case 85 : 
+			if(display != "none"){ 
+				this.container.style.display = "none";
+				this.upgrade.container.style.display = "";
+				this.upgrade.cy.forceRender();
+				this.upgradeScreen = true;
+			} else {
+				this.container.style.display = "";
+				this.upgrade.container.style.display = "none";
+				this.upgradeScreen = false;
+			}
+			break;
+		case 90 :
+			if(this.player.canZoom){ this.player.zooming = true }
+			break
 	}
 }
 
 Ether.Engine.prototype.checkAwards = function(time){
+	if(this.hub.unstable){ return }
+		
 	var stats = this.player.getElementCount();
 
 	if(time > this.awardDelay + 5000){

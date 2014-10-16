@@ -1,9 +1,9 @@
 @import "_normalize";
 
 
-$numberOfSections : 2;
+$numberOfSections : 2.5;
 $groupHeight : 100/$numberOfSections;
-$fontSize : 1em;
+$fontSize : 1.3em;
 $textColor : #FFF4E9;
 
 @font-face {
@@ -20,64 +20,6 @@ $textColor : #FFF4E9;
 	text-align : center;
 }
 
-@mixin mobileContent {
-	height : 75%;
-	width : 90%;
-	border-bottom : 1px solid $textColor;
-	border-top : 1px solid $textColor;
-	text-transform : uppercase;
-	position: relative;
-	text-align : justify;
-
-	p {
-		width: 100%;
-		font-size : 0.6em;
-		margin-left : 0;
-		margin-right : 0;
-	}
-
-	h1{
-		padding : 0;
-		font-size : 1em;
-		text-align : center;
-	}
-
-	#defBalance {
-		position : relative;
-
-		button {
-			position : absolute;
-			bottom : 0;
-		}
-
-		#rules{
-			top : 30%;
-			text-align : center;
-		}
-
-		h1{
-			display : none;
-		}
-	}
-}
-
-@mixin mobileHeader {
-	height : 20%;
-
-	p {
-		padding : 0em;
-		margin : 0.5em
-	}
-
-	h3{
-		display : none;
-	}
-
-	h4{
-		padding : 0;
-	}
-}
-
 body {
 	background-color : black;
 	color : $textColor;
@@ -88,16 +30,8 @@ body {
 .header {
 	@include centered;
 	padding : 0;
-	margin-bottom : 2%;
-	height : 18%;
-
-	@media screen and (max-width : 575px){
-		@include mobileHeader;
-	}
-
-	@media screen and (max-height : 615px){
-		@include mobileHeader;
-	}
+	margin-bottom : 1%;
+	height : 15%;
 }
 
 .mainContent {
@@ -105,15 +39,6 @@ body {
 	padding : 0;
 	height : 100%;
 	background-color : #001224;
-
-	@media screen and (max-width : 575px){
-		@include mobileContent;
-	}
-
-	@media screen and (max-height : 615px){
-		@include mobileContent;
-	}
-	
 }
 
 .mainGroup {
