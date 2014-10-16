@@ -333,6 +333,9 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 					
 					break;
 				case "purge" :
+					break;
+				case "upgrade" :
+					break
 					
 			}
 		} else {
@@ -344,31 +347,47 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 }
 
 Ether.Hub.prototype.updateMsgQue = function(){
-	
+	var config = {}
+
 	if(!this.zoomMessageShown && this.zoomMessage != ""){
-		this.msgQue.addMsg(this.zoomMessage,"zoom",this.zoomSubMessage)
+		config.string = this.zoomMessage;
+		config.type = "zoom";
+		config.sub = this.zoomSubMessage;
+
+		this.msgQue.addMsg(config)
 		this.zoomMessage = "";
-	}
 
-	if(this.awardMssg){
-		this.msgQue.addMsg(this.awardMssg[0],"award","+"+this.awardMssg[1]+" Lifespan")
+	} else if(this.awardMssg){
+		config.string = this.awardMssg[0];
+		config.type = "award";
+		config.sub = "+"+this.awardMssg[1]+" Lifespan";
+
+		this.msgQue.addMsg(config)
 		this.awardMssg = "";
-	}
 
-	if(this.lifeStageMssg != ""){
-		this.msgQue.addMsg(this.lifeStageMssg,"transform")
-		this.lifeStageMssg = ""
-	}
+	} else if(this.lifeStageMssg != ""){
+		config.string = this.lifeStageMssg;
+		config.type = "transform";
 
-	if(this.unstable){
+		this.msgQue.addMsg(config);
+		this.lifeStageMssg = "";
+
+	} else if(this.unstable){
 		
 		if(this.purging && !this.purgeNotified){
+			config.string = this.purgeMssg;
+			config.type = "purge";
+
+			this.msgQue.addMsg(config)
 			this.purgeNotified = true;
-			this.msgQue.addMsg(this.purgeMssg,"purge")
 			this.purging = false;
+
 		} else if(!this.stableWarned){
+			config.string = this.stableMssg;
+			config.type = "stability";
+
 			this.stableWarned = true;
-			this.msgQue.addMsg(this.stableMssg,"stability")
+			this.msgQue.addMsg(config);
 		}
 
 		
@@ -380,6 +399,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	var ether = this.engine.ethers[0];
 	var message = this.currentMessage.str
 	var sub = this.currentMessage.sub
+	var fill = this.currentMessage.fill
 
 
 	ctx.font = (this.currentMessage.type == "award") ? "90px simple" : "30px simple";
@@ -402,7 +422,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	ctx.fillStyle = "rgba(0,0,0,"+this.currentMessage.alpha+")";
 	ctx.fillText(message,x+2,y+2);
 
-	ctx.fillStyle = "rgba(164,161,151,"+this.currentMessage.alpha+")";
+	ctx.fillStyle = fill+this.currentMessage.alpha+")";
 	ctx.fillText(message,x,y);
 
 	if(sub != ""){
@@ -411,7 +431,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 		x = (this.engine.width/2) - (textWidth / 2);
 		ctx.fillStyle = "rgba(0,0,0,"+this.currentMessage.alpha+")";
 		ctx.fillText(sub,x+2,y-this.unit*3+2);
-		ctx.fillStyle = "rgba(164,161,151,"+this.currentMessage.alpha+")";
+		ctx.fillStyle = fill+this.currentMessage.alpha+")";
 		ctx.fillText(sub,x,y-this.unit*3);
 	}
 

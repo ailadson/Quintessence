@@ -2,8 +2,8 @@ Ether.MsgQue = function(){
 	this.que = [];
 }
 
-Ether.MsgQue.prototype.addMsg = function(string,type,sub){
-	this.que.push(new Ether.Msg(string,type,sub));
+Ether.MsgQue.prototype.addMsg = function(config){
+	this.que.push(new Ether.Msg(config));
 }
 
 Ether.MsgQue.prototype.getMsg = function(){
@@ -14,12 +14,13 @@ Ether.MsgQue.prototype.hasMsg = function(){
 	return this.que.length > 0
 }
 
-Ether.Msg = function(s,t,sb){
-	this.str = s
-	this.sub = sb || ""
+Ether.Msg = function(c){
+	this.str = c.string
+	this.sub = c.sub || ""
 	this.alpha = 1
-	this.alphaStep = 0.01
-	this.type = t
+	this.alphaStep = c.alphaStep || 0.02
+	this.type = c.type
+	this.fill = c.fill || "rgba(164,161,151,"
 }
 
 Ether.Msg.prototype.lowerAlpha = function(){

@@ -181,25 +181,43 @@ Ether.Upgrade.prototype.isUpgradable = function(ele){
 Ether.Upgrade.prototype.handleClick = function(e){
 	var a = e.id().split(".");
 	var type = a[0];
+	var cost = e.data("cost")
+	var config = {
+		string : "",
+		type : "upgrade",
+		alphaStep : 0.03
+	}
 
 	 switch(type){
 	 	case "movement" :
 	 		this.player.control += 10;
 	 		this.player.speed += 1;
 	 		this.upgradeCheck.w.shift();
+	 		config.fill = "rgba(71,189,222,"
+	 		config.sub = "- " + cost + " water";
+	 		this.engine.hub.msgQue.addMsg(config);
 	 		break
 	 	case "balance" :
 	 		this.player.balance += 0.5;
 	 		this.upgradeCheck.a.shift();
+	 		config.fill = "rgba(237,237,235,"
+	 		config.sub = "- " + cost + " air";
+	 		this.engine.hub.msgQue.addMsg(config);
 	 		break;
 	 	case "attraction" :
 	 		this.player.attraction += 2
 	 		this.player.force -= 0.1
 	 		this.upgradeCheck.f.shift();
+	 		config.fill = "rgba(224,102,74,"
+	 		config.sub = "- " + cost + " fire";	 		 
+	 		this.engine.hub.msgQue.addMsg(config);
 	 		break
 	 	case "resistance" :
 	 		this.player.resistance += 1;
 	 		this.upgradeCheck.e.shift();
+	 		config.fill = "rgba(108,127,46,"
+	 		config.sub = "- " + cost + " earth";
+	 		this.engine.hub.msgQue.addMsg(config);
 	 		break;
 	 	case "Tsnail" :
 	 		this.player.transformation = this.player.transformations.snail;
