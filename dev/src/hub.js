@@ -37,8 +37,9 @@ Ether.Hub = function(engine) {
 	this.lifeStageOpts = ["spread your wings","spread your trail"]
 	this.subMessage = "";
 
-	this.stableWarned = false
-	this.stableMssg = "The vibration is a sign of your imbalance"
+	this.stableWarned = false;
+	this.stableMssg0 = "Vibration is a sign of imbalance."
+	this.stableMssg1 = "When below 50, you will purge yourself until balance is restored"
 	this.purgeMssg = "PURGING"
 	this.purgeNotified = false;
 	this.unstable = false;
@@ -47,6 +48,27 @@ Ether.Hub = function(engine) {
 	this.gameOverAlpha = 0;
 	this.gameOverWidth;
 	this.gameOverColor = "rgba(0,0,0,"
+
+	//tutorial
+	this.firstElementMessage0 = "You have aquired your first element."
+	this.firstElementMessage11 = "New elements change your balance."
+	this.firstElementMessage10 = "Don't let it become too low."
+	this.firstElementShown = false;
+
+	this.lifeBarMessage0 = "Your lifespan is represented at the top of the screen."
+	this.lifeBarMessage1 = "When it runs out, you will die."
+
+	this.enemyMessage = "Rainbow Voids will purge you of all your elements. Stay away from them."
+	this.enemyMessageShown = false;
+
+	this.bigElementMessageShowing = false;
+	this.bigElementMessageShown = false;
+	this.bigElementMessage = "CAREFUL! Elements that are too large will cause immediate purging."
+
+	this.upgradeMessageShown = false;
+	this.upgradeAvailable = false;
+	this.upgradeMessageSub = "'U' has lit up in bottom"
+	this.upgradeMessage = "That means an upgrade is available. Press 'U' to access upgrades."
 
 
 	//mousemove
@@ -107,6 +129,17 @@ Ether.Hub = function(engine) {
 Ether.Hub.prototype.init = function(){
 	window.onmousemove = this.mousemove;
 	window.onclick = this.handleClick;
+
+	var config = {}
+	config.type = "tutorial"
+	
+	config.alphaStep = 0.02;
+	config.string = this.lifeBarMessage0;
+	this.msgQue.addMsg(config);
+
+	config.alphaStep = 0.03;
+	config.string = this.lifeBarMessage1;
+	this.msgQue.addMsg(config);
 }
 
  Ether.Hub.prototype.drawIntro = function(time){
@@ -171,20 +204,21 @@ Ether.Hub.prototype.drawZoom = function(ctx,time){
 		ctx.fillStyle = "#A3C2C2"
 	}
 	ctx.font = this.unit*1.5 + "px simple";
-	ctx.fillText("Z",this.engine.width - this.unit*2,this.engine.height - this.unit)
+	ctx.fillText("(Z)oom Out",this.engine.width - this.unit*8,this.engine.height - this.unit*2.5)
 }
 
 Ether.Hub.prototype.drawUpgrade = function(ctx,time){
 	if(!this.engine.player.moved){return}
 
-	if(!this.engine.upgrade.canUpgrade()){		
+	if(!this.engine.upgrade.canUpgrade()){	
 		ctx.fillStyle = "rgba(65,78,78,.2)"
 	} else {
+		this.upgradeAvailable = true;	
 		ctx.fillStyle = "#A3C2C2"
 	}
 
 	ctx.font = this.unit*1.5 + "px simple";
-	ctx.fillText("U",this.engine.width - this.unit*4,this.engine.height - this.unit)
+	ctx.fillText("(U)pgrades",this.engine.width - this.unit*8,this.engine.height - this.unit)
 }
 
 
@@ -205,7 +239,6 @@ Ether.Hub.prototype.getStats = function(){
 }
 
 Ether.Hub.prototype.drawBalance = function(stab,ctx){
-	//console.log("hub balance: "+stab)
 	var hubStab = (stab > 100) ? 0 : (100 - stab)
 	
 	ctx.font =this.unit*2+"px simple";
@@ -267,7 +300,6 @@ Ether.Hub.prototype.getEqualitySign = function(val1,val2){
 }
 
 Ether.Hub.prototype.drawLifeBar = function(ctx, time){
-	if(this.engine.betweenAges) { return }
 
 	var ether = this.engine.ethers[0];
 	var ratio = ether.currentSpan/ether.lifeSpan[0]
@@ -287,7 +319,7 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 	//MOVE THIS TO ETHER!!???
 	if(!ether.moved){return}
 		
-	if(time > this.lastTime + 1000 && !ether.inVoid){
+	if(time > this.lastTime + 1000 && !ether.inVoid &&!this.engine.isPaused){
 		this.lastTime = time;
 		if(ratio > 0){
 			ether.currentSpan--;
@@ -329,11 +361,11 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 				case "zoom" :
 					this.zoomMessageShown = true
 					break;
+				case "tutorial" :
+					this.engine.isPaused = true;
+					break; 
 				case "stablility" :
-					
-					break;
 				case "purge" :
-					break;
 				case "upgrade" :
 					break
 					
@@ -349,7 +381,20 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 Ether.Hub.prototype.updateMsgQue = function(){
 	var config = {}
 
-	if(!this.zoomMessageShown && this.zoomMessage != ""){
+	if(this.engine.player.receivedFirstElement && !this.firstElementShown){
+		config.type = "tutorial";
+
+		config.alphaStep = 0.015;
+		config.string = this.firstElementMessage0;
+		this.msgQue.addMsg(config);
+		config.alphaStep = undefined;
+		config.string = this.firstElementMessage10;
+		config.sub = this.firstElementMessage11;
+		this.msgQue.addMsg(config);
+
+		this.firstElementShown = true;
+
+	} else if(!this.zoomMessageShown && this.zoomMessage != ""){
 		config.string = this.zoomMessage;
 		config.type = "zoom";
 		config.sub = this.zoomSubMessage;
@@ -357,7 +402,21 @@ Ether.Hub.prototype.updateMsgQue = function(){
 		this.msgQue.addMsg(config)
 		this.zoomMessage = "";
 
-	} else if(this.awardMssg){
+	} else if(!this.upgradeMessageShown && this.upgradeAvailable){
+		config.string = this.upgradeMessage;
+		config.sub = this.upgradeMessageSub;
+		config.type = "tutorial"
+		this.msgQue.addMsg(config);
+
+		this.upgradeMessageShown = true;
+
+	}else if(!this.enemyMessageShown && this.engine.player.attackedByEnemy){
+		config.type = "enemy";
+		config.string = this.enemyMessage;
+		this.msgQue.addMsg(config);
+		this.enemyMessageShown = true;
+
+	}else if(this.awardMssg){
 		config.string = this.awardMssg[0];
 		config.type = "award";
 		config.sub = "+"+this.awardMssg[1]+" Lifespan";
@@ -372,22 +431,33 @@ Ether.Hub.prototype.updateMsgQue = function(){
 		this.msgQue.addMsg(config);
 		this.lifeStageMssg = "";
 
-	} else if(this.unstable){
-		
-		if(this.purging && !this.purgeNotified){
-			config.string = this.purgeMssg;
-			config.type = "purge";
+	} else if(this.engine.player.unstable){
+
+		if(this.engine.player.bigElementIncrease && !this.bigElementMessageShown){
+			config.string = this.bigElementMessage;
+			config.sub = this.purgeMssg;
+			config.type = "tutorial";
+			this.msgQue.addMsg(config);
+
+			this.engine.player.bigElementIncrease = false;
+			this.bigElementMessageShowing = true;
+			this.bigElementMessageShown = true;
+
+		} if(!this.bigElementMessageShowing && this.engine.player.purging && !this.purgeNotified){
+		 	config.string = this.purgeMssg;
+		 	config.type = "purge";
 
 			this.msgQue.addMsg(config)
-			this.purgeNotified = true;
-			this.purging = false;
+		 	this.purgeNotified = true;
+		 	this.engine.player.purging = false;
 
-		} else if(!this.stableWarned){
-			config.string = this.stableMssg;
-			config.type = "stability";
+		} else if(!this.bigElementMessageShowing && !this.purgeNotified && !this.stableWarned){
+		 	config.type = "stability";
+		 	this.stableWarned = true;
 
-			this.stableWarned = true;
-			this.msgQue.addMsg(config);
+		 	config.sub = this.stableMssg0;
+		 	config.string = this.stableMssg1;
+		 	this.msgQue.addMsg(config);
 		}
 
 		
@@ -439,8 +509,13 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 
 		if(this.currentMessage.lowerAlpha() < 0.3){
 			this.messageExist = false;
-			if(this.currentMessage.type == "purge"){
-				this.purgeNotified = false
+			switch(this.currentMessage.type){
+				case "purge" : this.purgeNotified = false;
+					break;
+				case "bigElement" : this.bigElementMessageShowing = false;
+					break;
+				case "tutorial" : this.engine.isPaused = false
+					break;
 			}
 			
 			if(this.currentMessage.alpha <= 0)this.currentMessage = ""

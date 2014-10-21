@@ -10,6 +10,8 @@
 	this.coreElements = [];
 	this.elements = [];
 	this.moved;
+	this.receivedFirstElement = false;
+	this.attackedByEnemy = false;
 
 	this.x = engine.width/2;
 	this.y = engine.height/2;
@@ -37,6 +39,10 @@
 	this.finalElementLength = 1;
 	this.stabilityLastTime = 0;
 
+	this.unstable = false;
+	this.bigElementIncrease = false;
+	this.oldSum = 9999;
+	this.purging = false;
 	this.dying = false;
 	this.dead = false;
 	
@@ -83,13 +89,16 @@ Ether.Ether.prototype.draw = function(engine,time){
 Ether.Ether.prototype.drawElements = function(engine,time){
 	var self = this;
 
+	this.bigElementIncrease = this.hadBigElementIncrease();
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i];
 
 		//update the x and y position
-		e.x = this.x + e.xOffset + (e.jitter * (this.getStability()/10));
-		e.y = this.y + e.yOffset;
-		e.jitter *= -1;
+		if(!this.engine.isPaused){
+			e.x = this.x + e.xOffset + (e.jitter * (this.getStability()/10));
+			e.y = this.y + e.yOffset;
+			e.jitter *= -1;
+		}
 
 		if(this.transformation){ 
 			this.transformation(e,time) 
@@ -126,23 +135,24 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 
 		engine.ctx.beginPath();
 		
-		// if(this.age == 0){
-			self.util.drawElement(e, engine.ctx, function(ctx,element){
-				var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-				return self.util.createGradient(gradient,[[0.5,"white"],[0.4,element.color],[1,"black"]])
-			});	
+		self.util.drawElement(e, engine.ctx, function(ctx,element){
+			var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
+			return self.util.createGradient(gradient,[[0.5,"white"],[0.4,element.color],[1,"black"]])
+		});	
 
-		//velocity
-		e.x += e.vx;
-		e.y += e.vy;
-
-		//maintain center
-		if(this.getDistanceFromCenter(e) > this.range){ 
-			e.x = this.x
-			e.y = this.y
+		if(!this.engine.isPaused){
 			//velocity
-			this.vx = Math.random()*10-5;
-			this.vy = Math.random()*10-5;
+			e.x += e.vx;
+			e.y += e.vy;
+
+			//maintain center
+			if(this.getDistanceFromCenter(e) > this.range){ 
+				e.x = this.x
+				e.y = this.y
+				//velocity
+				this.vx = Math.random()*10-5;
+				this.vy = Math.random()*10-5;
+			}
 		}
 	};
 }
@@ -151,13 +161,14 @@ Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	var stability = this.getStability();
 	//stabilit starts at 0 and increases as it become more unstable
 	if(stability >= 20 && !this.dead){
-		engine.hub.unstable = true 
+		this.unstable = true 
 	} else {
-		engine.hub.unstable = false
+		this.unstable = false
 	}
 
 	if(stability >= 50 && !this.dead){
-		engine.hub.purging = true;
+		this.purging = true;
+
 		if(time > this.stabilityLastTime + 2000 - stability){
 			this.stabilityLastTime = time;		
 			this.loseElements(3);
@@ -250,6 +261,22 @@ Ether.Ether.prototype.getElementCount = function(){
 	return this.elementCount
 }
 
+Ether.Ether.prototype.hadBigElementIncrease = function(){
+	var sum = 4;
+
+	for(var i in this.elementCount){
+		sum += this.elementCount[i];
+	}
+
+	if(sum >= this.oldSum*2){
+		this.oldSum = sum;
+		return true;
+	} else {
+		this.oldSum = sum <= 4 ? 9999 : sum;
+		return this.bigElementIncrease
+	}
+}
+
 Ether.Ether.prototype.addToElementCount = function(ele){
 	switch(ele.type){
 		case 'fire': this.elementCount.f += (Math.round((ele.radius/2)));
@@ -282,6 +309,7 @@ Ether.Ether.prototype.removeFromElementCount = function(ele){
 
 //Elements
 Ether.Ether.prototype.newElement = function(e){
+	this.receivedFirstElement = true;
 	this.engine.audio.playElementSound(e);
 	this.addToElementCount(e);
 	this.increaseMass(e);

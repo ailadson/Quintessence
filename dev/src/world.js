@@ -53,28 +53,11 @@ Ether.World.prototype.init = function(engine){
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var collection = this.elements[i];
-		//collection.length = 0; //clear out array
 		var type = eleStrings[i];
 
-		// switch(engine.ethers[0].age){
-		// 	case 0 :
-			this.initElements(type,collection,[20,300,500],[3,150,350],[3500,300,100],[50000,700,300])
-			this.initBadGuys(type,collection,120,true);
-				//break;
-
-			/*case 1 :
-				this.initElements(type,collection,[2,100,300],[0,50,250],[325,250,10],[1,200,70])
-				this.initBadGuys(type,collection,90);
-				break;
-			case 2 :
-				this.initElements(type,collection,[50,200],[30,150],[200,150],[400,100])
-				this.initBadGuys(type,collection,60);
-				break;
-			case 3 :
-				this.initElements(type,collection,[20,90],[5,50],[200,200],[1000,220])
-				this.initBadGuys(type,collection,30);
-				break;*/
-		//}		
+		this.initElements(type,collection,[60,350,500],[3,50,300],[3500,300,100],[40500,600,300])
+		this.initBadGuys(type,collection,120,true);
+	
 	};
 }
 
@@ -94,7 +77,7 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,0,1,function(e){
+			this.initElement(type,collection,25,1,function(e){
 				if(e.radius > max || e.radius < max) e.radius = max;
 			},true)
 		}
@@ -130,8 +113,10 @@ Ether.World.prototype.initBackground = function(){
 
 //DRAWING
 Ether.World.prototype.draw = function(engine,time){
-		this.xv = this.adjustVelocity("x",this.xv,time);
-		this.yv = this.adjustVelocity("y",this.yv,time);
+		if(!this.engine.isPaused){
+			this.xv = this.adjustVelocity("x",this.xv,time);
+			this.yv = this.adjustVelocity("y",this.yv,time);
+		}
 	
 		//drag timer
 		if(time > this.dragLastTime + 200){ this.dragLastTime = time }
@@ -139,15 +124,17 @@ Ether.World.prototype.draw = function(engine,time){
 		//DrawBackground
 		this.drawBackground(this.xv,this.yv);
 		
-		//update x+y
-		this.x += this.xv;
-		this.y += this.yv;
+		if(!this.engine.isPaused){
+			//update x+y
+			this.x += this.xv;
+			this.y += this.yv;
 
-		this.player.xv = this.xv;
-		this.player.yv = this.yv;
+			this.player.xv = this.xv;
+			this.player.yv = this.yv;
 
-		engine.xv = this.xv;
-		engine.yv = this.yv;
+			engine.xv = this.xv;
+			engine.yv = this.yv;
+		}
 
 		
 
@@ -159,7 +146,6 @@ Ether.World.prototype.draw = function(engine,time){
 
 			if(!this.isInView(e)){ continue }
 
-			//reverse direction of jitter
 			e.jitter *= -1;
 
 			//x and y positions determined on the fly
@@ -223,8 +209,10 @@ Ether.World.prototype.drawBackground = function(xv,yv){
 		for (var i = 0; i < row.length; i++) {
 			var hill = row[i];
 
-			hill.x += xv
-			hill.y += yv
+			if(!this.engine.isPaused){
+				hill.x += xv
+				hill.y += yv
+			}
 
 			if(hill.x+this.hillWidth < 0) hill.x = this.engine.width
 			if(hill.x > this.engine.width) hill.x = -this.hillWidth
@@ -240,6 +228,7 @@ Ether.World.prototype.drawBackground = function(xv,yv){
 }
 
 Ether.World.prototype.driftTowardsEther = function(element){
+	if(this.engine.isPaused){ return }
 	var ether = this.player;
 	var radius = element.radius < 40 ? element.radius * (ether.attraction*5) : element.radius * ether.attraction
 	var speed;
@@ -371,6 +360,7 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 			if(this.badToggle > this.player.resistance*2){
 				this.badToggle = 0;
 				this.engine.audio.playElementSound(e)
+				ether.attackedByEnemy = true;
 				ether.loseElements(1);
 			} else {
 				this.badToggle += 1;

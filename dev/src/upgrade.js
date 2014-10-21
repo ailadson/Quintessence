@@ -116,7 +116,7 @@ Ether.Upgrade.prototype.addData = function(cy){
 		if(node && node.data && !node.data("activated")){
 			var level = parseInt(node.id().split(".")[1]);
 			var type = node.id().split(".")[0].charAt(0).toUpperCase() + node.id().split(".")[0].slice(1)
-			node.data("cost",level*(12 + level));
+			node.data("cost",level*(7 + level));
 
 			switch(type.toLowerCase()){
 				case "movement" :

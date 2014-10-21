@@ -27,7 +27,7 @@
 	this.player = this.ethers[0];
 
 	//level
-	this.betweenAges = false;
+	this.isPaused = false;
 	this.upgradeScreen = false;
 
 	//endgame
@@ -45,7 +45,7 @@
 		if(self.upgradeScreen) return
 
 		//Draw Background
-		if(!self.gameOver){
+		if(!self.gameOver && !self.isPaused){
 			self.ctx.fillStyle = "black";
 			self.ctx.fillRect(0,0,self.width,self.height);
 		}
@@ -57,16 +57,20 @@
 		//otherwise, if between ages...
 		} else if(!self.gameOver){
 
+			//if(!self.isPaused){
+
 			//Draw World
 			self.world.draw(self,time);
 
 			//check awards
-			//if(!self.player.dying){ self.checkAwards(time) };
+			if(!self.player.dying){ self.checkAwards(time) };
+
 			//Draw Ethers
 			for (var i = 0; i < self.ethers.length; i++) {
 				self.ethers[i].draw(self,time);
 			};
 			self.ctx.globalCompositeOperation = "source-over";
+		//	}
 
 			//Draw Hub
 			self.hub.draw(time);
@@ -176,8 +180,8 @@ Ether.Engine.prototype.handleKeyDown =function(key){
 }
 
 Ether.Engine.prototype.checkAwards = function(time){
-	if(this.hub.unstable){ return }
-		
+	if(this.player.unstable){ return }
+
 	var stats = this.player.getElementCount();
 
 	if(time > this.awardDelay + 5000){
