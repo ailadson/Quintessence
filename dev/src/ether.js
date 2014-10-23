@@ -11,7 +11,7 @@
 	this.elements = [];
 	this.moved;
 	this.receivedFirstElement = false;
-	this.attackedByEnemy = false;
+	this.enemySeen = false;
 
 	this.x = engine.width/2;
 	this.y = engine.height/2;
@@ -27,7 +27,7 @@
 	this.resistance = 4;
 	this.attraction = 0;
 	this.balance = 1;
-	this.force = 1.5;
+	this.force = 100;
 	this.elementCount = {f:0,w:0,a:0,e:0}
 
 	//life and death
@@ -172,7 +172,6 @@ Ether.Ether.prototype.stabilityCheck = function(engine,time){
 		if(time > this.stabilityLastTime + 2000 - stability){
 			this.stabilityLastTime = time;		
 			this.loseElements(3);
-			this.engine.audio.playSound('purge',1)
 		}
 	} else {
 		engine.hub.purging = false;

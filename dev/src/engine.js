@@ -45,7 +45,7 @@
 		if(self.upgradeScreen) return
 
 		//Draw Background
-		if(!self.gameOver && !self.isPaused){
+		if(!self.gameOver){
 			self.ctx.fillStyle = "black";
 			self.ctx.fillRect(0,0,self.width,self.height);
 		}
@@ -87,7 +87,7 @@
 				self.ctx.fillRect(0,0,self.width,self.height);
 			
 				self.ctx.font = "30px simple"
-				var width = ctx.measureText("so it goes").width;
+				var width = self.ctx.measureText("so it goes").width;
 				self.ctx.fillStyle = "black";
 				self.ctx.fillText("so it goes",self.width/2 - width/2,self.height/2);
 			}

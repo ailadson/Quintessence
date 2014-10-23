@@ -50,25 +50,30 @@ Ether.Hub = function(engine) {
 	this.gameOverColor = "rgba(0,0,0,"
 
 	//tutorial
-	this.firstElementMessage0 = "You have aquired your first element."
+	this.lifeSpanMssgShown = false;
+
+	this.firstElementMessage0 = "You have acquired your first element."
 	this.firstElementMessage11 = "New elements change your balance."
-	this.firstElementMessage10 = "Don't let it become too low."
+	this.firstElementMessage10 = "Don't let it become too low | < 50"
 	this.firstElementShown = false;
 
 	this.lifeBarMessage0 = "Your lifespan is represented at the top of the screen."
 	this.lifeBarMessage1 = "When it runs out, you will die."
 
-	this.enemyMessage = "Rainbow Voids will purge you of all your elements. Stay away from them."
+	this.enemyMessage0 = "Rainbow Voids will purge you of all your elements."
+	this.enemyMessage1 = " Stay away from them."
 	this.enemyMessageShown = false;
 
 	this.bigElementMessageShowing = false;
 	this.bigElementMessageShown = false;
-	this.bigElementMessage = "CAREFUL! Elements that are too large will cause immediate purging."
+	this.bigElementSub = "CAREFUL!"
+	this.bigElementMessage = "Large elements can cause a sudden imbalance."
 
 	this.upgradeMessageShown = false;
 	this.upgradeAvailable = false;
-	this.upgradeMessageSub = "'U' has lit up in bottom"
-	this.upgradeMessage = "That means an upgrade is available. Press 'U' to access upgrades."
+	this.upgradeMessage0 = "See (U)pgrades in the lower-right corner."
+	this.upgradeMessage1 = "It means you have an available upgrade."
+	this.upgradeMessage2 = "Press 'U' to access upgrades."
 
 
 	//mousemove
@@ -129,17 +134,6 @@ Ether.Hub = function(engine) {
 Ether.Hub.prototype.init = function(){
 	window.onmousemove = this.mousemove;
 	window.onclick = this.handleClick;
-
-	var config = {}
-	config.type = "tutorial"
-	
-	config.alphaStep = 0.02;
-	config.string = this.lifeBarMessage0;
-	this.msgQue.addMsg(config);
-
-	config.alphaStep = 0.03;
-	config.string = this.lifeBarMessage1;
-	this.msgQue.addMsg(config);
 }
 
  Ether.Hub.prototype.drawIntro = function(time){
@@ -354,19 +348,36 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 			this.currentMessage = msg
 
 			switch(msg.type){
+				case "blank" : 
+					msg.alphaStep = 1;
+					msg.alphaTime = 1;
+					msg.fontSize = 50;
+					break;
 				case "award" : 
+					msg.fontSize = 90
 					this.subMessage = msg.sub
 					this.engine.audio.playSound('life');
 					break;
 				case "zoom" :
+					msg.fontSize = 50;
 					this.zoomMessageShown = true
 					break;
 				case "tutorial" :
 					this.engine.isPaused = true;
+					msg.alphaTime = 6000;
+					msg.alphaStep = 1;
+					msg.fontSize = 50;
+
 					break; 
-				case "stablility" :
 				case "purge" :
-				case "upgrade" :
+					msg.fontSize = 100;
+					this.engine.audio.playSound('purge');
+					break;
+				case "stability" :
+					msg.fontSize = 60;
+					break;
+				case "default" :
+					msg.fontSize = 50;
 					break
 					
 			}
@@ -381,69 +392,72 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 Ether.Hub.prototype.updateMsgQue = function(){
 	var config = {}
 
-	if(this.engine.player.receivedFirstElement && !this.firstElementShown){
+	if(!this.lifeSpanMssgShown){
+		this.addBlankMsg();
+
 		config.type = "tutorial";
 
+		config.string = this.lifeBarMessage0;
+		this.msgQue.addMsg(config);
+
+		config.string = this.lifeBarMessage1;
+		this.msgQue.addMsg(config);
+
+		this.lifeSpanMssgShown = true;
+
+	} else if(this.engine.player.receivedFirstElement && !this.firstElementShown){
+		this.addBlankMsg();
+		config.type = "tutorial";
 		config.alphaStep = 0.015;
 		config.string = this.firstElementMessage0;
 		this.msgQue.addMsg(config);
+		
 		config.alphaStep = undefined;
+		config.string = this.firstElementMessage11;
+		this.msgQue.addMsg(config);
 		config.string = this.firstElementMessage10;
-		config.sub = this.firstElementMessage11;
 		this.msgQue.addMsg(config);
 
 		this.firstElementShown = true;
 
-	} else if(!this.zoomMessageShown && this.zoomMessage != ""){
-		config.string = this.zoomMessage;
-		config.type = "zoom";
-		config.sub = this.zoomSubMessage;
-
-		this.msgQue.addMsg(config)
-		this.zoomMessage = "";
-
 	} else if(!this.upgradeMessageShown && this.upgradeAvailable){
-		config.string = this.upgradeMessage;
-		config.sub = this.upgradeMessageSub;
-		config.type = "tutorial"
+		this.addBlankMsg();
+		config.type = "tutorial";
+
+		config.string = this.upgradeMessage0;
+		this.msgQue.addMsg(config);
+
+		config.string = this.upgradeMessage1;
+		this.msgQue.addMsg(config);
+
+		config.string = this.upgradeMessage2;
 		this.msgQue.addMsg(config);
 
 		this.upgradeMessageShown = true;
 
-	}else if(!this.enemyMessageShown && this.engine.player.attackedByEnemy){
-		config.type = "enemy";
-		config.string = this.enemyMessage;
+	} else if(this.engine.player.unstable && this.engine.player.bigElementIncrease && !this.bigElementMessageShown){
+		this.addBlankMsg();
+		config.string = this.bigElementMessage;
+		config.sub = this.purgeMssg;
+		config.type = "tutorial";
+		this.msgQue.addMsg(config);
+
+		this.engine.player.bigElementIncrease = false;
+		this.bigElementMessageShowing = true;
+		this.bigElementMessageShown = true;
+
+	} else if(!this.enemyMessageShown && this.engine.player.enemySeen){
+		this.addBlankMsg();
+		config.type = "tutorial";
+		config.string = this.enemyMessage0;
+		this.msgQue.addMsg(config);
+		config.string = this.enemyMessage1;
 		this.msgQue.addMsg(config);
 		this.enemyMessageShown = true;
 
-	}else if(this.awardMssg){
-		config.string = this.awardMssg[0];
-		config.type = "award";
-		config.sub = "+"+this.awardMssg[1]+" Lifespan";
-
-		this.msgQue.addMsg(config)
-		this.awardMssg = "";
-
-	} else if(this.lifeStageMssg != ""){
-		config.string = this.lifeStageMssg;
-		config.type = "transform";
-
-		this.msgQue.addMsg(config);
-		this.lifeStageMssg = "";
-
 	} else if(this.engine.player.unstable){
 
-		if(this.engine.player.bigElementIncrease && !this.bigElementMessageShown){
-			config.string = this.bigElementMessage;
-			config.sub = this.purgeMssg;
-			config.type = "tutorial";
-			this.msgQue.addMsg(config);
-
-			this.engine.player.bigElementIncrease = false;
-			this.bigElementMessageShowing = true;
-			this.bigElementMessageShown = true;
-
-		} if(!this.bigElementMessageShowing && this.engine.player.purging && !this.purgeNotified){
+		 if(!this.bigElementMessageShowing && this.engine.player.purging && !this.purgeNotified){
 		 	config.string = this.purgeMssg;
 		 	config.type = "purge";
 
@@ -461,7 +475,37 @@ Ether.Hub.prototype.updateMsgQue = function(){
 		}
 
 		
-	}
+	} else if(!this.zoomMessageShown && this.zoomMessage != ""){
+		config.string = this.zoomMessage;
+		config.type = "zoom";
+		config.sub = this.zoomSubMessage;
+
+		this.msgQue.addMsg(config)
+		this.zoomMessage = "";
+
+	} else if(this.awardMssg){
+		config.string = this.awardMssg[0];
+		config.type = "award";
+		config.sub = "+"+this.awardMssg[1]+" Lifespan";
+
+		this.msgQue.addMsg(config)
+		this.awardMssg = "";
+
+	} else if(this.lifeStageMssg != ""){
+		config.string = this.lifeStageMssg;
+		config.type = "transform";
+
+		this.msgQue.addMsg(config);
+		this.lifeStageMssg = "";
+
+	} 
+}
+
+Ether.Hub.prototype.addBlankMsg = function(){
+	config = {};
+	config.type = "blank";
+	config.string = "";
+	this.msgQue.addMsg(config); //there is a weird timing thing. messy hack
 }
 
 Ether.Hub.prototype.renderMessage = function(ctx,time){
@@ -470,11 +514,11 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	var message = this.currentMessage.str
 	var sub = this.currentMessage.sub
 	var fill = this.currentMessage.fill
+	var fontsize = this.currentMessage.fontSize;
 
+	ctx.font = fontsize+"px simple"
 
-	ctx.font = (this.currentMessage.type == "award") ? "90px simple" : "30px simple";
-
-	if(typeof ctx.measureText != 'function'){ 
+	if(typeof ctx.measureText != 'function'){ //fix. dont remove
 		console.log(ctx) ;
 		return 
 	}
@@ -505,7 +549,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 		ctx.fillText(sub,x,y-this.unit*3);
 	}
 
-	if(time > this.lastMessageTime + 100){
+	if(time > this.lastMessageTime + this.currentMessage.alphaTime){
 
 		if(this.currentMessage.lowerAlpha() < 0.3){
 			this.messageExist = false;

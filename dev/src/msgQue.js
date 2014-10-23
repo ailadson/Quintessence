@@ -19,6 +19,7 @@ Ether.Msg = function(c){
 	this.sub = c.sub || ""
 	this.alpha = 1
 	this.alphaStep = c.alphaStep || 0.02
+	this.alphaTime = c.alphaTime || 100;
 	this.type = c.type
 	this.fill = c.fill || "rgba(164,161,151,"
 }

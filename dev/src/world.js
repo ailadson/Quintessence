@@ -28,11 +28,12 @@
 	this.driftArray = [];
 	this.sizeOffset = 5000;
 
-	this.hills = [];
-	this.hillWidthAmount = 4
-	this.hillHeightAmount = 2;
-	this.hillWidth = engine.width/this.hillWidthAmount;
-	this.hillHeight = engine.height/this.hillHeightAmount;
+	// this.hills = [];
+	// this.hillWidthAmount = 4
+	// this.hillHeightAmount = 2;
+	// this.hillWidth = engine.width/this.hillWidthAmount;
+	// this.hillHeight = engine.height/this.hillHeightAmount;
+	this.farBackground = [];
 
 	this.badToggle = 0
 
@@ -55,7 +56,7 @@ Ether.World.prototype.init = function(engine){
 		var collection = this.elements[i];
 		var type = eleStrings[i];
 
-		this.initElements(type,collection,[60,350,500],[3,50,300],[3500,300,100],[40500,600,300])
+		this.initElements(type,collection,[60,350,500],[3,50,300],[4000,300,100],[40500,600,300])
 		this.initBadGuys(type,collection,120,true);
 	
 	};
@@ -77,7 +78,7 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,25,1,function(e){
+			this.initElement(type,collection,100,1,function(e){
 				if(e.radius > max || e.radius < max) e.radius = max;
 			},true)
 		}
@@ -102,13 +103,18 @@ Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,e
 }
 
 Ether.World.prototype.initBackground = function(){
-	for (var i = 0; i < this.hillHeightAmount + 10; i++) {
-		var hills = [];
-		for (var j = 0; j < this.hillWidthAmount+10; j++) {
-			hills[j] = {x: (this.hillWidth*j), y: (this.hillHeight*i)}
+	for (var i = 0; i < 3; i++) {
+		this.farBackground[i] = [];
+
+		for (var j = 0; j < 3; j++) {
+			this.farBackground[i][j] = new Image();
+			this.farBackground[i][j].src = "imgs/background.jpg";
+			this.farBackground[i][j].xPos = (i*1356) - 1356;
+			this.farBackground[i][j].yPos = (j*1356) - 1356;
 		};
-		this.hills.push(hills);
 	};
+
+	console.log(this.farBackground)
 }
 
 //DRAWING
@@ -116,6 +122,9 @@ Ether.World.prototype.draw = function(engine,time){
 		if(!this.engine.isPaused){
 			this.xv = this.adjustVelocity("x",this.xv,time);
 			this.yv = this.adjustVelocity("y",this.yv,time);
+		} else {
+			this.xv = 0;
+			this.yv = 0;
 		}
 	
 		//drag timer
@@ -202,47 +211,74 @@ Ether.World.prototype.zoomOutElements = function(val){
 	};
 }
 
-Ether.World.prototype.drawBackground = function(xv,yv){
-	for (var j = 0; j < this.hills.length; j++) {
-		var row = this.hills[j]
+Ether.World.prototype.drawBackground = function(x,y){
+	var xv = Math.ceil(x/5);
+	var yv = Math.ceil(y/5);
+	
+	// for (var j = 0; j < this.hills.length; j++) {
+	// 	var row = this.hills[j]
 
-		for (var i = 0; i < row.length; i++) {
-			var hill = row[i];
+	// 	for (var i = 0; i < row.length; i++) {
+	// 		var hill = row[i];
 
-			if(!this.engine.isPaused){
-				hill.x += xv
-				hill.y += yv
-			}
+	// 		if(!this.engine.isPaused){
+	// 			hill.x += xv
+	// 			hill.y += yv
+	// 		}
 
-			if(hill.x+this.hillWidth < 0) hill.x = this.engine.width
-			if(hill.x > this.engine.width) hill.x = -this.hillWidth
-			if(hill.y+this.hillHeight < 0) hill.y = this.engine.height
-			if(hill.y > this.engine.height) hill.y = -this.hillHeight
+	// 		if(hill.x+this.hillWidth < 0) hill.x = this.engine.width
+	// 		if(hill.x > this.engine.width) hill.x = -this.hillWidth
+	// 		if(hill.y+this.hillHeight < 0) hill.y = this.engine.height
+	// 		if(hill.y > this.engine.height) hill.y = -this.hillHeight
 
-			var gradient = this.engine.ctx.createLinearGradient(hill.x,hill.y,hill.x+this.hillWidth,hill.y+this.hillHeight);
-			this.engine.ctx.fillStyle = this.util.createGradient(gradient,[[0.05,"rgba(0,0,0,1)"],[0.95,"rgba(20,20,20,1)"]]);
-			this.engine.ctx.fillRect(hill.x,hill.y,this.hillWidth+5,this.hillHeight+5)
+	// 		var gradient = this.engine.ctx.createLinearGradient(hill.x,hill.y,hill.x+this.hillWidth,hill.y+this.hillHeight);
+	// 		this.engine.ctx.fillStyle = this.util.createGradient(gradient,[[0.05,"rgba(0,0,0,1)"],[0.95,"rgba(20,20,20,1)"]]);
+	// 		this.engine.ctx.fillRect(hill.x,hill.y,this.hillWidth+5,this.hillHeight+5)
+	// 	};
+	// }
+
+	for (var i = 0; i < this.farBackground.length; i++) {
+		var row = this.farBackground[i];
+
+		for (var j = 0; j < row.length; j++) {
+			var field = row[j];
+			field.xPos += xv;
+			field.yPos += yv;
+
+			if(field.xPos + field.width*2 <= 0) field.xPos = this.engine.width;
+			if(field.xPos >= field.width*2) field.xPos = -field.width;
+			if(field.yPos + field.height*2 <= 0) field.yPos = this.engine.height;
+			if(field.yPos >= field.height*2) field.yPos = -field.height;
+
+
+			this.engine.ctx.drawImage(field, field.xPos, field.yPos)
 		};
-	}
+		
+	};
+	
 
 }
 
 Ether.World.prototype.driftTowardsEther = function(element){
 	if(this.engine.isPaused){ return }
 	var ether = this.player;
-	var radius = element.radius < 40 ? element.radius * (ether.attraction*5) : element.radius * ether.attraction
+	var radius = Math.round((element.radius * 2 * ether.attraction) + ether.range);
 	var speed;
 
 	 if(element.bad){
 	 	speed = ether.speed-ether.resistance
-	 }else if(element.radius > 50){ 
-	 	speed = element.radius/(ether.force*60) 
 	 }else{ 
-	 	speed = element.radius/ether.force
+	 	speed = Math.round((ether.force/element.radius) * 100) / 100; 
 	 }
 
-	if(element.bad || this.util.getDistanceFromCenter(element,ether) <= radius){
+	 // console.log("DRIFT CHECK")
+	 // console.log("SPEED: " + speed)
+	 // console.log("RADIUS: " + radius)
+	 // console
+	 // console.log("~~~~~~~~~~~~~~~~~~")
 
+	if(element.bad || this.util.getDistanceFromCenter(element,ether) <= radius){
+		console.log("inside the movement")
 		var check;
 
 		while(!check){
@@ -347,6 +383,8 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 	var x = e.xOffset + this.x;
 	var y = e.yOffset + this.y;
 	var distance = ether.getDistanceFromCenter({x:x,y:y});
+	
+	if(e.bad){ ether.enemySeen = true };
 
 	if(distance < range){
 		if(!e.bad){
@@ -360,8 +398,7 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 			if(this.badToggle > this.player.resistance*2){
 				this.badToggle = 0;
 				this.engine.audio.playElementSound(e)
-				ether.attackedByEnemy = true;
-				ether.loseElements(1);
+				ether.loseElements(2);
 			} else {
 				this.badToggle += 1;
 			}
