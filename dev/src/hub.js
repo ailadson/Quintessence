@@ -29,20 +29,15 @@ Ether.Hub = function(engine) {
 	this.zoomLastTime = 0
 	this.zoomMessage = ""
 	this.zoomMessageShown = false
-	this.zoomSubMessage = "Press Z to zoom out"
+	this.zoomMessage0 = ""
+	this.zoomMessage1 = "It means you can zoom out."
+	this.zoomMessage2 = "Press Z to zoom out"
 	
 	//awards
 	this.awardMssg = "";
 	this.lifeStageMssg = "";
 	this.lifeStageOpts = ["spread your wings","spread your trail"]
 	this.subMessage = "";
-
-	this.stableWarned = false;
-	this.stableMssg0 = "Vibration is a sign of imbalance."
-	this.stableMssg1 = "When below 50, you will purge yourself until balance is restored"
-	this.purgeMssg = "PURGING"
-	this.purgeNotified = false;
-	this.unstable = false;
 
 	this.gameOverLastTime = 0;
 	this.gameOverAlpha = 0;
@@ -52,9 +47,16 @@ Ether.Hub = function(engine) {
 	//tutorial
 	this.lifeSpanMssgShown = false;
 
+	this.stableWarned = false;
+	this.stableMssg0 = "Vibration is a sign of imbalance."
+	this.stableMssg1 = "You will purge yourself if BALANCE falls below 50."
+	this.purgeMssg = "PURGING"
+	this.purgeNotified = false;
+	this.unstable = false;
+
 	this.firstElementMessage0 = "You have acquired your first element."
-	this.firstElementMessage11 = "New elements change your balance."
-	this.firstElementMessage10 = "Don't let it become too low | < 50"
+	this.firstElementMessage11 = "New elements change your BALANCE."
+	this.firstElementMessage10 = "Don't let it become too low (< 50)."
 	this.firstElementShown = false;
 
 	this.lifeBarMessage0 = "Your lifespan is represented at the top of the screen."
@@ -180,20 +182,8 @@ Ether.Hub.prototype.draw = function(time){
 Ether.Hub.prototype.drawZoom = function(ctx,time){
 	if(!this.engine.player.moved){return}
 
-	if(this.zoomTimeout != 0){
-		if(time > this.zoomLastTime + 1000){
-			this.zoomLastTime = time;
-			this.zoomTimeout -= 1;
-			if(this.zoomTimeout == 0){
-				this.engine.player.canZoom = true;
-
-				if(!this.zoomMessageShown){
-					this.zoomMessage = "See yourself on a different scale";
-				}
-			}
-		}
+	if(!this.engine.player.canZoom){
 		ctx.fillStyle = "rgba(65,78,78,.2)"
-
 	} else {
 		ctx.fillStyle = "#A3C2C2"
 	}
@@ -351,33 +341,34 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 				case "blank" : 
 					msg.alphaStep = 1;
 					msg.alphaTime = 1;
-					msg.fontSize = 50;
+					msg.fontSize = 1;
 					break;
 				case "award" : 
-					msg.fontSize = 90
+					msg.fontSize = 2.5
 					this.subMessage = msg.sub
 					this.engine.audio.playSound('life');
 					break;
-				case "zoom" :
-					msg.fontSize = 50;
-					this.zoomMessageShown = true
-					break;
 				case "tutorial" :
-					this.engine.isPaused = true;
-					msg.alphaTime = 6000;
-					msg.alphaStep = 1;
-					msg.fontSize = 50;
+					if(Ether.Tutorial){
+						this.engine.isPaused = true;
+						msg.alphaTime = 5000;
+						msg.alphaStep = 1;
+						msg.fontSize = 2;
+					} else {
+						this.messageExist = false;
+						this.currentMessage = "";
+					}
 
 					break; 
 				case "purge" :
-					msg.fontSize = 100;
+					msg.fontSize = 3;
 					this.engine.audio.playSound('purge');
 					break;
 				case "stability" :
-					msg.fontSize = 60;
+					msg.fontSize = 2;
 					break;
 				case "default" :
-					msg.fontSize = 50;
+					msg.fontSize = 2;
 					break
 					
 			}
@@ -446,6 +437,16 @@ Ether.Hub.prototype.updateMsgQue = function(){
 		this.bigElementMessageShowing = true;
 		this.bigElementMessageShown = true;
 
+	} else if(this.engine.player.unstable && !this.bigElementMessageShowing && !this.purgeNotified && !this.stableWarned){
+	 	this.addBlankMsg();
+	 	config.type = "tutorial";
+	 	this.stableWarned = true;
+
+	 	config.string = this.stableMssg0;
+	 	this.msgQue.addMsg(config);
+
+	 	config.string = this.stableMssg1;
+	 	this.msgQue.addMsg(config);
 	} else if(!this.enemyMessageShown && this.engine.player.enemySeen){
 		this.addBlankMsg();
 		config.type = "tutorial";
@@ -454,6 +455,21 @@ Ether.Hub.prototype.updateMsgQue = function(){
 		config.string = this.enemyMessage1;
 		this.msgQue.addMsg(config);
 		this.enemyMessageShown = true;
+
+	} else if(!this.zoomMessageShown && this.zoomMessage0 != ""){
+		config.type = "tutorial";
+
+		config.string = this.zoomMessage0;
+		this.msgQue.addMsg(config);
+
+		config.string = this.zoomMessage1;
+		this.msgQue.addMsg(config);
+
+		config.string = this.zoomMessage2;
+		this.msgQue.addMsg(config);
+
+		 this.zoomMessage = "";
+		this.zoomMessageShown = true;
 
 	} else if(this.engine.player.unstable){
 
@@ -465,24 +481,9 @@ Ether.Hub.prototype.updateMsgQue = function(){
 		 	this.purgeNotified = true;
 		 	this.engine.player.purging = false;
 
-		} else if(!this.bigElementMessageShowing && !this.purgeNotified && !this.stableWarned){
-		 	config.type = "stability";
-		 	this.stableWarned = true;
-
-		 	config.sub = this.stableMssg0;
-		 	config.string = this.stableMssg1;
-		 	this.msgQue.addMsg(config);
-		}
+		} 
 
 		
-	} else if(!this.zoomMessageShown && this.zoomMessage != ""){
-		config.string = this.zoomMessage;
-		config.type = "zoom";
-		config.sub = this.zoomSubMessage;
-
-		this.msgQue.addMsg(config)
-		this.zoomMessage = "";
-
 	} else if(this.awardMssg){
 		config.string = this.awardMssg[0];
 		config.type = "award";
@@ -516,7 +517,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	var fill = this.currentMessage.fill
 	var fontsize = this.currentMessage.fontSize;
 
-	ctx.font = fontsize+"px simple"
+	ctx.font = (fontsize*this.unit)+"px simple"
 
 	if(typeof ctx.measureText != 'function'){ //fix. dont remove
 		console.log(ctx) ;
@@ -526,7 +527,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	var textWidth = ctx.measureText(message).width;
 
 	if(textWidth > this.engine.width - 10 && this.currentMessage.type == "award"){ 
-		ctx.font = "70px simple"
+		ctx.font = (1.5*this.unit)+"px simple"
 		textWidth = ctx.measureText(message).width
 	}
 
@@ -540,7 +541,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	ctx.fillText(message,x,y);
 
 	if(sub != ""){
-		ctx.font = "25px simple";
+		ctx.font = this.unit+"px simple";
 		textWidth = ctx.measureText(sub).width;
 		x = (this.engine.width/2) - (textWidth / 2);
 		ctx.fillStyle = "rgba(0,0,0,"+this.currentMessage.alpha+")";

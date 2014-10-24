@@ -1,7 +1,7 @@
 <html>
 
 	<head>
-		<title>click play to play</title>
+		<title>live. die.</title>
 		<link href='http://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'>
 		<link href='reset.css' rel='stylesheet' type='text/css'>
 		<link href='index.css' rel='stylesheet' type='text/css'>
@@ -11,31 +11,60 @@
 <section class="mainContent">
 		<section class='header'>
 			<h4>quintessence</h4>
-			<h3>*~Why We Are Here~*</h3>
-			<p>Discover your self</p>
 		</section>
 
 		
 			<section class="mainGroup" id="notes">
 				<p>Use WSAD/Arrow Keys to navigate.</p>
-				<p>If BALANCE falls below 50, the ether will purge itself until it's stable!!</p>
-				<p>All the stats can be deduced by looking at your character.</p>
-				<p>Keep an eye on the lower right hand corner</p>
-				<p>When 'Z' lights up, press the 'Z' key to zoom out. This will become nessecary as you grow larger.</p>
-				<p>When 'U' lights up, that means you can upgrade. Press the 'U' key to go to the upgrade tree</p>
-				<p>STAY BALANCED</p>
+				Tutorial: <input type="checkbox" id="checkbox"><br>
+				Discover yourself in CONSCIOUSNESS <input type="checkbox" id="con"> or MATTER <input type="checkbox" id="mat">
 			</section>
 
 			<section class="mainGroup" id="defBalance">
 				<br>
 				<h1>a definition of "BALANCE"</h1>
 				<section id="rules">
-					<p>|<span style="color:brown">Earth</span> == Air| </p>
-					<p> |<span style="color:blue">Water</span> == <span style="color:red">Fire</span>|</p>
+					<p>|<span style="color:#6C7F2E">Earth</span> == <span style="color:#EDEDEB">Air</span>| </p>
+					<p> |<span style="color:#47BDDE">Water</span> == <span style="color:#E0664A">Fire</span>|</p>
 				</section>
-				<a href="game.html"><button id="play">Start</button></a>
+				<button id="play">Start</button>
 			</section>
 		</section>
 	</body>
+	<script>
+		var button = document.getElementById("play");
+		var consciousness = document.getElementById("con");
+		var matter = document.getElementById("mat");
 
+		button.addEventListener("click",getGame);
+
+		function getGame () {
+			if((!matter.checked && !consciousness.checked) ||
+				(matter.checked && consciousness.checked)){
+				alert("You must select consciousness OR matter")
+				return;
+			}
+
+			if(document.getElementById("checkbox").checked){
+				if(matter.checked){
+					window.location.href = "gameMT.html";
+				}else{
+					window.location.href = "gameCT.html";					
+				}
+				return;
+			} else {
+				if(matter.checked){
+					window.location.href = "gameM.html";
+				}else{
+					window.location.href = "gameC.html";					
+				}
+				return;
+			}
+		}
+
+		var sound = new Audio("audio/startPage.wav");
+		sound.volume = 0.8;
+		sound.play();
+		setInterval(function(){ console.log("play"); sound.play(); },8000);
+	</script>
 </html>

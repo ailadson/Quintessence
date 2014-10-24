@@ -103,3 +103,107 @@ Ether.awards["matter"] = [
 		text : "[silence]"
 	}
 ];
+
+Ether.awards["consciousness"] = [
+	{
+		text : "I"
+	},{
+		text : "I am"
+	},{
+		text : "Me"
+	},{
+		text : "Mine"
+	},{
+		text : "You"
+	},{
+		text : "I love"
+	},{
+		text : "I am sleepy"
+	},{
+		text : "I am hot"
+	},{
+		text : "I am cold"
+	},{
+		text : "I am thirsty"
+	},{
+		text : "I am hungry"
+	},{
+		text : "I am horny"
+	},{
+		text : "I am in the world"
+	},{
+		text : "I want this"
+	},{
+		text : "Why can't I have that?"
+	},{
+		text : "I'm afraid"
+	},{
+		text : "Why do I hurt?"
+	},{
+		text : "How do I get more?"
+	},{
+		text : "Who are my friends?"
+	},{
+		text : "How can I thrive?"
+	},{
+		text : "This is my stuff"
+	},{
+		text : "I am right"
+	},{
+		text : "They are wrong"
+	},{
+		text : "I will create"
+	},{
+		text : "Will I die?"
+	},{
+		text : "Everything dies"
+	},{
+		text : "Why am I here?"
+	},{
+		text : "I will die"
+	},{
+		text : "Who am I?"
+	},{
+		text : "Where did I come from?"
+	},{
+		text : "This is the truth"
+	},{
+		text : "That is not the truth"
+	},{
+		text : "This is who I am"
+	},{
+		text : "Who I am keeps changing"
+	},{
+		text : "I am my thougts"
+	},{
+		text : "My thoughts always change"
+	},{
+		text : "Do I change?"
+	},{
+		text : "What is constant?"
+	},{
+		text : "I am awareness"
+	},{
+		text : "Was awareness always here?"
+	},{
+		text : "From here did this awareness come?"
+	},{
+		text : "All comes from nothing"
+	},{
+		text : "All goes to nothing"
+	},{
+		text : "I am all"
+	},{
+		text : "I am nothing"
+	},{
+		text : "I am self evident"
+	},{
+		text : "I am self here"
+	},{
+		text : "No word is true"
+	},{
+		text : "How can sounds describe silence?"
+	},{
+		text : "[silence]"
+	}
+];

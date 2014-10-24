@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<link href='http://fonts.googleapis.com/css?family=Titillium+Web' rel='stylesheet' type='text/css'>
+		<link href='index.css' rel='stylesheet' type='text/css'>
+		<title>QUINTESSENCE</title>
+		<style type="text/css">
+
+			body {
+				margin: 0px
+			}
+
+			#upgrade{
+				background-color: #1C1F1F
+			}
+
+		</style>
+		<script src="cytoscape.js"></script>
+		<script>
+			window.requestAnimFrame = (function(){
+			  return  window.requestAnimationFrame       ||
+			          window.webkitRequestAnimationFrame ||
+			          window.mozRequestAnimationFrame    ||
+			          function( callback ){
+			            window.setTimeout(callback, 1000 / 60);
+			          };
+			})();
+		</script>
+	</head>
+	<body>
+		
+		<div id="container">
+			<canvas id="canvas"></canvas>
+		</div>
+		<div id="upgrade"></div>
+		<script type="text/javascript">
+			var Ether = {};
+
+			Ether.AwardType = 'consciousness';
+			Ether.Tutorial = true;
+
+		</script>
+		<script type="text/javascript" src="script.min.js"></script>
+		<!--script src="../dev/src/mobileCheck.js"></script>
+		<script src="../dev/src/element.js"></script>
+		<script src="../dev/src/msgQue.js"></script>
+		<script src="../dev/src/awards.js"></script>
+		<script src="../dev/src/util.js"></script>
+		<script src="../dev/src/ether.js"></script>
+		<script src="../dev/src/world.js"></script>
+		<script src="../dev/src/hub.js"></script>
+		<script src="../dev/src/audio.js"></script>
+		<script src="../dev/src/upgrade.js"></script>
+		<script src="../dev/src/engine.js"></script-->
+
+	</body>
+</html>

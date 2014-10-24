@@ -509,7 +509,7 @@ body {
   text-align: center;
   padding: 0;
   height: 100%;
-  background-color: #001224;
+  background-image: url("imgs/background.jpg");
 }
 
 .mainGroup {

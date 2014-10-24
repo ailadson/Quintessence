@@ -145,7 +145,7 @@ Ether.Engine.prototype.init = function(){
 
 	this.upgrade.init();
 	
-	this.setAwards('matter')
+	this.setAwards(Ether.AwardType)
 
 
 	//this.trophy.init();
@@ -222,7 +222,7 @@ Ether.Engine.prototype.setAwards = function(type){
 	for (var i = 0; i < this.awards.length; i++) {
 		this.awards[i].amount = amount;
 		this.awards[i].award = Math.ceil(award/2);
-		amount += 3;
+		amount += 2;
 		award = i+1;
 	};
 }

@@ -84,6 +84,7 @@ Ether.Ether.prototype.draw = function(engine,time){
 	this.drawCoreElements(engine);
 	this.drawElements(engine,time);
 	this.stabilityCheck(engine,time);
+	this.checkZoom();
 }
 
 Ether.Ether.prototype.drawElements = function(engine,time){
@@ -176,39 +177,6 @@ Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	} else {
 		engine.hub.purging = false;
 	}
-}
-
-Ether.Ether.prototype.getMoreScreen = function(time){
-	if(this.zoomCounter != 0 && time > this.zoomLastTime + this.zoomDelay){
-		this.zoomLastTime = time;
-		this.zoomCounter -= 1
-		this.zoomOut(this.zoomStep);
-		this.engine.world.zoomOutBackground(this.zoomStep+0.1);
-		this.engine.world.zoomOutElements(this.zoomStep);
-	} else if(this.zoomCounter == 0){
-		this.canZoom = false;
-		this.zooming = false;
-		this.zoomCounter = this.zoomCounterMax
-		this.engine.hub.zoomTimeout = 100;
-	}
-
-}
-
-
-Ether.Ether.prototype.zoomOut = function(val){
-	this.range = Math.round(this.range/val);
-	this.zoom = Math.round(this.zoom + val);
-
-	for (var i = 0; i < this.elements.length; i++) {
-		var e = this.elements[i]
-		e.radius = Math.round(e.radius/val);
-		e.xOffset = Math.round(e.xOffset/val);
-		e.yOffset = Math.round(e.yOffset/val);
-	};
-
-	for (var i = 0; i < this.coreElements.length; i++) {
-		this.coreElements[i].radius =  Math.round(this.coreElements[i].radius/val);
-	};
 }
 
 Ether.Ether.prototype.getDistanceFromCenter = function(e){
@@ -382,6 +350,60 @@ Ether.Ether.prototype.isGameOver = function(){
 	if(this.elements.length == 0){
 		this.engine.gameOver = true;
 	}
+}
+
+//zoom
+Ether.Ether.prototype.checkZoom = function(){
+	if(this.isAtScreenEdge() && !this.canZoom){ 
+		console.log("At Screen Edge")
+		if(!this.engine.hub.zoomMessageShown){
+			this.engine.hub.zoomMessage0 = "See (Z)oom in the lower-right corner.";
+		}
+
+		this.canZoom = true;
+	}
+}
+
+Ether.Ether.prototype.isAtScreenEdge = function(){
+
+	if(this.x + (this.range*1.5) > this.engine.width){
+		return true
+	} else if(this.y + (this.range*1.5) > this.engine.height){
+		return true
+	}
+}
+
+Ether.Ether.prototype.getMoreScreen = function(time){
+	if(this.zoomCounter != 0 && time > this.zoomLastTime + this.zoomDelay){
+		this.zoomLastTime = time;
+		this.zoomCounter -= 1
+		this.zoomOut(this.zoomStep);
+		this.engine.world.zoomOutBackground(1.25);
+		this.engine.world.zoomOutElements(this.zoomStep);
+	} else if(this.zoomCounter == 0){
+		this.canZoom = false;
+		this.zooming = false;
+		this.zoomCounter = this.zoomCounterMax
+		this.engine.hub.zoomTimeout = 100;
+	}
+
+}
+
+
+Ether.Ether.prototype.zoomOut = function(val){
+	this.range = Math.round(this.range/val);
+	this.zoom = Math.round(this.zoom + val);
+
+	for (var i = 0; i < this.elements.length; i++) {
+		var e = this.elements[i]
+		e.radius = Math.round(e.radius/val);
+		e.xOffset = Math.round(e.xOffset/val);
+		e.yOffset = Math.round(e.yOffset/val);
+	};
+
+	for (var i = 0; i < this.coreElements.length; i++) {
+		this.coreElements[i].radius =  Math.round(this.coreElements[i].radius/val);
+	};
 }
 
 

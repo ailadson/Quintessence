@@ -34,6 +34,8 @@
 	// this.hillWidth = engine.width/this.hillWidthAmount;
 	// this.hillHeight = engine.height/this.hillHeightAmount;
 	this.farBackground = [];
+	this.midGround = [];
+	this.NumberOfStars = 4;
 
 	this.badToggle = 0
 
@@ -56,7 +58,7 @@ Ether.World.prototype.init = function(engine){
 		var collection = this.elements[i];
 		var type = eleStrings[i];
 
-		this.initElements(type,collection,[60,350,500],[3,50,300],[4000,300,100],[40500,600,300])
+		this.initElements(type,collection,[60,350,500],[3,50,300],[5000,300,100],[40500,600,300])
 		this.initBadGuys(type,collection,120,true);
 	
 	};
@@ -78,7 +80,7 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,100,1,function(e){
+			this.initElement(type,collection,30,1,function(e){
 				if(e.radius > max || e.radius < max) e.radius = max;
 			},true)
 		}
@@ -114,7 +116,12 @@ Ether.World.prototype.initBackground = function(){
 		};
 	};
 
-	console.log(this.farBackground)
+	for (var i = 0; i < this.NumberOfStars; i++) {
+		this.midGround[i] = new Image();
+		this.midGround[i].src = "imgs/star"+i+".png";
+		this.midGround[i].xPos = Math.round(Math.random() * this.engine.width*6) - this.engine.width*3;
+		this.midGround[i].yPos = Math.round(Math.random() * this.engine.height*6) - this.engine.height*3;
+	};
 }
 
 //DRAWING
@@ -197,10 +204,11 @@ Ether.World.prototype.draw = function(engine,time){
 
 
 Ether.World.prototype.zoomOutBackground = function(val){
-	this.hillHeightAmount *= val;
-	this.hillWidthAmount *= val;
-	this.hillWidth = this.engine.width/this.hillWidthAmount;
-	this.hillHeight = this.engine.height/this.hillHeightAmount;
+	for (var i = 0; i < this.midGround.length; i++) {
+		var star = this.midGround[i];
+		star.width /= val;
+		star.height /= val;
+	};
 }
 
 Ether.World.prototype.zoomOutElements = function(val){
@@ -211,9 +219,14 @@ Ether.World.prototype.zoomOutElements = function(val){
 	};
 }
 
-Ether.World.prototype.drawBackground = function(x,y){
-	var xv = Math.ceil(x/5);
-	var yv = Math.ceil(y/5);
+Ether.World.prototype.drawBackground = function(xv,yv){
+	var xvBack = Math.ceil(xv/10);
+	var yvBack = Math.ceil(yv/10);
+	var xvMid = Math.ceil(xv/5);
+	var yvMid = Math.ceil(yv/5);
+
+	var width = this.engine.width;
+	var height = this.engine.height;
 	
 	// for (var j = 0; j < this.hills.length; j++) {
 	// 	var row = this.hills[j]
@@ -242,18 +255,52 @@ Ether.World.prototype.drawBackground = function(x,y){
 
 		for (var j = 0; j < row.length; j++) {
 			var field = row[j];
-			field.xPos += xv;
-			field.yPos += yv;
+			field.xPos += xvBack;
+			field.yPos += yvBack;
 
-			if(field.xPos + field.width*2 <= 0) field.xPos = this.engine.width;
-			if(field.xPos >= field.width*2) field.xPos = -field.width;
-			if(field.yPos + field.height*2 <= 0) field.yPos = this.engine.height;
-			if(field.yPos >= field.height*2) field.yPos = -field.height;
+			if(field.xPos + field.width*2 <= 0){ 
+				field.xPos = width
+			} else if(field.xPos >= field.width*2){ 
+				field.xPos = -field.width;
+			}
+
+			if(field.yPos + field.height*2 <= 0){ 
+				field.yPos = height;
+
+			}else if(field.yPos >= field.height*2){ 
+				field.yPos = -field.height;
+			}
 
 
 			this.engine.ctx.drawImage(field, field.xPos, field.yPos)
 		};
 		
+	};
+
+	for (var i = 0; i < this.midGround.length; i++) {
+		var star = this.midGround[i];
+
+		star.xPos += xvMid;
+		star.yPos += yvMid;
+
+		if(star.xPos < -width*3){ 
+			star.yPos = Math.round(Math.random() * height*6) - height*3;
+			star.xPos = (width * 3) - star.width;
+		} else if(star.xPos > width * 3){
+			star.yPos = Math.round(Math.random() * height*6) - height*3;
+			star.xPos = -width*3;
+		}
+
+		if(star.yPos < -height*3){
+			star.xPos = Math.round(Math.random() * width*6) - width*3;
+			star.yPos = height * 3 - star.height;
+		} else if(star.yPos > height * 3){
+			star.xPos = Math.round(Math.random() * width*6) - width*3;
+			star.yPos = -height * 3;
+		}
+
+		this.engine.ctx.drawImage(star, star.xPos, star.yPos)
+
 	};
 	
 
@@ -262,7 +309,7 @@ Ether.World.prototype.drawBackground = function(x,y){
 Ether.World.prototype.driftTowardsEther = function(element){
 	if(this.engine.isPaused){ return }
 	var ether = this.player;
-	var radius = Math.round((element.radius * 2 * ether.attraction) + ether.range);
+	var radius = Math.round((element.radius * 2 * ether.attraction) + ether.range + 10);
 	var speed;
 
 	 if(element.bad){
@@ -278,7 +325,6 @@ Ether.World.prototype.driftTowardsEther = function(element){
 	 // console.log("~~~~~~~~~~~~~~~~~~")
 
 	if(element.bad || this.util.getDistanceFromCenter(element,ether) <= radius){
-		console.log("inside the movement")
 		var check;
 
 		while(!check){

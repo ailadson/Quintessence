@@ -205,8 +205,8 @@ Ether.Upgrade.prototype.handleClick = function(e){
 	 		this.engine.hub.msgQue.addMsg(config);
 	 		break;
 	 	case "attraction" :
-	 		this.player.attraction += (2/7);
-	 		this.player.force -= (7/50)
+	 		this.player.attraction += (3/7);
+	 		this.player.force -= (50/7)
 	 		this.upgradeCheck.f.shift();
 	 		config.fill = "rgba(224,102,74,"
 	 		config.sub = "- " + cost + " fire";	 		 

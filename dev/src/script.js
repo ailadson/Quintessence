@@ -1,9 +1,7 @@
-/*! Quintessence - v0.0.1 - 2014-10-10 */window.mobilecheck = function() {
+/*! Quintessence - v0.0.1 - 2014-10-24 */window.mobilecheck = function() {
 var check = false;
 (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true})(navigator.userAgent||navigator.vendor||window.opera);
-return check; };var Ether = Ether || {};
-
-Ether.Element = function(type,size,config,bad){
+return check; };Ether.Element = function(type,size,config,bad){
 	var config = config || {};
 	this["type"] = config["type"] || type;
 	this.bad = bad;
@@ -77,8 +75,8 @@ Ether.Element = function(type,size,config,bad){
 	this.que = [];
 }
 
-Ether.MsgQue.prototype.addMsg = function(string,type,sub){
-	this.que.push(new Ether.Msg(string,type,sub));
+Ether.MsgQue.prototype.addMsg = function(config){
+	this.que.push(new Ether.Msg(config));
 }
 
 Ether.MsgQue.prototype.getMsg = function(){
@@ -89,12 +87,14 @@ Ether.MsgQue.prototype.hasMsg = function(){
 	return this.que.length > 0
 }
 
-Ether.Msg = function(s,t,sb){
-	this.str = s
-	this.sub = sb || ""
+Ether.Msg = function(c){
+	this.str = c.string
+	this.sub = c.sub || ""
 	this.alpha = 1
-	this.alphaStep = 0.01
-	this.type = t
+	this.alphaStep = c.alphaStep || 0.02
+	this.alphaTime = c.alphaTime || 100;
+	this.type = c.type
+	this.fill = c.fill || "rgba(164,161,151,"
 }
 
 Ether.Msg.prototype.lowerAlpha = function(){
@@ -209,6 +209,110 @@ Ether.awards["matter"] = [
 	},{
 		text : "[silence]"
 	}
+];
+
+Ether.awards["consciousness"] = [
+	{
+		text : "I"
+	},{
+		text : "I am"
+	},{
+		text : "Me"
+	},{
+		text : "Mine"
+	},{
+		text : "You"
+	},{
+		text : "I love"
+	},{
+		text : "I am sleepy"
+	},{
+		text : "I am hot"
+	},{
+		text : "I am cold"
+	},{
+		text : "I am thirsty"
+	},{
+		text : "I am hungry"
+	},{
+		text : "I am horny"
+	},{
+		text : "I am in the world"
+	},{
+		text : "I want this"
+	},{
+		text : "Why can't I have that?"
+	},{
+		text : "I'm afraid"
+	},{
+		text : "Why do I hurt?"
+	},{
+		text : "How do I get more?"
+	},{
+		text : "Who are my friends?"
+	},{
+		text : "How can I thrive?"
+	},{
+		text : "This is my stuff"
+	},{
+		text : "I am right"
+	},{
+		text : "They are wrong"
+	},{
+		text : "I will create"
+	},{
+		text : "Will I die?"
+	},{
+		text : "Everything dies"
+	},{
+		text : "Why am I here?"
+	},{
+		text : "I will die"
+	},{
+		text : "Who am I?"
+	},{
+		text : "Where did I come from?"
+	},{
+		text : "This is the truth"
+	},{
+		text : "That is not the truth"
+	},{
+		text : "This is who I am"
+	},{
+		text : "Who I am keeps changing"
+	},{
+		text : "I am my thougts"
+	},{
+		text : "My thoughts always change"
+	},{
+		text : "Do I change?"
+	},{
+		text : "What is constant?"
+	},{
+		text : "I am awareness"
+	},{
+		text : "Was awareness always here?"
+	},{
+		text : "From here did this awareness come?"
+	},{
+		text : "All comes from nothing"
+	},{
+		text : "All goes to nothing"
+	},{
+		text : "I am all"
+	},{
+		text : "I am nothing"
+	},{
+		text : "I am self evident"
+	},{
+		text : "I am self here"
+	},{
+		text : "No word is true"
+	},{
+		text : "How can sounds describe silence?"
+	},{
+		text : "[silence]"
+	}
 ];;Ether.Util = function (engine) {
 	this.engine = engine;
 }
@@ -265,6 +369,8 @@ Ether.Util.prototype.getLocalStorage = function(){
 	this.coreElements = [];
 	this.elements = [];
 	this.moved;
+	this.receivedFirstElement = false;
+	this.enemySeen = false;
 
 	this.x = engine.width/2;
 	this.y = engine.height/2;
@@ -280,7 +386,7 @@ Ether.Util.prototype.getLocalStorage = function(){
 	this.resistance = 4;
 	this.attraction = 0;
 	this.balance = 1;
-	this.force = 1.5;
+	this.force = 100;
 	this.elementCount = {f:0,w:0,a:0,e:0}
 
 	//life and death
@@ -292,6 +398,10 @@ Ether.Util.prototype.getLocalStorage = function(){
 	this.finalElementLength = 1;
 	this.stabilityLastTime = 0;
 
+	this.unstable = false;
+	this.bigElementIncrease = false;
+	this.oldSum = 9999;
+	this.purging = false;
 	this.dying = false;
 	this.dead = false;
 	
@@ -333,18 +443,22 @@ Ether.Ether.prototype.draw = function(engine,time){
 	this.drawCoreElements(engine);
 	this.drawElements(engine,time);
 	this.stabilityCheck(engine,time);
+	this.checkZoom();
 }
 
 Ether.Ether.prototype.drawElements = function(engine,time){
 	var self = this;
 
+	this.bigElementIncrease = this.hadBigElementIncrease();
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i];
 
 		//update the x and y position
-		e.x = this.x + e.xOffset + (e.jitter * (this.getStability()/10));
-		e.y = this.y + e.yOffset;
-		e.jitter *= -1;
+		if(!this.engine.isPaused){
+			e.x = this.x + e.xOffset + (e.jitter * (this.getStability()/10));
+			e.y = this.y + e.yOffset;
+			e.jitter *= -1;
+		}
 
 		if(this.transformation){ 
 			this.transformation(e,time) 
@@ -381,23 +495,24 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 
 		engine.ctx.beginPath();
 		
-		// if(this.age == 0){
-			self.util.drawElement(e, engine.ctx, function(ctx,element){
-				var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
-				return self.util.createGradient(gradient,[[0.5,"white"],[0.4,element.color],[1,"black"]])
-			});	
+		self.util.drawElement(e, engine.ctx, function(ctx,element){
+			var gradient = ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
+			return self.util.createGradient(gradient,[[0.5,"white"],[0.4,element.color],[1,"black"]])
+		});	
 
-		//velocity
-		e.x += e.vx;
-		e.y += e.vy;
-
-		//maintain center
-		if(this.getDistanceFromCenter(e) > this.range){ 
-			e.x = this.x
-			e.y = this.y
+		if(!this.engine.isPaused){
 			//velocity
-			this.vx = Math.random()*10-5;
-			this.vy = Math.random()*10-5;
+			e.x += e.vx;
+			e.y += e.vy;
+
+			//maintain center
+			if(this.getDistanceFromCenter(e) > this.range){ 
+				e.x = this.x
+				e.y = this.y
+				//velocity
+				this.vx = Math.random()*10-5;
+				this.vy = Math.random()*10-5;
+			}
 		}
 	};
 }
@@ -406,54 +521,21 @@ Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	var stability = this.getStability();
 	//stabilit starts at 0 and increases as it become more unstable
 	if(stability >= 20 && !this.dead){
-		engine.hub.unstable = true 
+		this.unstable = true 
 	} else {
-		engine.hub.unstable = false
+		this.unstable = false
 	}
 
 	if(stability >= 50 && !this.dead){
-		engine.hub.purging = true;
+		this.purging = true;
+
 		if(time > this.stabilityLastTime + 2000 - stability){
 			this.stabilityLastTime = time;		
 			this.loseElements(3);
-			this.engine.audio.playSound('purge',1)
 		}
 	} else {
 		engine.hub.purging = false;
 	}
-}
-
-Ether.Ether.prototype.getMoreScreen = function(time){
-	if(this.zoomCounter != 0 && time > this.zoomLastTime + this.zoomDelay){
-		this.zoomLastTime = time;
-		this.zoomCounter -= 1
-		this.zoomOut(this.zoomStep);
-		this.engine.world.zoomOutBackground(this.zoomStep+0.1);
-		this.engine.world.zoomOutElements(this.zoomStep);
-	} else if(this.zoomCounter == 0){
-		this.canZoom = false;
-		this.zooming = false;
-		this.zoomCounter = this.zoomCounterMax
-		this.engine.hub.zoomTimeout = 100;
-	}
-
-}
-
-
-Ether.Ether.prototype.zoomOut = function(val){
-	this.range = Math.round(this.range/val);
-	this.zoom = Math.round(this.zoom + val);
-
-	for (var i = 0; i < this.elements.length; i++) {
-		var e = this.elements[i]
-		e.radius = Math.round(e.radius/val);
-		e.xOffset = Math.round(e.xOffset/val);
-		e.yOffset = Math.round(e.yOffset/val);
-	};
-
-	for (var i = 0; i < this.coreElements.length; i++) {
-		this.coreElements[i].radius =  Math.round(this.coreElements[i].radius/val);
-	};
 }
 
 Ether.Ether.prototype.getDistanceFromCenter = function(e){
@@ -505,6 +587,22 @@ Ether.Ether.prototype.getElementCount = function(){
 	return this.elementCount
 }
 
+Ether.Ether.prototype.hadBigElementIncrease = function(){
+	var sum = 4;
+
+	for(var i in this.elementCount){
+		sum += this.elementCount[i];
+	}
+
+	if(sum >= this.oldSum*2){
+		this.oldSum = sum;
+		return true;
+	} else {
+		this.oldSum = sum <= 4 ? 9999 : sum;
+		return this.bigElementIncrease
+	}
+}
+
 Ether.Ether.prototype.addToElementCount = function(ele){
 	switch(ele.type){
 		case 'fire': this.elementCount.f += (Math.round((ele.radius/2)));
@@ -537,6 +635,7 @@ Ether.Ether.prototype.removeFromElementCount = function(ele){
 
 //Elements
 Ether.Ether.prototype.newElement = function(e){
+	this.receivedFirstElement = true;
 	this.engine.audio.playElementSound(e);
 	this.addToElementCount(e);
 	this.increaseMass(e);
@@ -610,6 +709,60 @@ Ether.Ether.prototype.isGameOver = function(){
 	if(this.elements.length == 0){
 		this.engine.gameOver = true;
 	}
+}
+
+//zoom
+Ether.Ether.prototype.checkZoom = function(){
+	if(this.isAtScreenEdge() && !this.canZoom){ 
+		console.log("At Screen Edge")
+		if(!this.engine.hub.zoomMessageShown){
+			this.engine.hub.zoomMessage0 = "See (Z)oom in the lower-right corner.";
+		}
+
+		this.canZoom = true;
+	}
+}
+
+Ether.Ether.prototype.isAtScreenEdge = function(){
+
+	if(this.x + (this.range*1.5) > this.engine.width){
+		return true
+	} else if(this.y + (this.range*1.5) > this.engine.height){
+		return true
+	}
+}
+
+Ether.Ether.prototype.getMoreScreen = function(time){
+	if(this.zoomCounter != 0 && time > this.zoomLastTime + this.zoomDelay){
+		this.zoomLastTime = time;
+		this.zoomCounter -= 1
+		this.zoomOut(this.zoomStep);
+		this.engine.world.zoomOutBackground(1.25);
+		this.engine.world.zoomOutElements(this.zoomStep);
+	} else if(this.zoomCounter == 0){
+		this.canZoom = false;
+		this.zooming = false;
+		this.zoomCounter = this.zoomCounterMax
+		this.engine.hub.zoomTimeout = 100;
+	}
+
+}
+
+
+Ether.Ether.prototype.zoomOut = function(val){
+	this.range = Math.round(this.range/val);
+	this.zoom = Math.round(this.zoom + val);
+
+	for (var i = 0; i < this.elements.length; i++) {
+		var e = this.elements[i]
+		e.radius = Math.round(e.radius/val);
+		e.xOffset = Math.round(e.xOffset/val);
+		e.yOffset = Math.round(e.yOffset/val);
+	};
+
+	for (var i = 0; i < this.coreElements.length; i++) {
+		this.coreElements[i].radius =  Math.round(this.coreElements[i].radius/val);
+	};
 }
 
 
@@ -882,11 +1035,14 @@ Ether.Trophy.prototype.save = function(ether){
 	this.driftArray = [];
 	this.sizeOffset = 5000;
 
-	this.hills = [];
-	this.hillWidthAmount = 4
-	this.hillHeightAmount = 2;
-	this.hillWidth = engine.width/this.hillWidthAmount;
-	this.hillHeight = engine.height/this.hillHeightAmount;
+	// this.hills = [];
+	// this.hillWidthAmount = 4
+	// this.hillHeightAmount = 2;
+	// this.hillWidth = engine.width/this.hillWidthAmount;
+	// this.hillHeight = engine.height/this.hillHeightAmount;
+	this.farBackground = [];
+	this.midGround = [];
+	this.NumberOfStars = 4;
 
 	this.badToggle = 0
 
@@ -907,28 +1063,11 @@ Ether.World.prototype.init = function(engine){
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var collection = this.elements[i];
-		//collection.length = 0; //clear out array
 		var type = eleStrings[i];
 
-		// switch(engine.ethers[0].age){
-		// 	case 0 :
-			this.initElements(type,collection,[20,300,500],[3,150,350],[3500,300,100],[50000,700,300])
-			this.initBadGuys(type,collection,120,true);
-				//break;
-
-			/*case 1 :
-				this.initElements(type,collection,[2,100,300],[0,50,250],[325,250,10],[1,200,70])
-				this.initBadGuys(type,collection,90);
-				break;
-			case 2 :
-				this.initElements(type,collection,[50,200],[30,150],[200,150],[400,100])
-				this.initBadGuys(type,collection,60);
-				break;
-			case 3 :
-				this.initElements(type,collection,[20,90],[5,50],[200,200],[1000,220])
-				this.initBadGuys(type,collection,30);
-				break;*/
-		//}		
+		this.initElements(type,collection,[60,350,500],[3,50,300],[5000,300,100],[40500,600,300])
+		this.initBadGuys(type,collection,120,true);
+	
 	};
 }
 
@@ -948,7 +1087,7 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,0,1,function(e){
+			this.initElement(type,collection,30,1,function(e){
 				if(e.radius > max || e.radius < max) e.radius = max;
 			},true)
 		}
@@ -973,19 +1112,34 @@ Ether.World.prototype.initElement = function(type,collection,amount,sizeOffset,e
 }
 
 Ether.World.prototype.initBackground = function(){
-	for (var i = 0; i < this.hillHeightAmount + 10; i++) {
-		var hills = [];
-		for (var j = 0; j < this.hillWidthAmount+10; j++) {
-			hills[j] = {x: (this.hillWidth*j), y: (this.hillHeight*i)}
+	for (var i = 0; i < 3; i++) {
+		this.farBackground[i] = [];
+
+		for (var j = 0; j < 3; j++) {
+			this.farBackground[i][j] = new Image();
+			this.farBackground[i][j].src = "imgs/background.jpg";
+			this.farBackground[i][j].xPos = (i*1356) - 1356;
+			this.farBackground[i][j].yPos = (j*1356) - 1356;
 		};
-		this.hills.push(hills);
+	};
+
+	for (var i = 0; i < this.NumberOfStars; i++) {
+		this.midGround[i] = new Image();
+		this.midGround[i].src = "imgs/star"+i+".png";
+		this.midGround[i].xPos = Math.round(Math.random() * this.engine.width*6) - this.engine.width*3;
+		this.midGround[i].yPos = Math.round(Math.random() * this.engine.height*6) - this.engine.height*3;
 	};
 }
 
 //DRAWING
 Ether.World.prototype.draw = function(engine,time){
-		this.xv = this.adjustVelocity("x",this.xv,time);
-		this.yv = this.adjustVelocity("y",this.yv,time);
+		if(!this.engine.isPaused){
+			this.xv = this.adjustVelocity("x",this.xv,time);
+			this.yv = this.adjustVelocity("y",this.yv,time);
+		} else {
+			this.xv = 0;
+			this.yv = 0;
+		}
 	
 		//drag timer
 		if(time > this.dragLastTime + 200){ this.dragLastTime = time }
@@ -993,15 +1147,17 @@ Ether.World.prototype.draw = function(engine,time){
 		//DrawBackground
 		this.drawBackground(this.xv,this.yv);
 		
-		//update x+y
-		this.x += this.xv;
-		this.y += this.yv;
+		if(!this.engine.isPaused){
+			//update x+y
+			this.x += this.xv;
+			this.y += this.yv;
 
-		this.player.xv = this.xv;
-		this.player.yv = this.yv;
+			this.player.xv = this.xv;
+			this.player.yv = this.yv;
 
-		engine.xv = this.xv;
-		engine.yv = this.yv;
+			engine.xv = this.xv;
+			engine.yv = this.yv;
+		}
 
 		
 
@@ -1013,7 +1169,6 @@ Ether.World.prototype.draw = function(engine,time){
 
 			if(!this.isInView(e)){ continue }
 
-			//reverse direction of jitter
 			e.jitter *= -1;
 
 			//x and y positions determined on the fly
@@ -1056,10 +1211,11 @@ Ether.World.prototype.draw = function(engine,time){
 
 
 Ether.World.prototype.zoomOutBackground = function(val){
-	this.hillHeightAmount *= val;
-	this.hillWidthAmount *= val;
-	this.hillWidth = this.engine.width/this.hillWidthAmount;
-	this.hillHeight = this.engine.height/this.hillHeightAmount;
+	for (var i = 0; i < this.midGround.length; i++) {
+		var star = this.midGround[i];
+		star.width /= val;
+		star.height /= val;
+	};
 }
 
 Ether.World.prototype.zoomOutElements = function(val){
@@ -1071,43 +1227,111 @@ Ether.World.prototype.zoomOutElements = function(val){
 }
 
 Ether.World.prototype.drawBackground = function(xv,yv){
-	for (var j = 0; j < this.hills.length; j++) {
-		var row = this.hills[j]
+	var xvBack = Math.ceil(xv/10);
+	var yvBack = Math.ceil(yv/10);
+	var xvMid = Math.ceil(xv/5);
+	var yvMid = Math.ceil(yv/5);
 
-		for (var i = 0; i < row.length; i++) {
-			var hill = row[i];
+	var width = this.engine.width;
+	var height = this.engine.height;
+	
+	// for (var j = 0; j < this.hills.length; j++) {
+	// 	var row = this.hills[j]
 
-			hill.x += xv
-			hill.y += yv
+	// 	for (var i = 0; i < row.length; i++) {
+	// 		var hill = row[i];
 
-			if(hill.x+this.hillWidth < 0) hill.x = this.engine.width
-			if(hill.x > this.engine.width) hill.x = -this.hillWidth
-			if(hill.y+this.hillHeight < 0) hill.y = this.engine.height
-			if(hill.y > this.engine.height) hill.y = -this.hillHeight
+	// 		if(!this.engine.isPaused){
+	// 			hill.x += xv
+	// 			hill.y += yv
+	// 		}
 
-			var gradient = this.engine.ctx.createLinearGradient(hill.x,hill.y,hill.x+this.hillWidth,hill.y+this.hillHeight);
-			this.engine.ctx.fillStyle = this.util.createGradient(gradient,[[0.05,"rgba(0,0,0,1)"],[0.95,"rgba(20,20,20,1)"]]);
-			this.engine.ctx.fillRect(hill.x,hill.y,this.hillWidth+5,this.hillHeight+5)
+	// 		if(hill.x+this.hillWidth < 0) hill.x = this.engine.width
+	// 		if(hill.x > this.engine.width) hill.x = -this.hillWidth
+	// 		if(hill.y+this.hillHeight < 0) hill.y = this.engine.height
+	// 		if(hill.y > this.engine.height) hill.y = -this.hillHeight
+
+	// 		var gradient = this.engine.ctx.createLinearGradient(hill.x,hill.y,hill.x+this.hillWidth,hill.y+this.hillHeight);
+	// 		this.engine.ctx.fillStyle = this.util.createGradient(gradient,[[0.05,"rgba(0,0,0,1)"],[0.95,"rgba(20,20,20,1)"]]);
+	// 		this.engine.ctx.fillRect(hill.x,hill.y,this.hillWidth+5,this.hillHeight+5)
+	// 	};
+	// }
+
+	for (var i = 0; i < this.farBackground.length; i++) {
+		var row = this.farBackground[i];
+
+		for (var j = 0; j < row.length; j++) {
+			var field = row[j];
+			field.xPos += xvBack;
+			field.yPos += yvBack;
+
+			if(field.xPos + field.width*2 <= 0){ 
+				field.xPos = width
+			} else if(field.xPos >= field.width*2){ 
+				field.xPos = -field.width;
+			}
+
+			if(field.yPos + field.height*2 <= 0){ 
+				field.yPos = height;
+
+			}else if(field.yPos >= field.height*2){ 
+				field.yPos = -field.height;
+			}
+
+
+			this.engine.ctx.drawImage(field, field.xPos, field.yPos)
 		};
-	}
+		
+	};
+
+	for (var i = 0; i < this.midGround.length; i++) {
+		var star = this.midGround[i];
+
+		star.xPos += xvMid;
+		star.yPos += yvMid;
+
+		if(star.xPos < -width*3){ 
+			star.yPos = Math.round(Math.random() * height*6) - height*3;
+			star.xPos = (width * 3) - star.width;
+		} else if(star.xPos > width * 3){
+			star.yPos = Math.round(Math.random() * height*6) - height*3;
+			star.xPos = -width*3;
+		}
+
+		if(star.yPos < -height*3){
+			star.xPos = Math.round(Math.random() * width*6) - width*3;
+			star.yPos = height * 3 - star.height;
+		} else if(star.yPos > height * 3){
+			star.xPos = Math.round(Math.random() * width*6) - width*3;
+			star.yPos = -height * 3;
+		}
+
+		this.engine.ctx.drawImage(star, star.xPos, star.yPos)
+
+	};
+	
 
 }
 
 Ether.World.prototype.driftTowardsEther = function(element){
+	if(this.engine.isPaused){ return }
 	var ether = this.player;
-	var radius = element.radius < 40 ? element.radius * (ether.attraction*5) : element.radius * ether.attraction
+	var radius = Math.round((element.radius * 2 * ether.attraction) + ether.range + 10);
 	var speed;
 
 	 if(element.bad){
 	 	speed = ether.speed-ether.resistance
-	 }else if(element.radius > 50){ 
-	 	speed = element.radius/(ether.force*60) 
 	 }else{ 
-	 	speed = element.radius/ether.force
+	 	speed = Math.round((ether.force/element.radius) * 100) / 100; 
 	 }
 
-	if(element.bad || this.util.getDistanceFromCenter(element,ether) <= radius){
+	 // console.log("DRIFT CHECK")
+	 // console.log("SPEED: " + speed)
+	 // console.log("RADIUS: " + radius)
+	 // console
+	 // console.log("~~~~~~~~~~~~~~~~~~")
 
+	if(element.bad || this.util.getDistanceFromCenter(element,ether) <= radius){
 		var check;
 
 		while(!check){
@@ -1212,6 +1436,8 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 	var x = e.xOffset + this.x;
 	var y = e.yOffset + this.y;
 	var distance = ether.getDistanceFromCenter({x:x,y:y});
+	
+	if(e.bad){ ether.enemySeen = true };
 
 	if(distance < range){
 		if(!e.bad){
@@ -1225,7 +1451,7 @@ Ether.World.prototype.isInRangeOfEther = function(e,collection,index){
 			if(this.badToggle > this.player.resistance*2){
 				this.badToggle = 0;
 				this.engine.audio.playElementSound(e)
-				ether.loseElements(1);
+				ether.loseElements(2);
 			} else {
 				this.badToggle += 1;
 			}
@@ -1400,7 +1626,9 @@ Ether.World.prototype.newElement = function(e){
 	this.zoomLastTime = 0
 	this.zoomMessage = ""
 	this.zoomMessageShown = false
-	this.zoomSubMessage = "Press Z to zoom out"
+	this.zoomMessage0 = ""
+	this.zoomMessage1 = "It means you can zoom out."
+	this.zoomMessage2 = "Press Z to zoom out"
 	
 	//awards
 	this.awardMssg = "";
@@ -1408,16 +1636,43 @@ Ether.World.prototype.newElement = function(e){
 	this.lifeStageOpts = ["spread your wings","spread your trail"]
 	this.subMessage = "";
 
-	this.stableWarned = false
-	this.stableMssg = "The vibration is a sign of your imbalance"
-	this.purgeMssg = "PURGING"
-	this.purgeNotified = false;
-	this.unstable = false;
-
 	this.gameOverLastTime = 0;
 	this.gameOverAlpha = 0;
 	this.gameOverWidth;
 	this.gameOverColor = "rgba(0,0,0,"
+
+	//tutorial
+	this.lifeSpanMssgShown = false;
+
+	this.stableWarned = false;
+	this.stableMssg0 = "Vibration is a sign of imbalance."
+	this.stableMssg1 = "You will purge yourself if BALANCE falls below 50."
+	this.purgeMssg = "PURGING"
+	this.purgeNotified = false;
+	this.unstable = false;
+
+	this.firstElementMessage0 = "You have acquired your first element."
+	this.firstElementMessage11 = "New elements change your BALANCE."
+	this.firstElementMessage10 = "Don't let it become too low (< 50)."
+	this.firstElementShown = false;
+
+	this.lifeBarMessage0 = "Your lifespan is represented at the top of the screen."
+	this.lifeBarMessage1 = "When it runs out, you will die."
+
+	this.enemyMessage0 = "Rainbow Voids will purge you of all your elements."
+	this.enemyMessage1 = " Stay away from them."
+	this.enemyMessageShown = false;
+
+	this.bigElementMessageShowing = false;
+	this.bigElementMessageShown = false;
+	this.bigElementSub = "CAREFUL!"
+	this.bigElementMessage = "Large elements can cause a sudden imbalance."
+
+	this.upgradeMessageShown = false;
+	this.upgradeAvailable = false;
+	this.upgradeMessage0 = "See (U)pgrades in the lower-right corner."
+	this.upgradeMessage1 = "It means you have an available upgrade."
+	this.upgradeMessage2 = "Press 'U' to access upgrades."
 
 
 	//mousemove
@@ -1524,38 +1779,27 @@ Ether.Hub.prototype.draw = function(time){
 Ether.Hub.prototype.drawZoom = function(ctx,time){
 	if(!this.engine.player.moved){return}
 
-	if(this.zoomTimeout != 0){
-		if(time > this.zoomLastTime + 1000){
-			this.zoomLastTime = time;
-			this.zoomTimeout -= 1;
-			if(this.zoomTimeout == 0){
-				this.engine.player.canZoom = true;
-
-				if(!this.zoomMessageShown){
-					this.zoomMessage = "See yourself on a different scale";
-				}
-			}
-		}
+	if(!this.engine.player.canZoom){
 		ctx.fillStyle = "rgba(65,78,78,.2)"
-
 	} else {
 		ctx.fillStyle = "#A3C2C2"
 	}
 	ctx.font = this.unit*1.5 + "px simple";
-	ctx.fillText("Z",this.engine.width - this.unit*2,this.engine.height - this.unit)
+	ctx.fillText("(Z)oom Out",this.engine.width - this.unit*8,this.engine.height - this.unit*2.5)
 }
 
 Ether.Hub.prototype.drawUpgrade = function(ctx,time){
 	if(!this.engine.player.moved){return}
 
-	if(!this.engine.upgrade.canUpgrade()){		
+	if(!this.engine.upgrade.canUpgrade()){	
 		ctx.fillStyle = "rgba(65,78,78,.2)"
 	} else {
+		this.upgradeAvailable = true;	
 		ctx.fillStyle = "#A3C2C2"
 	}
 
 	ctx.font = this.unit*1.5 + "px simple";
-	ctx.fillText("U",this.engine.width - this.unit*4,this.engine.height - this.unit)
+	ctx.fillText("(U)pgrades",this.engine.width - this.unit*8,this.engine.height - this.unit)
 }
 
 
@@ -1576,7 +1820,6 @@ Ether.Hub.prototype.getStats = function(){
 }
 
 Ether.Hub.prototype.drawBalance = function(stab,ctx){
-	//console.log("hub balance: "+stab)
 	var hubStab = (stab > 100) ? 0 : (100 - stab)
 	
 	ctx.font =this.unit*2+"px simple";
@@ -1638,7 +1881,6 @@ Ether.Hub.prototype.getEqualitySign = function(val1,val2){
 }
 
 Ether.Hub.prototype.drawLifeBar = function(ctx, time){
-	if(this.engine.betweenAges) { return }
 
 	var ether = this.engine.ethers[0];
 	var ratio = ether.currentSpan/ether.lifeSpan[0]
@@ -1658,7 +1900,7 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 	//MOVE THIS TO ETHER!!???
 	if(!ether.moved){return}
 		
-	if(time > this.lastTime + 1000 && !ether.inVoid){
+	if(time > this.lastTime + 1000 && !ether.inVoid &&!this.engine.isPaused){
 		this.lastTime = time;
 		if(ratio > 0){
 			ether.currentSpan--;
@@ -1693,17 +1935,38 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 			this.currentMessage = msg
 
 			switch(msg.type){
+				case "blank" : 
+					msg.alphaStep = 1;
+					msg.alphaTime = 1;
+					msg.fontSize = 1;
+					break;
 				case "award" : 
+					msg.fontSize = 2.5
 					this.subMessage = msg.sub
 					this.engine.audio.playSound('life');
 					break;
-				case "zoom" :
-					this.zoomMessageShown = true
-					break;
-				case "stablility" :
-					
-					break;
+				case "tutorial" :
+					if(Ether.Tutorial){
+						this.engine.isPaused = true;
+						msg.alphaTime = 5000;
+						msg.alphaStep = 1;
+						msg.fontSize = 2;
+					} else {
+						this.messageExist = false;
+						this.currentMessage = "";
+					}
+
+					break; 
 				case "purge" :
+					msg.fontSize = 3;
+					this.engine.audio.playSound('purge');
+					break;
+				case "stability" :
+					msg.fontSize = 2;
+					break;
+				case "default" :
+					msg.fontSize = 2;
+					break
 					
 			}
 		} else {
@@ -1715,35 +1978,132 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 }
 
 Ether.Hub.prototype.updateMsgQue = function(){
-	
-	if(!this.zoomMessageShown && this.zoomMessage != ""){
-		this.msgQue.addMsg(this.zoomMessage,"zoom",this.zoomSubMessage)
-		this.zoomMessage = "";
-	}
+	var config = {}
 
-	if(this.awardMssg){
-		this.msgQue.addMsg(this.awardMssg[0],"award","+"+this.awardMssg[1]+" Lifespan")
+	if(!this.lifeSpanMssgShown){
+		this.addBlankMsg();
+
+		config.type = "tutorial";
+
+		config.string = this.lifeBarMessage0;
+		this.msgQue.addMsg(config);
+
+		config.string = this.lifeBarMessage1;
+		this.msgQue.addMsg(config);
+
+		this.lifeSpanMssgShown = true;
+
+	} else if(this.engine.player.receivedFirstElement && !this.firstElementShown){
+		this.addBlankMsg();
+		config.type = "tutorial";
+		config.alphaStep = 0.015;
+		config.string = this.firstElementMessage0;
+		this.msgQue.addMsg(config);
+		
+		config.alphaStep = undefined;
+		config.string = this.firstElementMessage11;
+		this.msgQue.addMsg(config);
+		config.string = this.firstElementMessage10;
+		this.msgQue.addMsg(config);
+
+		this.firstElementShown = true;
+
+	} else if(!this.upgradeMessageShown && this.upgradeAvailable){
+		this.addBlankMsg();
+		config.type = "tutorial";
+
+		config.string = this.upgradeMessage0;
+		this.msgQue.addMsg(config);
+
+		config.string = this.upgradeMessage1;
+		this.msgQue.addMsg(config);
+
+		config.string = this.upgradeMessage2;
+		this.msgQue.addMsg(config);
+
+		this.upgradeMessageShown = true;
+
+	} else if(this.engine.player.unstable && this.engine.player.bigElementIncrease && !this.bigElementMessageShown){
+		this.addBlankMsg();
+		config.string = this.bigElementMessage;
+		config.sub = this.purgeMssg;
+		config.type = "tutorial";
+		this.msgQue.addMsg(config);
+
+		this.engine.player.bigElementIncrease = false;
+		this.bigElementMessageShowing = true;
+		this.bigElementMessageShown = true;
+
+	} else if(this.engine.player.unstable && !this.bigElementMessageShowing && !this.purgeNotified && !this.stableWarned){
+	 	this.addBlankMsg();
+	 	config.type = "tutorial";
+	 	this.stableWarned = true;
+
+	 	config.string = this.stableMssg0;
+	 	this.msgQue.addMsg(config);
+
+	 	config.string = this.stableMssg1;
+	 	this.msgQue.addMsg(config);
+	} else if(!this.enemyMessageShown && this.engine.player.enemySeen){
+		this.addBlankMsg();
+		config.type = "tutorial";
+		config.string = this.enemyMessage0;
+		this.msgQue.addMsg(config);
+		config.string = this.enemyMessage1;
+		this.msgQue.addMsg(config);
+		this.enemyMessageShown = true;
+
+	} else if(!this.zoomMessageShown && this.zoomMessage0 != ""){
+		config.type = "tutorial";
+
+		config.string = this.zoomMessage0;
+		this.msgQue.addMsg(config);
+
+		config.string = this.zoomMessage1;
+		this.msgQue.addMsg(config);
+
+		config.string = this.zoomMessage2;
+		this.msgQue.addMsg(config);
+
+		 this.zoomMessage = "";
+		this.zoomMessageShown = true;
+
+	} else if(this.engine.player.unstable){
+
+		 if(!this.bigElementMessageShowing && this.engine.player.purging && !this.purgeNotified){
+		 	config.string = this.purgeMssg;
+		 	config.type = "purge";
+
+			this.msgQue.addMsg(config)
+		 	this.purgeNotified = true;
+		 	this.engine.player.purging = false;
+
+		} 
+
+		
+	} else if(this.awardMssg){
+		config.string = this.awardMssg[0];
+		config.type = "award";
+		config.sub = "+"+this.awardMssg[1]+" Lifespan";
+
+		this.msgQue.addMsg(config)
 		this.awardMssg = "";
-	}
 
-	if(this.lifeStageMssg != ""){
-		this.msgQue.addMsg(this.lifeStageMssg,"transform")
-		this.lifeStageMssg = ""
-	}
+	} else if(this.lifeStageMssg != ""){
+		config.string = this.lifeStageMssg;
+		config.type = "transform";
 
-	if(this.unstable){
-		
-		if(this.purging && !this.purgeNotified){
-			this.purgeNotified = true;
-			this.msgQue.addMsg(this.purgeMssg,"purge")
-			this.purging = false;
-		} else if(!this.stableWarned){
-			this.stableWarned = true;
-			this.msgQue.addMsg(this.stableMssg,"stability")
-		}
+		this.msgQue.addMsg(config);
+		this.lifeStageMssg = "";
 
-		
-	}
+	} 
+}
+
+Ether.Hub.prototype.addBlankMsg = function(){
+	config = {};
+	config.type = "blank";
+	config.string = "";
+	this.msgQue.addMsg(config); //there is a weird timing thing. messy hack
 }
 
 Ether.Hub.prototype.renderMessage = function(ctx,time){
@@ -1751,11 +2111,12 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	var ether = this.engine.ethers[0];
 	var message = this.currentMessage.str
 	var sub = this.currentMessage.sub
+	var fill = this.currentMessage.fill
+	var fontsize = this.currentMessage.fontSize;
 
+	ctx.font = (fontsize*this.unit)+"px simple"
 
-	ctx.font = (this.currentMessage.type == "award") ? "90px simple" : "30px simple";
-
-	if(typeof ctx.measureText != 'function'){ 
+	if(typeof ctx.measureText != 'function'){ //fix. dont remove
 		console.log(ctx) ;
 		return 
 	}
@@ -1763,7 +2124,7 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	var textWidth = ctx.measureText(message).width;
 
 	if(textWidth > this.engine.width - 10 && this.currentMessage.type == "award"){ 
-		ctx.font = "70px simple"
+		ctx.font = (1.5*this.unit)+"px simple"
 		textWidth = ctx.measureText(message).width
 	}
 
@@ -1773,25 +2134,30 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	ctx.fillStyle = "rgba(0,0,0,"+this.currentMessage.alpha+")";
 	ctx.fillText(message,x+2,y+2);
 
-	ctx.fillStyle = "rgba(164,161,151,"+this.currentMessage.alpha+")";
+	ctx.fillStyle = fill+this.currentMessage.alpha+")";
 	ctx.fillText(message,x,y);
 
 	if(sub != ""){
-		ctx.font = "25px simple";
+		ctx.font = this.unit+"px simple";
 		textWidth = ctx.measureText(sub).width;
 		x = (this.engine.width/2) - (textWidth / 2);
 		ctx.fillStyle = "rgba(0,0,0,"+this.currentMessage.alpha+")";
 		ctx.fillText(sub,x+2,y-this.unit*3+2);
-		ctx.fillStyle = "rgba(164,161,151,"+this.currentMessage.alpha+")";
+		ctx.fillStyle = fill+this.currentMessage.alpha+")";
 		ctx.fillText(sub,x,y-this.unit*3);
 	}
 
-	if(time > this.lastMessageTime + 100){
+	if(time > this.lastMessageTime + this.currentMessage.alphaTime){
 
 		if(this.currentMessage.lowerAlpha() < 0.3){
 			this.messageExist = false;
-			if(this.currentMessage.type == "purge"){
-				this.purgeNotified = false
+			switch(this.currentMessage.type){
+				case "purge" : this.purgeNotified = false;
+					break;
+				case "bigElement" : this.bigElementMessageShowing = false;
+					break;
+				case "tutorial" : this.engine.isPaused = false
+					break;
 			}
 			
 			if(this.currentMessage.alpha <= 0)this.currentMessage = ""
@@ -1993,7 +2359,7 @@ Ether.Upgrade.prototype.addData = function(cy){
 		if(node && node.data && !node.data("activated")){
 			var level = parseInt(node.id().split(".")[1]);
 			var type = node.id().split(".")[0].charAt(0).toUpperCase() + node.id().split(".")[0].slice(1)
-			node.data("cost",level*(12 + level));
+			node.data("cost",level*(7 + level));
 
 			switch(type.toLowerCase()){
 				case "movement" :
@@ -2058,25 +2424,43 @@ Ether.Upgrade.prototype.isUpgradable = function(ele){
 Ether.Upgrade.prototype.handleClick = function(e){
 	var a = e.id().split(".");
 	var type = a[0];
+	var cost = e.data("cost")
+	var config = {
+		string : "",
+		type : "upgrade",
+		alphaStep : 0.03
+	}
 
 	 switch(type){
 	 	case "movement" :
 	 		this.player.control += 10;
 	 		this.player.speed += 1;
 	 		this.upgradeCheck.w.shift();
+	 		config.fill = "rgba(71,189,222,"
+	 		config.sub = "- " + cost + " water";
+	 		this.engine.hub.msgQue.addMsg(config);
 	 		break
 	 	case "balance" :
 	 		this.player.balance += 0.5;
-	 		this.upgradeCheck.b.shift();
+	 		this.upgradeCheck.a.shift();
+	 		config.fill = "rgba(237,237,235,"
+	 		config.sub = "- " + cost + " air";
+	 		this.engine.hub.msgQue.addMsg(config);
 	 		break;
 	 	case "attraction" :
-	 		this.player.attraction += 2
-	 		this.player.force -= 0.1
+	 		this.player.attraction += (3/7);
+	 		this.player.force -= (50/7)
 	 		this.upgradeCheck.f.shift();
+	 		config.fill = "rgba(224,102,74,"
+	 		config.sub = "- " + cost + " fire";	 		 
+	 		this.engine.hub.msgQue.addMsg(config);
 	 		break
 	 	case "resistance" :
 	 		this.player.resistance += 1;
 	 		this.upgradeCheck.e.shift();
+	 		config.fill = "rgba(108,127,46,"
+	 		config.sub = "- " + cost + " earth";
+	 		this.engine.hub.msgQue.addMsg(config);
 	 		break;
 	 	case "Tsnail" :
 	 		this.player.transformation = this.player.transformations.snail;
@@ -2108,7 +2492,7 @@ Ether.Upgrade.prototype.handleClick = function(e){
 			 		this.upgradeCheck.f.push(cost);
 			 		break
 			 	case "resistance" :
-			 		this.upgradeCheck.r.push(cost);
+			 		this.upgradeCheck.e.push(cost);
 			 		break;
 			}
 
@@ -2886,7 +3270,7 @@ Ether.Upgrade.prototype.edges = [
 	this.player = this.ethers[0];
 
 	//level
-	this.betweenAges = false;
+	this.isPaused = false;
 	this.upgradeScreen = false;
 
 	//endgame
@@ -2916,16 +3300,20 @@ Ether.Upgrade.prototype.edges = [
 		//otherwise, if between ages...
 		} else if(!self.gameOver){
 
+			//if(!self.isPaused){
+
 			//Draw World
 			self.world.draw(self,time);
 
 			//check awards
-			//if(!self.player.dying){ self.checkAwards(time) };
+			if(!self.player.dying){ self.checkAwards(time) };
+
 			//Draw Ethers
 			for (var i = 0; i < self.ethers.length; i++) {
 				self.ethers[i].draw(self,time);
 			};
 			self.ctx.globalCompositeOperation = "source-over";
+		//	}
 
 			//Draw Hub
 			self.hub.draw(time);
@@ -2942,7 +3330,7 @@ Ether.Upgrade.prototype.edges = [
 				self.ctx.fillRect(0,0,self.width,self.height);
 			
 				self.ctx.font = "30px simple"
-				var width = ctx.measureText("so it goes").width;
+				var width = self.ctx.measureText("so it goes").width;
 				self.ctx.fillStyle = "black";
 				self.ctx.fillText("so it goes",self.width/2 - width/2,self.height/2);
 			}
@@ -3000,7 +3388,7 @@ Ether.Engine.prototype.init = function(){
 
 	this.upgrade.init();
 	
-	this.setAwards('matter')
+	this.setAwards(Ether.AwardType)
 
 
 	//this.trophy.init();
@@ -3035,8 +3423,8 @@ Ether.Engine.prototype.handleKeyDown =function(key){
 }
 
 Ether.Engine.prototype.checkAwards = function(time){
-	if(this.hub.unstable){ return }
-		
+	if(this.player.unstable){ return }
+
 	var stats = this.player.getElementCount();
 
 	if(time > this.awardDelay + 5000){
@@ -3077,7 +3465,7 @@ Ether.Engine.prototype.setAwards = function(type){
 	for (var i = 0; i < this.awards.length; i++) {
 		this.awards[i].amount = amount;
 		this.awards[i].award = Math.ceil(award/2);
-		amount += 3;
+		amount += 2;
 		award = i+1;
 	};
 }
