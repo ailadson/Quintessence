@@ -120,23 +120,23 @@ Ether.Upgrade.prototype.addData = function(cy){
 
 			switch(type.toLowerCase()){
 				case "movement" :
-					node.data("info",type+" : "+ (level*(12 + level)) + " : Water");
+					node.data("info",type+" : "+ (level*(11 + level)) + " : Water");
 					break;
 				case "resistance" :
-					node.data("info",type+" : "+ (level*(12 + level)) + " : Earth");
+					node.data("info",type+" : "+ (level*(11 + level)) + " : Earth");
 					break;
 				case "attraction" :
-					node.data("info",type+" : "+ (level*(12 + level)) + " : Fire");
+					node.data("info",type+" : "+ (level*(11 + level)) + " : Fire");
 					break;
 				case "balance" :
-					node.data("info",type+" : "+ (level*(12 + level)) + " : Air");
+					node.data("info",type+" : "+ (level*(11 + level)) + " : Air");
 					break;
 				case "tsnail" :
 				case "tbutterfly":
 					var len = type.length;
 					var lStr = type.slice(1,len);
 					var str = lStr.charAt(0).toUpperCase() + lStr.slice(1)
-					node.data("info",str+" : "+ Math.round(level*(12 + level)/1.3));
+					node.data("info",str+" : "+ Math.round(level*(10 + level)/1.3));
 			}
 		}
 		

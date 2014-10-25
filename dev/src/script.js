@@ -405,7 +405,8 @@ Ether.Util.prototype.getLocalStorage = function(){
 	this.dying = false;
 	this.dead = false;
 	this.dyingTime = 0;
-	this.gameOverCounter = 1000;
+	this.gameOverCounter = 5;
+	this.pulseTimeout = 0;
 	
 	
 	this.transformation;
@@ -446,6 +447,7 @@ Ether.Ether.prototype.draw = function(engine,time){
 	this.drawElements(engine,time);
 	this.stabilityCheck(engine,time);
 	this.checkZoom();
+	this.ageEther(time);
 }
 
 Ether.Ether.prototype.drawElements = function(engine,time){
@@ -462,12 +464,12 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 			e.jitter *= -1;
 		}
 
+		// console.log("dyingTime: " + this.dyingTime);
+		// console.log("time: " + time);
+		// console.log("this.dying: " + this.dying)
+
 		if(this.transformation){ 
 			this.transformation(e,time) 
-		} else if (this.dying && time > this.dyingTime + 100){
-			this.dyingTime = time;
-			this.loseElements(1);
-			this.isGameOver();
 		}
 
 		//Draw Ether Elements
@@ -487,6 +489,12 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 	if(this.transformation && time > this.rotateLastTime + 500){
 		this.rotateLastTime = time;
 	}
+
+	if (!this.transformation && this.dying && time > this.dyingTime + 150){
+			this.dyingTime = time;
+			this.loseElements(1);
+			this.isGameOver();
+		}
 }
 
 Ether.Ether.prototype.drawCoreElements = function(engine){
@@ -553,16 +561,42 @@ Ether.Ether.prototype.findDegree = function(opp,hyp){
 }
 
 Ether.Ether.prototype.ageEther = function(time){
-	if(time > this.ageLastTime + this.healthRate(time)){
-		this.ageLastTime = time;
+	// if(time > this.ageLastTime + this.healthRate(time)){
+	// 	this.ageLastTime = time;
 		
-		if(this.elements.length != 0){
-			var e =this.loseElement(this.elements[this.elements.length-1],true)
-			this.engine.audio.playElementSound(e);
+	// 	if(this.elements.length != 0){
+	// 		var e =this.loseElement(this.elements[this.elements.length-1],true)
+	// 		this.engine.audio.playElementSound(e);
+	// 	}
+	// }
+
+	if(this.dying){return}
+
+	var ratio = this.getLifeRatio();
+
+	if(!this.moved){return}
+		
+	if(time > this.ageLastTime + 1000 && /*!this.inVoid &&*/ !this.engine.isPaused){
+		this.ageLastTime = time;
+
+		if(ratio > 0){
+			this.currentSpan--;
+
+			if(ratio <= .25){
+				if(time > this.pulseTimeout + (ratio*100 *40) + 2000){
+					this.engine.audio.playSound("tutorial",0.3);
+				}
+			}
+
+		} else {
+			this.dying = true;
 		}
 	}
 }
 
+Ether.Ether.prototype.getLifeRatio = function(){
+	return this.currentSpan/this.lifeSpan[0];
+}
 //Stats
 Ether.Ether.prototype.healthRate = function(time){
 	if(!this.totalLifeSpan) 
@@ -711,9 +745,11 @@ Ether.Ether.prototype.receiveAward = function(a){
 Ether.Ether.prototype.isGameOver = function(){
 	if(this.elements.length == 0){
 		this.gameOverCounter -= 1;
-
-		if(this.gameOverCounter == 0)
-			this.dead = true;
+	}
+		
+	if(this.gameOverCounter == 0){
+		this.dead = true;
+		console.log("dead")
 	}
 }
 
@@ -1502,6 +1538,7 @@ Ether.World.prototype.adjustVelocity = function(axis,val,time){
 //interaction
 Ether.World.prototype.handleKeyDown = function(e){
 	var ctrl = this.player.getControl();
+	//if(this.engine.player.dying){ return }
 	//if(!this.draggingX || !this.draggingY){
 		switch(e){
 			case 87:
@@ -1884,7 +1921,7 @@ Ether.Hub.prototype.getEqualitySign = function(val1,val2){
 Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 
 	var ether = this.engine.ethers[0];
-	var ratio = ether.currentSpan/ether.lifeSpan[0]
+	 var ratio = ether.getLifeRatio();
 	var color = this.getLifeBarColor(ratio);
 
 	ctx.fillStyle = "#FFF4E9";
@@ -1899,16 +1936,18 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 	ctx.strokeRect((this.unit * 2), this.unit * 1.5, this.unit * 46, this.unit * 0.5)
 
 	//MOVE THIS TO ETHER!!???
-	if(!ether.moved){return}
+	// if(!ether.moved){return}
 		
-	if(time > this.lastTime + 1000 && !ether.inVoid &&!this.engine.isPaused){
-		this.lastTime = time;
-		if(ratio > 0){
-			ether.currentSpan--;
-		} else {
-			ether.dying = true;
-		}
-	}
+	// if(time > this.lastTime + 1000 && !ether.inVoid &&!this.engine.isPaused){
+	// 	this.lastTime = time;
+	// 	if(ratio > 0){
+	// 		ether.currentSpan--;
+
+	// 		if(ratio)
+	// 	} else {
+	// 		ether.dying = true;
+	// 	}
+	// }
 
 }
 
@@ -1949,9 +1988,10 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 				case "tutorial" :
 					if(Ether.Tutorial){
 						this.engine.isPaused = true;
-						msg.alphaTime = 5000;
+						msg.alphaTime = 3000;
 						msg.alphaStep = 1;
 						msg.fontSize = 2;
+						this.engine.audio.playSound('tutorial');
 					} else {
 						this.messageExist = false;
 						this.currentMessage = "";
@@ -2118,7 +2158,6 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	ctx.font = (fontsize*this.unit)+"px simple"
 
 	if(typeof ctx.measureText != 'function'){ //fix. dont remove
-		console.log(ctx) ;
 		return 
 	}
 
@@ -2200,6 +2239,8 @@ Ether.Hub.prototype.gameOver = function(ctx,time){
 	this.engine;
 	this.ctx;
 	this.audio = {};
+	this.ambientSounds = 10;
+	this.ambientTime = 0;
 }
 
 Ether.Audio.prototype.init = function(){
@@ -2207,7 +2248,13 @@ Ether.Audio.prototype.init = function(){
 }
 
 Ether.Audio.prototype.loadSounds = function(index){
-	var urls = ["fire","water","air","earth","life","upgrade","purge","nope"];
+	var urls = ["fire","water","air","earth","life","upgrade","purge","nope","tutorial"];
+
+	//add ambient
+	for (var i = 1; i <= this.ambientSounds; i++) {
+		urls.push("ambient"+i);
+	};
+
 	var index = index || 0;
 	var self = this;
 	var url = urls[index];
@@ -2241,6 +2288,23 @@ Ether.Audio.prototype.muteOtherSound = function(){
 	for(var s in this.audio){
 		if(!this.audio[s].ended)
 			this.audio[s].pause()
+	}
+}
+
+Ether.Audio.prototype.playAmbience = function(time){
+	
+	if(time > this.ambientTime + 3000){
+		this.ambientTime = time;
+
+		var chance = Math.round(Math.random() * 3)
+
+		if(chance >= 1){
+			var rand = Math.floor(Math.random()*10) + 1;
+			var sound = this.audio["ambient"+rand];
+
+			sound.volume = 0.2;
+			sound.play();
+		}
 	}
 };Ether.Upgrade = function(engine){
 	var self = this;
@@ -2364,23 +2428,23 @@ Ether.Upgrade.prototype.addData = function(cy){
 
 			switch(type.toLowerCase()){
 				case "movement" :
-					node.data("info",type+" : "+ (level*(12 + level)) + " : Water");
+					node.data("info",type+" : "+ (level*(11 + level)) + " : Water");
 					break;
 				case "resistance" :
-					node.data("info",type+" : "+ (level*(12 + level)) + " : Earth");
+					node.data("info",type+" : "+ (level*(11 + level)) + " : Earth");
 					break;
 				case "attraction" :
-					node.data("info",type+" : "+ (level*(12 + level)) + " : Fire");
+					node.data("info",type+" : "+ (level*(11 + level)) + " : Fire");
 					break;
 				case "balance" :
-					node.data("info",type+" : "+ (level*(12 + level)) + " : Air");
+					node.data("info",type+" : "+ (level*(11 + level)) + " : Air");
 					break;
 				case "tsnail" :
 				case "tbutterfly":
 					var len = type.length;
 					var lStr = type.slice(1,len);
 					var str = lStr.charAt(0).toUpperCase() + lStr.slice(1)
-					node.data("info",str+" : "+ Math.round(level*(12 + level)/1.3));
+					node.data("info",str+" : "+ Math.round(level*(10 + level)/1.3));
 			}
 		}
 		
@@ -3288,6 +3352,8 @@ Ether.Upgrade.prototype.edges = [
 		requestAnimFrame(self.animate);
 
 		if(self.upgradeScreen) return
+
+		self.audio.playAmbience(time);
 
 		//Draw Background
 		if(!self.gameOver && !self.player.dead){

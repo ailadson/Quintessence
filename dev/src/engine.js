@@ -45,6 +45,8 @@
 
 		if(self.upgradeScreen) return
 
+		self.audio.playAmbience(time);
+
 		//Draw Background
 		if(!self.gameOver && !self.player.dead){
 			self.ctx.fillStyle = "black";

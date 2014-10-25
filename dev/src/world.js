@@ -489,6 +489,7 @@ Ether.World.prototype.adjustVelocity = function(axis,val,time){
 //interaction
 Ether.World.prototype.handleKeyDown = function(e){
 	var ctrl = this.player.getControl();
+	//if(this.engine.player.dying){ return }
 	//if(!this.draggingX || !this.draggingY){
 		switch(e){
 			case 87:

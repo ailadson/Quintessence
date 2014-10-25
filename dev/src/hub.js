@@ -286,7 +286,7 @@ Ether.Hub.prototype.getEqualitySign = function(val1,val2){
 Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 
 	var ether = this.engine.ethers[0];
-	var ratio = ether.currentSpan/ether.lifeSpan[0]
+	 var ratio = ether.getLifeRatio();
 	var color = this.getLifeBarColor(ratio);
 
 	ctx.fillStyle = "#FFF4E9";
@@ -301,16 +301,18 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 	ctx.strokeRect((this.unit * 2), this.unit * 1.5, this.unit * 46, this.unit * 0.5)
 
 	//MOVE THIS TO ETHER!!???
-	if(!ether.moved){return}
+	// if(!ether.moved){return}
 		
-	if(time > this.lastTime + 1000 && !ether.inVoid &&!this.engine.isPaused){
-		this.lastTime = time;
-		if(ratio > 0){
-			ether.currentSpan--;
-		} else {
-			ether.dying = true;
-		}
-	}
+	// if(time > this.lastTime + 1000 && !ether.inVoid &&!this.engine.isPaused){
+	// 	this.lastTime = time;
+	// 	if(ratio > 0){
+	// 		ether.currentSpan--;
+
+	// 		if(ratio)
+	// 	} else {
+	// 		ether.dying = true;
+	// 	}
+	// }
 
 }
 
@@ -351,9 +353,10 @@ Ether.Hub.prototype.drawMessage = function(ctx,time,award){
 				case "tutorial" :
 					if(Ether.Tutorial){
 						this.engine.isPaused = true;
-						msg.alphaTime = 5000;
+						msg.alphaTime = 3000;
 						msg.alphaStep = 1;
 						msg.fontSize = 2;
+						this.engine.audio.playSound('tutorial');
 					} else {
 						this.messageExist = false;
 						this.currentMessage = "";
@@ -520,7 +523,6 @@ Ether.Hub.prototype.renderMessage = function(ctx,time){
 	ctx.font = (fontsize*this.unit)+"px simple"
 
 	if(typeof ctx.measureText != 'function'){ //fix. dont remove
-		console.log(ctx) ;
 		return 
 	}
 

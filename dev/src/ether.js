@@ -46,7 +46,8 @@
 	this.dying = false;
 	this.dead = false;
 	this.dyingTime = 0;
-	this.gameOverCounter = 1000;
+	this.gameOverCounter = 5;
+	this.pulseTimeout = 0;
 	
 	
 	this.transformation;
@@ -87,6 +88,7 @@ Ether.Ether.prototype.draw = function(engine,time){
 	this.drawElements(engine,time);
 	this.stabilityCheck(engine,time);
 	this.checkZoom();
+	this.ageEther(time);
 }
 
 Ether.Ether.prototype.drawElements = function(engine,time){
@@ -103,12 +105,12 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 			e.jitter *= -1;
 		}
 
+		// console.log("dyingTime: " + this.dyingTime);
+		// console.log("time: " + time);
+		// console.log("this.dying: " + this.dying)
+
 		if(this.transformation){ 
 			this.transformation(e,time) 
-		} else if (this.dying && time > this.dyingTime + 100){
-			this.dyingTime = time;
-			this.loseElements(1);
-			this.isGameOver();
 		}
 
 		//Draw Ether Elements
@@ -128,6 +130,12 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 	if(this.transformation && time > this.rotateLastTime + 500){
 		this.rotateLastTime = time;
 	}
+
+	if (!this.transformation && this.dying && time > this.dyingTime + 150){
+			this.dyingTime = time;
+			this.loseElements(1);
+			this.isGameOver();
+		}
 }
 
 Ether.Ether.prototype.drawCoreElements = function(engine){
@@ -194,16 +202,42 @@ Ether.Ether.prototype.findDegree = function(opp,hyp){
 }
 
 Ether.Ether.prototype.ageEther = function(time){
-	if(time > this.ageLastTime + this.healthRate(time)){
-		this.ageLastTime = time;
+	// if(time > this.ageLastTime + this.healthRate(time)){
+	// 	this.ageLastTime = time;
 		
-		if(this.elements.length != 0){
-			var e =this.loseElement(this.elements[this.elements.length-1],true)
-			this.engine.audio.playElementSound(e);
+	// 	if(this.elements.length != 0){
+	// 		var e =this.loseElement(this.elements[this.elements.length-1],true)
+	// 		this.engine.audio.playElementSound(e);
+	// 	}
+	// }
+
+	if(this.dying){return}
+
+	var ratio = this.getLifeRatio();
+
+	if(!this.moved){return}
+		
+	if(time > this.ageLastTime + 1000 && /*!this.inVoid &&*/ !this.engine.isPaused){
+		this.ageLastTime = time;
+
+		if(ratio > 0){
+			this.currentSpan--;
+
+			if(ratio <= .25){
+				if(time > this.pulseTimeout + (ratio*100 *40) + 2000){
+					this.engine.audio.playSound("tutorial",0.3);
+				}
+			}
+
+		} else {
+			this.dying = true;
 		}
 	}
 }
 
+Ether.Ether.prototype.getLifeRatio = function(){
+	return this.currentSpan/this.lifeSpan[0];
+}
 //Stats
 Ether.Ether.prototype.healthRate = function(time){
 	if(!this.totalLifeSpan) 
@@ -352,9 +386,11 @@ Ether.Ether.prototype.receiveAward = function(a){
 Ether.Ether.prototype.isGameOver = function(){
 	if(this.elements.length == 0){
 		this.gameOverCounter -= 1;
-
-		if(this.gameOverCounter == 0)
-			this.dead = true;
+	}
+		
+	if(this.gameOverCounter == 0){
+		this.dead = true;
+		console.log("dead")
 	}
 }
 
