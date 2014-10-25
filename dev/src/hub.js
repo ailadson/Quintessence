@@ -308,7 +308,7 @@ Ether.Hub.prototype.drawLifeBar = function(ctx, time){
 		if(ratio > 0){
 			ether.currentSpan--;
 		} else {
-			ether.dead = true;
+			ether.dying = true;
 		}
 	}
 

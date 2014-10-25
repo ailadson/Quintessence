@@ -34,6 +34,7 @@
 	this.gameOver = false;
 	this.gameOverAlpha = 0;
 	this.gameOverTime = 0;
+	this.gameOverDelay = 0;
 
 	//award
 	this.awardDelay = -5000;
@@ -45,7 +46,7 @@
 		if(self.upgradeScreen) return
 
 		//Draw Background
-		if(!self.gameOver){
+		if(!self.gameOver && !self.player.dead){
 			self.ctx.fillStyle = "black";
 			self.ctx.fillRect(0,0,self.width,self.height);
 		}
@@ -55,7 +56,7 @@
 			self.hub.drawIntro(time);
 
 		//otherwise, if between ages...
-		} else if(!self.gameOver){
+		} else if(!self.player.dead){
 
 			//if(!self.isPaused){
 
@@ -78,6 +79,15 @@
 			//
 
 		//otherwise, if player is dead
+		} else if(self.player.dead && !self.gameOver){
+			if(self.gameOverDelay == 0){
+				self.gameOverDelay = time;
+			}
+
+			if(time > self.gameOverDelay + 6000){
+				self.gameOver = true;
+			}
+
 		} else if(self.gameOver){
 			if(time > self.gameOverTime + 100){
 				self.gameOverAlpha+=0.01;
@@ -91,6 +101,7 @@
 				self.ctx.fillStyle = "black";
 				self.ctx.fillText("so it goes",self.width/2 - width/2,self.height/2);
 			}
+			
 			self.hub.gameOver(self.ctx,time);
 		}
 	}

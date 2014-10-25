@@ -45,6 +45,8 @@
 	this.purging = false;
 	this.dying = false;
 	this.dead = false;
+	this.dyingTime = 0;
+	this.gameOverCounter = 1000;
 	
 	
 	this.transformation;
@@ -103,8 +105,9 @@ Ether.Ether.prototype.drawElements = function(engine,time){
 
 		if(this.transformation){ 
 			this.transformation(e,time) 
-		} else if (this.dead){
-			this.loseElements(2);
+		} else if (this.dying && time > this.dyingTime + 100){
+			this.dyingTime = time;
+			this.loseElements(1);
 			this.isGameOver();
 		}
 
@@ -161,13 +164,13 @@ Ether.Ether.prototype.drawCoreElements = function(engine){
 Ether.Ether.prototype.stabilityCheck = function(engine,time){
 	var stability = this.getStability();
 	//stabilit starts at 0 and increases as it become more unstable
-	if(stability >= 20 && !this.dead){
+	if(stability >= 20 && !this.dying){
 		this.unstable = true 
 	} else {
 		this.unstable = false
 	}
 
-	if(stability >= 50 && !this.dead){
+	if(stability >= 50 && !this.dying){
 		this.purging = true;
 
 		if(time > this.stabilityLastTime + 2000 - stability){
@@ -348,7 +351,10 @@ Ether.Ether.prototype.receiveAward = function(a){
 
 Ether.Ether.prototype.isGameOver = function(){
 	if(this.elements.length == 0){
-		this.engine.gameOver = true;
+		this.gameOverCounter -= 1;
+
+		if(this.gameOverCounter == 0)
+			this.dead = true;
 	}
 }
 
@@ -438,12 +444,12 @@ Ether.Ether.prototype.rotateElement = function(e,time){
 	e.xOffset = (e.range * Math.cos(this.util.degToRad(e.degree)));
 	e.yOffset = (e.xOffset * Math.tan(this.util.degToRad(e.degree)));
 
-	if(this.dead){this.loseElements(1); this.isGameOver()}
+	if(this.dying){this.loseElements(1); this.isGameOver()}
 	
 }
 
 Ether.Ether.prototype.createSludge = function(e,time){
-	if(this.dead){
+	if(this.dying){
 		this.blowUpElements(time);
 	} else if(time > this.sludgeLastTime + this.sludgeTimeOffset){
 		this.sludgeLastTime = time; //lock after 1st iteration. for the sake of delay.
