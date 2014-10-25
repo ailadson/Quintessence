@@ -391,7 +391,7 @@ Ether.Util.prototype.getLocalStorage = function(){
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [40]; //in seconds
+	this.lifeSpan = [400]; //in seconds
 	this.currentSpan = this.lifeSpan[0];
 	this.totalLifeSpan;
 	this.ageLastTime = 0;
@@ -405,6 +405,7 @@ Ether.Util.prototype.getLocalStorage = function(){
 	this.dying = false;
 	this.dead = false;
 	this.dyingTime = 0;
+	this.gameOverCounter = 1000;
 	
 	
 	this.transformation;
@@ -709,7 +710,10 @@ Ether.Ether.prototype.receiveAward = function(a){
 
 Ether.Ether.prototype.isGameOver = function(){
 	if(this.elements.length == 0){
-		this.dead = true;
+		this.gameOverCounter -= 1;
+
+		if(this.gameOverCounter == 0)
+			this.dead = true;
 	}
 }
 
@@ -1037,11 +1041,6 @@ Ether.Trophy.prototype.save = function(ether){
 	this.driftArray = [];
 	this.sizeOffset = 5000;
 
-	// this.hills = [];
-	// this.hillWidthAmount = 4
-	// this.hillHeightAmount = 2;
-	// this.hillWidth = engine.width/this.hillWidthAmount;
-	// this.hillHeight = engine.height/this.hillHeightAmount;
 	this.farBackground = [];
 	this.midGround = [];
 	this.NumberOfStars = 4;
@@ -1067,7 +1066,7 @@ Ether.World.prototype.init = function(engine){
 		var collection = this.elements[i];
 		var type = eleStrings[i];
 
-		this.initElements(type,collection,[60,350,500],[3,50,300],[5000,500,150],[40500,600,300])
+		this.initElements(type,collection,[60,350,500],[3,50,300],[5000,600,150],[40500,600,300])
 		this.initBadGuys(type,collection,120,true);
 	
 	};
@@ -3346,6 +3345,7 @@ Ether.Upgrade.prototype.edges = [
 				self.ctx.fillStyle = "black";
 				self.ctx.fillText("so it goes",self.width/2 - width/2,self.height/2);
 			}
+			
 			self.hub.gameOver(self.ctx,time);
 		}
 	}

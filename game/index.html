@@ -10,18 +10,25 @@
 	<body>
 <section class="mainContent">
 		<section class='header'>
-			<h4>quintessence</h4>
+			<h3><u>quintessence</u></h3>
 		</section>
 
 		
 			<section class="mainGroup" id="notes">
-				<p>Use WSAD/Arrow Keys to navigate.</p>
-				Tutorial: <input type="checkbox" id="checkbox"><br>
-				Discover yourself in CONSCIOUSNESS <input type="checkbox" id="con"> or MATTER <input type="checkbox" id="mat">
+				<b>Upgrades</b><br>
+				<img src="imgs/upgradeHexagon.jpg" height="30" width="30"></img> Attracts elements towards you. Uses fire<br><br>
+				<img src="imgs/upgradePentagon.jpg" height="30" width="30"></img> Better movement controls. Uses water.<br><br>
+				<img src="imgs/upgradeSquare.jpg" height="30" width="30"></img> More resistant towards Rainbow Voids. Uses earth. <br><br>
+				<img src="imgs/upgradeTriangle.jpg" height="30" width="30"></img> Better balance regulation. Uses air.<br><br>
+				<img src="imgs/upgradeStar.jpg" height="30" width="30"></img> Initiates a transformation. Uses all elements.<br><br>
+
+				<p>Use WSAD/Arrow Keys to navigate.</p><br>
+				Tutorial Mode (recommended for first-time players): <input type="checkbox" id="checkbox"><br><br>
+				Discover yourself in CONSCIOUSNESS <input type="checkbox" id="con"> or MATTER <input type="checkbox" id="mat"><br>
 			</section>
 
 			<section class="mainGroup" id="defBalance">
-				<br>
+				<br><br><br><br>
 				<h1>a definition of "BALANCE"</h1>
 				<section id="rules">
 					<p>|<span style="color:#6C7F2E">Earth</span> == <span style="color:#EDEDEB">Air</span>| </p>
@@ -65,6 +72,6 @@
 		var sound = new Audio("audio/startPage.wav");
 		sound.volume = 0.8;
 		sound.play();
-		setInterval(function(){ console.log("play"); sound.play(); },8000);
+		setInterval(function(){ console.log("play"); sound.play(); },6000);
 	</script>
 </html>

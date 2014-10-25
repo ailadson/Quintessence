@@ -28,11 +28,6 @@
 	this.driftArray = [];
 	this.sizeOffset = 5000;
 
-	// this.hills = [];
-	// this.hillWidthAmount = 4
-	// this.hillHeightAmount = 2;
-	// this.hillWidth = engine.width/this.hillWidthAmount;
-	// this.hillHeight = engine.height/this.hillHeightAmount;
 	this.farBackground = [];
 	this.midGround = [];
 	this.NumberOfStars = 4;
@@ -58,7 +53,7 @@ Ether.World.prototype.init = function(engine){
 		var collection = this.elements[i];
 		var type = eleStrings[i];
 
-		this.initElements(type,collection,[60,350,500],[3,50,300],[5000,500,150],[40500,600,300])
+		this.initElements(type,collection,[60,350,500],[3,50,300],[5000,600,150],[40500,600,300])
 		this.initBadGuys(type,collection,120,true);
 	
 	};
