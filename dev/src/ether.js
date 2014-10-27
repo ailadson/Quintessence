@@ -32,12 +32,15 @@
 
 	//life and death
 	this.health = 5000;
-	this.lifeSpan = [400]; //in seconds
+	this.lifeSpan = [200]; //in seconds
 	this.currentSpan = this.lifeSpan[0];
 	this.totalLifeSpan;
 	this.ageLastTime = 0;
 	this.finalElementLength = 1;
 	this.stabilityLastTime = 0;
+	this.balanceDeath = false;
+	this.timeSpentUnbalanced = 0;
+	this.lastBalanceTime = undefined;
 
 	this.unstable = false;
 	this.bigElementIncrease = false;
@@ -48,6 +51,7 @@
 	this.dyingTime = 0;
 	this.gameOverCounter = 5;
 	this.pulseTimeout = 0;
+	this.newWorld = false;
 	
 	
 	this.transformation;
@@ -84,11 +88,38 @@ Ether.Ether.prototype.init = function(){
 
 Ether.Ether.prototype.draw = function(engine,time){
 	if(this.zooming){ this.getMoreScreen(time) }
+	if(this.checkBalanceDeath(time)){
+		this.dead = true;
+		this.balanceDeath = true;
+	}
+	this.isOutsideBoundary();
 	this.drawCoreElements(engine);
 	this.drawElements(engine,time);
 	this.stabilityCheck(engine,time);
 	this.checkZoom();
 	this.ageEther(time);
+}
+
+Ether.Ether.prototype.checkBalanceDeath = function(time){
+	if(this.getStability() >= 100){
+
+		var lastTime = this.lastBalanceTime || time;
+		this.lastBalanceTime = time;
+
+		var difference = time - lastTime;
+		this.timeSpentUnbalanced += difference;
+
+		console.log(this.timeSpentUnbalanced)
+		if(this.timeSpentUnbalanced > 4000){
+			this.lastBalanceTime = undefined;
+			this.timeSpentUnbalanced = 0;
+			return true;
+		}
+	} else {
+		this.lastBalanceTime = undefined;
+		this.timeSpentUnbalanced = 0;
+		return false;
+	}
 }
 
 Ether.Ether.prototype.drawElements = function(engine,time){
@@ -231,7 +262,25 @@ Ether.Ether.prototype.ageEther = function(time){
 
 		} else {
 			this.dying = true;
+			if(!this.saved){
+				this.save();
+				this.saved = true;
+			}
 		}
+	}
+}
+
+Ether.Ether.prototype.isOutsideBoundary = function(){
+	var world = this.engine.world;
+
+	if((this.x < (world.x - world.width/2)) ||
+		(this.x > (world.x + world.width/2)) ||
+		(this.y < (world.y - world.height/2)) ||
+		(this.y > (world.y + world.height/2))){
+
+			this.newWorld = true;
+			this.zoomOut(2.5);
+			this.engine.world.reInit();
 	}
 }
 
@@ -438,7 +487,7 @@ Ether.Ether.prototype.zoomOut = function(val){
 
 	for (var i = 0; i < this.elements.length; i++) {
 		var e = this.elements[i]
-		e.radius = Math.round(e.radius/val);
+		e.radius = Math.ceil(e.radius/val);
 		e.xOffset = Math.round(e.xOffset/val);
 		e.yOffset = Math.round(e.yOffset/val);
 	};
@@ -636,6 +685,11 @@ function Sludge(engine,player){
 
 
 Ether.Ether.prototype.save = function(){
-	//this.engine.trophy.save(this);
-	console.log('save')
+	var currentStorage = JSON.parse(window.localStorage.ETHER);
+
+	currentStorage.ethers.push({elements : this.elements, core : this.coreElements});
+
+	var newStorage = JSON.stringify(currentStorage);
+
+	window.localStorage.ETHER = newStorage;
 }

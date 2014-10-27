@@ -86,12 +86,14 @@
 				self.gameOverDelay = time;
 			}
 
-			if(time > self.gameOverDelay + 6000){
+			if(time > self.gameOverDelay + 2000){
 				self.gameOver = true;
 			}
 
 		} else if(self.gameOver){
 			if(time > self.gameOverTime + 100){
+				console.log(self.player)
+				var text = self.player.balanceDeath ? "you've died of imbalance" : "so it goes"
 				self.gameOverAlpha+=0.01;
 				self.gameOverTime = time;
 
@@ -99,12 +101,14 @@
 				self.ctx.fillRect(0,0,self.width,self.height);
 			
 				self.ctx.font = "30px simple"
-				var width = self.ctx.measureText("so it goes").width;
+				var width = self.ctx.measureText(text).width;
 				self.ctx.fillStyle = "black";
-				self.ctx.fillText("so it goes",self.width/2 - width/2,self.height/2);
+				self.ctx.fillText(text,self.width/2 - width/2,self.height/2);
+
+				self.hub.gameOver(self.ctx,time);
 			}
 			
-			self.hub.gameOver(self.ctx,time);
+			
 		}
 	}
 

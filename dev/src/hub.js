@@ -85,12 +85,11 @@ Ether.Hub = function(engine) {
 
 		if(self.gameOverWidth){
 
-			if((self.gameOverColor != "rgba(255,0,0,") &&
-				(e.x > self.engine.width-self.gameOverWidth*2) &&
+			if((e.x > self.engine.width-self.gameOverWidth*2) &&
 				(e.y > self.engine.height-self.gameOverWidth*2)){
 				self.gameOverColor = "rgba(255,0,0,"
 			} else {
-				self.gameOverColor = "rgba(255,255,255,"
+				self.gameOverColor = "rgba(0,0,0,"
 			}
 			return
 		}
@@ -589,8 +588,8 @@ Ether.Hub.prototype.hasLeftBorder = function(){
 }
 
 Ether.Hub.prototype.gameOver = function(ctx,time){
-	if(time > this.gameOverLastTime + 100 && this.gameOverAlpha != 1){
-		this.gameOverAlpha+= 0.02;
+	if(this.gameOverAlpha != 1){//time > this.gameOverLastTime + 100 && ){
+		this.gameOverAlpha+= 0.01;
 		if(this.gameOverAlpha > 1) this.gameOverAlpha = 1
 	}
 

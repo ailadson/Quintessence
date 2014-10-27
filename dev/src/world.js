@@ -7,8 +7,8 @@
 	this.player;
 
 	//world positioning values
-	this.width = engine.width*100;
-	this.height = engine.height*100;
+	this.width = engine.width*10;
+	this.height = engine.height*10;
 	this.x = engine.width/2;
 	this.y = engine.height/2;
 	this.xv = 0;
@@ -19,14 +19,22 @@
 	this.speedUp["x"] = false;
 	this.speedUp["y"] = false;
 
+	this.backgroundImgNumb = 0;
+
 	//elements
 	this.fire = [];
 	this.water = [];
 	this.earth = [];
 	this.air = [];
 	this.elements = [this.earth,this.air,this.fire,this.water];
+	this.backgroundEthers;
 	this.driftArray = [];
 	this.sizeOffset = 5000;
+
+	this.numberOfSmallElements = 50;
+	this.numberOfMidElements = 10;
+	this.numberOfLargeElements = 2;
+	this.numberOfBadElements = 1;
 
 	this.farBackground = [];
 	this.midGround = [];
@@ -34,29 +42,81 @@
 
 	this.badToggle = 0
 
+	this.centerCircleWhite = 1;
+	this.centerCircleBlack = 0;
+
 }
 
 //WORLD INIT
 Ether.World.prototype.init = function(engine){
-	var eleStrings = ['earth','air','fire','water'];
 	
-	// if(engine.ethers[0].age != 0){ 
-	// 	this.zoomOut(2) 
-	// } else {
-		this.player = engine.ethers[0]
-		this.util = engine.util;
-	// }
+	this.player = engine.ethers[0];
+
+	this.util = engine.util;
 
 	this.initBackground();
 
+	this.createElements();
+
+	this.initBGEthers();
+}
+
+Ether.World.prototype.reInit = function(){
+	this.x = this.engine.width/2;
+	this.y = this.engine.height/2;
+	this.width += 150;
+	this.height += 150;
+
+	this.numberOfSmallElements = Math.ceil(this.numberOfSmallElements * 1.1);
+	this.numberOfMidElements = Math.ceil(this.numberOfMidElements * 1.1);
+	this.numberOfLargeElements = Math.ceil(this.numberOfLargeElements * 1.1);
+	this.numberOfBadElements = Math.ceil(this.numberOfBadElements *1.1);
+
+	for(var i = 0; i < this.elements.length; i++){
+		this.elements[i].length = 0;
+	}
+
+	this.backgroundImgNumb += 1;
+	if(this.backgroundImgNumb >= 10) this.backgroundImgNumb = 9;
+	this.initBackground();
+
+	this.createElements();
+}
+
+Ether.World.prototype.reInitBack = function(){
+	this.x = this.engine.width/2;
+	this.y = this.engine.height/2;
+	this.width -= 210;
+	this.height -= 210;
+
+	this.numberOfSmallElements = Math.ceil(this.numberOfSmallElements / 1.1);
+	this.numberOfMidElements = Math.ceil(this.numberOfMidElements / 1.1);
+	this.numberOfLargeElements = Math.ceil(this.numberOfLargeElements / 1.1);
+	this.numberOfBadElements = Math.ceil(this.numberOfBadElements / 1.1);
+
+	for(var i = 0; i < this.elements.length; i++){
+		this.elements[i].length = 0;
+	}
+
+	this.backgroundImgNumb -= 1;
+	if(this.backgroundImgNumb < 0) this.backgroundImgNumb = 0;
+	this.initBackground();
+
+	this.createElements();
+}
+
+Ether.World.prototype.createElements = function(){
+	var eleStrings = ['earth','air','fire','water'];
+	
 	for (var i = 0; i < this.elements.length; i++) {
 		var collection = this.elements[i];
 		var type = eleStrings[i];
 
-		this.initElements(type,collection,[60,350,500],[3,50,300],[5000,600,150],[40500,600,300])
+		this.initElements(type,collection,[60,350,500],[3,50,300],[this.numberOfSmallElements,this.numberOfMidElements,this.numberOfLargeElements],[40500,600,300])
 		this.initBadGuys(type,collection,120,true);
 	
 	};
+
 }
 
 Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffset){
@@ -75,7 +135,7 @@ Ether.World.prototype.initElements = function(type,collection,max,min,n,sizeOffs
 Ether.World.prototype.initBadGuys = function(type,collection,max,t){
 	var bool = t || this.engine.badGuys;
 	if(bool){
-			this.initElement(type,collection,30,1,function(e){
+			this.initElement(type,collection,this.numberOfBadElements,1,function(e){
 				if(e.radius > max || e.radius < max) e.radius = max;
 			},true)
 		}
@@ -105,7 +165,7 @@ Ether.World.prototype.initBackground = function(){
 
 		for (var j = 0; j < 3; j++) {
 			this.farBackground[i][j] = new Image();
-			this.farBackground[i][j].src = "imgs/background.jpg";
+			this.farBackground[i][j].src = "imgs/background"+this.backgroundImgNumb+".jpg";
 			this.farBackground[i][j].xPos = (i*1356) - 1356;
 			this.farBackground[i][j].yPos = (j*1356) - 1356;
 		};
@@ -117,6 +177,50 @@ Ether.World.prototype.initBackground = function(){
 		this.midGround[i].xPos = Math.round(Math.random() * this.engine.width*6) - this.engine.width*3;
 		this.midGround[i].yPos = Math.round(Math.random() * this.engine.height*6) - this.engine.height*3;
 	};
+}
+
+Ether.World.prototype.initBGEthers = function(){
+	this.loadBackgroundEthers();
+
+	for (var i = 0; i < this.backgroundEthers.length; i++) {
+		var ele = this.backgroundEthers[i];
+		var xOffset = Math.round(((Math.random()*(this.width*2)) - this.width)/2);
+		var yOffset = Math.round(((Math.random()*(this.height*2)) - this.height)/2);
+
+
+		ele.range = Math.round((Math.random()*this.engine.width/10+this.engine.width/20) - this.engine.width/20);
+		ele.xOffset = xOffset;
+		ele.yOffset = yOffset;
+
+		for (var j = 0; j < ele.elements.length; j++) {
+			var e = ele.elements[j];
+			e.rgb.a = 0.1;
+			e.color = "rgba("+e.rgb.r+","+e.rgb.g+","+e.rgb.b+","+e.rgb.a+")";
+		};
+
+		for (var j = 0; j < ele.core.length; j++) {
+			var e = ele.core[j];
+			e.xOffset = 0;
+			e.yOffset = 0;
+			e.rgb.a = 0.15;
+			e.color = "rgba("+e.rgb.r+","+e.rgb.g+","+e.rgb.b+","+e.rgb.a+")";
+		};
+		
+	
+	};
+}
+
+
+Ether.World.prototype.loadBackgroundEthers = function(){
+
+
+
+	if(window.localStorage.ETHER){
+		this.backgroundEthers = JSON.parse(window.localStorage.ETHER).ethers
+	} else {
+		window.localStorage.ETHER = JSON.stringify({ethers:[]});
+		this.backgroundEthers = JSON.parse(window.localStorage.ETHER).ethers
+	}
 }
 
 //DRAWING
@@ -134,6 +238,8 @@ Ether.World.prototype.draw = function(engine,time){
 		
 		//DrawBackground
 		this.drawBackground(this.xv,this.yv);
+		this.drawBackgroundEthers(time);
+		this.drawCenterCircle(engine);
 		
 		if(!this.engine.isPaused){
 			//update x+y
@@ -194,6 +300,7 @@ Ether.World.prototype.draw = function(engine,time){
 
 	this.drawDriftingElements(engine); //TO DO!!
 	this.drawBorder(engine);
+	
 }
 
 
@@ -299,6 +406,94 @@ Ether.World.prototype.drawBackground = function(xv,yv){
 	};
 	
 
+}
+
+Ether.World.prototype.drawCenterCircle = function(engine){
+	var self = this;
+
+	if(this.backgroundImgNumb != 0){
+		var portal = {
+			x : this.x,
+			y : this.y,
+			radius : 80,
+		}
+
+		this.centerCircleWhite -= 0.01;
+		if(this.centerCircleWhite <=0 ) this.centerCircleWhite = 1;
+		this.centerCircleBlack += 0.01;
+		if(this.centerCircleBlack >= 1) this.centerCircleBlack = 0;
+
+		this.util.drawElement(portal, engine.ctx, function(ctx, element){
+			var gradient = engine.ctx.createRadialGradient(portal.x,portal.y,0,portal.x,portal.y,portal.radius);
+			return self.util.createGradient(gradient,[[self.centerCircleWhite,"white"],[self.centerCircleBlack,"black"]])
+		});
+	}
+}
+
+Ether.World.prototype.drawBackgroundEthers = function(time){
+	var self = this;
+	var width = this.engine.width;
+	var height = this.engine.height;
+
+	for (var i = 0; i < this.backgroundEthers.length; i++) {
+		var ether = this.backgroundEthers[i];
+
+		ether.xOffset += this.xv;
+		ether.yOffset += this.yv;
+
+		if(this.x + ether.xOffset < -width*3) ether.xOffset = this.engine.width + (width * 3) - this.x;
+		if(this.x + ether.xOffset > this.engine.width + width*3) ether.xOffset = -(width*3)- this.x;
+		if(this.y + ether.yOffset < -height*3) ether.yOffset = this.engine.height + (height * 3) - this.y;
+		if(this.y + ether.yOffset > this.engine.height + height*3) ether.yOffset = -(height*3) - this.y;
+
+		ether.x = this.x + ether.xOffset;
+		ether.y = this.y + ether.yOffset;
+
+		for (var j = 0; j < ether.elements.length; j++) {
+			var e = ether.elements[j];
+
+			e.x = ether.x + e.xOffset;
+			e.y = ether.y + e.yOffset;
+
+			if(ether.transformation){ 
+				ether.transformation(e,time) 
+			}
+
+			this.engine.ctx.beginPath();
+
+			this.util.drawElement(e, this.engine.ctx, function(ctx, element){
+				var gradient = self.engine.ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
+				return self.util.createGradient(gradient,[[0.1,"rgba(255,255,255,"+element.rgb.a+")"],[0.1,"rgba(255,255,255,"+element.rgb.a+")"],[0.8,element.color],[0.1,"rgba(0,0,0,"+element.rgb.a+")"]])
+			});
+		};
+
+		 for (var j = 0; j < ether.core.length; j++) {
+			var e = ether.core[j];
+			// console.log(e.xOffset)
+			e.x = ether.x + e.xOffset;
+			e.y = ether.y + e.yOffset;
+
+			this.engine.ctx.beginPath();
+
+			this.util.drawElement(e, this.engine.ctx, function(ctx, element){
+				//console.log(element.x)
+				var gradient = self.engine.ctx.createRadialGradient(element.x,element.y,0,element.x,element.y,element.radius);
+				return self.util.createGradient(gradient,[[0.5,"rgba(255,255,255,"+element.rgb.a+")"],[0.4,element.color],[1,"rgba(0,0,0,"+element.rgb.a+")"]])
+			});
+
+			//velocity
+			e.xOffset += e.vx;
+			e.yOffset += e.vy;
+
+			if(this.util.getDistanceFromCenter(ether,{x:e.x,y:e.y}) > ether.range){ 
+				e.xOffset = 0;
+				e.yOffset = 0;
+				//velocity
+				e.vx = Math.random()*10-5;
+				e.vy = Math.random()*10-5;
+			}
+		 };
+	};
 }
 
 Ether.World.prototype.driftTowardsEther = function(element){
